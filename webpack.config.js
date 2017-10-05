@@ -1,5 +1,6 @@
 var CopyWebpackPlugin = require('copy-webpack-plugin');
 var webpack = require('webpack');
+var UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 
 module.exports = function(env) {
     var result = {
@@ -10,7 +11,6 @@ module.exports = function(env) {
             ])
         ],
         entry: [
-            'babel-polyfill',
             './js/index.js'
         ],
         module: {
@@ -20,7 +20,7 @@ module.exports = function(env) {
                 use: {
                     loader: 'babel-loader',
                     options: {
-                        presets: ['env', 'react']
+                        presets: ['react']
                     }
                 }
             }]
@@ -35,7 +35,7 @@ module.exports = function(env) {
     };
     switch (env) {
         case 'production':
-            result.plugins.push(new webpack.optimize.UglifyJsPlugin());
+            result.plugins.push(new UglifyJSPlugin());
         break;
     }
     return result;
