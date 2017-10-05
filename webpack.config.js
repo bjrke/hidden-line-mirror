@@ -11,7 +11,7 @@ module.exports = function(env) {
             ])
         ],
         entry: [
-            './app/index.js'
+            './app/index.jsx'
         ],
         module: {
             loaders: [
