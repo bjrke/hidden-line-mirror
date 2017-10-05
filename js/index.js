@@ -3,4 +3,7 @@ import ReactDOM from 'react-dom';
 
 import Greeting from './greeting'
 
-ReactDOM.render(React.createElement(Greeting), document.getElementById('content'));
+const element = document.createElement('div');
+document.body.appendChild(element);
+ReactDOM.render(React.createElement(Greeting), element);
+document.title='Hidden Line';
