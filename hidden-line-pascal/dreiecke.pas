@@ -1,0 +1,273 @@
+unit dreiecke;
+interface
+uses graph,vector,punkte,linien;
+type
+  dreiecktyp=object
+    p:array[1..3] of ppunkt;
+    l:array[1..3] of linie;
+    gl:lset;
+    cols:color;
+    procedure draw1;
+    procedure draw2;
+    procedure draw3(c:color);
+    function linientest(li:linie):boolean;
+    function punkttest(t:vector2d):int;
+    function flaechentest:boolean;
+  end;
+  pdreieck=^dreieck;
+  dreieck=object(dreiecktyp)
+    o:array[1..3] of ppunkt3d;
+    next:pdreieck;
+    n:vector3d;
+    d:float;
+    function tiefe(k:vector2d;ausgabe:boolean):float;
+  end;
+
+  dreieckliste=^dliste;
+  dliste=object
+    aktuell:pdreieck;
+    function add(p1,p2,p3:ppunkt3d;ls:lset):pdreieck;
+    function first:pdreieck;
+    function next:pdreieck;
+    private Anker,Last:pdreieck;
+  end;
+
+procedure initpdreieck(var p:pdreieck;p1,p2,p3:ppunkt3d;ls:lset);
+procedure disposepdreieck(var p:pdreieck);
+procedure initdliste(var p:dreieckliste);
+procedure killdliste(var p:dreieckliste);
+
+var
+  dreiecks:dreieckliste;
+  mintiefe,maxtiefe,mt,nt:float;
+implementation
+
+procedure initpdreieck;
+var d1,d2:vector3d;
+    h:float;
+begin
+  new(p);
+  p^.o[1]:=p1;
+  p^.o[2]:=p2;
+  p^.o[3]:=p3;
+  p^.p[1]:=p1^.b;
+  p^.p[2]:=p2^.b;
+  p^.p[3]:=p3^.b;
+  p^.gl:=ls;
+  initlinie(p^.l[1],p^.p[2],p^.p[3]);
+  initlinie(p^.l[2],p^.p[3],p^.p[1]);
+  initlinie(p^.l[3],p^.p[1],p^.p[2]);
+  p^.next:=nil;
+  sub3d(d1,p^.o[2]^.o,p^.o[1]^.o);
+  sub3d(d2,p^.o[3]^.o,p^.o[1]^.o);
+  kreuz(p^.n,d1,d2);
+  h:=sqrt(sqr(p^.n[x])+sqr(p^.n[y])+sqr(p^.n[z]));
+  p^.n[x]:=p^.n[x]/h;
+  p^.n[y]:=p^.n[y]/h;
+  p^.n[z]:=p^.n[z]/h;
+  p^.d:=skalar(p^.n,p^.o[1]^.o);
+end;
+procedure disposepdreieck;
+begin
+  dispose(p)
+end;
+
+procedure dreiecktyp.draw1;
+begin
+  if (gl*[1])<>[] then l[1].draw(cols);
+  if (gl*[2])<>[] then l[2].draw(cols);
+  if (gl*[3])<>[] then l[3].draw(cols);
+end;
+
+procedure dreiecktyp.draw2;
+var tri:array[1..3]of pointtype;
+begin
+  setfillstyle(1,cols);
+  setcolor(cols);
+  tri[1].x:=round(bmx+p[1]^.b[x]);
+  tri[1].y:=round(bmy-p[1]^.b[y]);
+  tri[2].x:=round(bmx+p[2]^.b[x]);
+  tri[2].y:=round(bmy-p[2]^.b[y]);
+  tri[3].x:=round(bmx+p[3]^.b[x]);
+  tri[3].y:=round(bmy-p[3]^.b[y]);
+  fillpoly(3,tri)
+end;
+
+procedure dreiecktyp.draw3;
+begin
+  l[1].draw(c);
+  l[2].draw(c);
+  l[3].draw(c);
+end;
+
+function dreiecktyp.punkttest;
+var
+  K:matrix3d;
+  h,b1,b2,b3:vector3d;
+  kd,la:float;
+  xc,yc,l1,l2,l3:int;
+  s:string;
+
+  function testl(l:float):int;
+  begin
+    if abs(l)<epsilon1 then begin  {=0}
+      testl:=0
+    end else if abs(l-1)<epsilon1 then begin {=1}
+      testl:=1
+    end else if l<0 then begin {<0}
+      testl:=2
+    end else if l>1 then begin {>1}
+      testl:=3
+    end else begin  {0<l<1}
+      testl:=4
+    end
+  end;
+
+begin
+  K[x][x]:=p[1]^.b[x];    K[y][x]:=p[2]^.b[x];    K[z][x]:=p[3]^.b[x];
+  K[x][y]:=p[1]^.b[y];    K[y][y]:=p[2]^.b[y];    K[z][y]:=p[3]^.b[y];
+  K[x][z]:=1;     K[y][z]:=1;     K[z][z]:=1;
+  b1[x]:=t[x];    b1[y]:=t[y];        b1[z]:=1;
+  kd:=det3d(K);
+  if abs(kd)>epsilon1 then begin
+    h:=K[x];    K[x]:=b1;    la:=det3d(K)/kd;  K[x]:=h;        l1:=testl(la);
+    h:=K[y];    K[y]:=b1;    la:=det3d(K)/kd;  K[y]:=h;        l2:=testl(la);
+    h:=K[z];    K[z]:=b1;    la:=det3d(K)/kd;  K[z]:=h;        l3:=testl(la);
+    case l1*25+l2*5+l3 of
+      124:punkttest:=0;          {drin}
+
+      24:punkttest:=1;            {kanten}
+      104:punkttest:=2;
+      120:punkttest:=3;
+
+      25:punkttest:=11;          {eckpunkte}
+      5:punkttest:=12;
+      1:punkttest:=13;
+    else punkttest:=20;         {draußen}
+    end;
+  end else begin
+    outstring('nullerdiv');
+    punkttest:=0;
+  end;
+end;
+
+function dreiecktyp.linientest;
+var
+  pa,pe:int;
+  h:vector2d;
+  la,m:float;
+  li1,li2,li3:int;
+  w:boolean;
+begin
+  pa:=punkttest(li.a^.b);
+  pe:=punkttest(li.e^.b);
+  if (pa=0)or(pe=0)then
+    linientest:=true
+  else if (pa<20)and(pe<20)then begin
+    h[x]:=(li.a^.b[x]+li.e^.b[x])/2;
+    h[y]:=(li.a^.b[y]+li.e^.b[y])/2;
+    linientest:=(punkttest(h)=0);
+  end else begin
+    li1:=linien.intersect(li,l[1],la,m);
+    li2:=linien.intersect(li,l[2],la,m);
+    li3:=linien.intersect(li,l[3],la,m);
+    linientest:=(li1=1)or(li2=1)or(li3=1)or((li1=2)and(li2=2))or((li2=2)and(li3=2))or((li3=2)and(li1=2));
+  end
+end;
+
+function dreiecktyp.flaechentest;
+var
+  a,b,c:vector2d;
+begin
+  sub2d(a,p[1]^.b,p[3]^.b);
+  sub2d(b,p[1]^.b,p[2]^.b);
+  sub2d(c,p[2]^.b,p[3]^.b);
+  flaechentest:=betrag2d(a)*1.01<betrag2d(b)+betrag2d(c)
+end;
+
+function dreieck.tiefe;
+var
+  bv,h:vector3d;
+  t,la:float;
+begin
+  h:=iv;
+  mul3d(h,k[x]);
+  if ausgabe then begin
+    outvector3d('i',h);
+  end;
+  add3d(bv,blickr,h);
+  h:=jv;
+  mul3d(h,k[y]);
+  if ausgabe then begin
+    outvector3d('j',h);
+  end;
+  add3d(bv,bv,h);
+  t:=skalar(n,bv);
+  if ausgabe then begin
+    outvector3d('bv',bv);
+    outfloat('t',t);
+  end;
+  if abs(t)>epsilon3 then begin
+    la:=(d-skalar(n,auge))/t;
+    mul3d(bv,la);
+    t:=betrag3d(bv);
+    if ausgabe then begin
+      outvector3d('bv',bv);
+      outfloat('la',la);
+      outfloat('d',d);
+      outfloat('skalar(n,auge)',skalar(n,auge));
+      outfloat('t',t);
+    end;
+  end else begin
+    h[x]:=(o[1]^.o[x]+o[2]^.o[x]+o[3]^.o[x])/3-auge[x];
+    h[y]:=(o[1]^.o[y]+o[2]^.o[y]+o[3]^.o[y])/3-auge[x];
+    h[x]:=(o[1]^.o[z]+o[2]^.o[z]+o[3]^.o[z])/3-auge[x];
+    t:=100000000;
+  end;
+{  cols:=darkgray;}
+  if t>maxtiefe then maxtiefe:=t;
+  if t<mintiefe then mintiefe:=t;
+  tiefe:=t;
+end;
+
+function dliste.add;
+var h:pdreieck;
+begin
+  initpdreieck(h,p1,p2,p3,ls);
+  if anker=nil then
+    anker:=h;
+  if last=nil then
+    last:=h
+  else begin
+    last^.next:=h;
+    last:=h
+  end;
+  add:=h
+end;
+
+function dliste.first;
+begin
+  aktuell:=anker;
+  first:=aktuell;
+end;
+
+function dliste.next;
+begin
+  if aktuell<>nil then
+    aktuell:=aktuell^.next;
+  next:=aktuell;
+end;
+
+procedure initdliste;
+begin
+  new(p);
+  p^.anker:=nil;
+  p^.last:=nil
+end;
+
+procedure killdliste;        {hier muß natürlich noch was hin}
+begin
+  dispose(p);
+end;
+begin
+end.
