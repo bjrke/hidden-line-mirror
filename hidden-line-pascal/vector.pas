@@ -1,6 +1,6 @@
 unit vector;
 interface
-uses ggigraph,crt;
+uses ptcgraph,crt;
 const
   x=0;
   y=1;

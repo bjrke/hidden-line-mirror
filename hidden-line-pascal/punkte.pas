@@ -1,6 +1,6 @@
 unit punkte;
 interface
-uses ggigraph,vector,zeit;
+uses ptcgraph,vector,zeit;
 
 type
   color=byte;

@@ -1,5 +1,5 @@
 program dreidplot;
-uses crt,ggigraph,vector,dreidext,projekt,dreiecke,polyswee,polygon,punkte,zeit;
+uses crt,ptcgraph,vector,dreidext,projekt,dreiecke,polyswee,polygon,punkte,zeit;
 var
   bmx,bmy,m:int;
   ch:char;
@@ -122,7 +122,6 @@ end;
 
 begin
   init;
-  m:=memavail;
   repeat
     zaehl.init;
     neukamera;
@@ -140,8 +139,6 @@ begin
     sweep;
     outtime;
     zaehl.ausgabe;
-    outint('memdiff ',m-memavail);
-    m:=memavail;
 
     OutInt('höchste Tiefe Suchbaum:',mtf);
     if wurzel[1]<>nil then outstring('wurzel[1]');

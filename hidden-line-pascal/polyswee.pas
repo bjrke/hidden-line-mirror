@@ -1,6 +1,6 @@
 unit polyswee;
 interface
-uses crt,ggigraph,polygon,vector,punkte,linien,dreiecke,zeit;
+uses crt,ptcgraph,polygon,vector,punkte,linien,dreiecke,zeit;
 var
   zumalen:set of byte;
 
