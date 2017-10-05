@@ -11,22 +11,38 @@ module.exports = function(env) {
             ])
         ],
         entry: [
-            './js/index.js'
+            './app/index.js'
         ],
         module: {
-            loaders: [{
-                test: /\.jsx?$/,
-                exclude: /node_modules/,
-                use: {
-                    loader: 'babel-loader',
-                    options: {
-                        presets: ['react']
+            loaders: [
+                {
+                    test: /\.jsx?$/,
+                    exclude: /node_modules/,
+                    use: {
+                        loader: 'babel-loader',
+                        options: {
+                            presets: ['react']
+                        }
                     }
+                },
+                {
+                    test: /\.less$/,
+                    use: [{
+                        loader: "style-loader"
+                    }, {
+                        loader: "css-loader", options: {
+                            sourceMap: true
+                        }
+                    }, {
+                        loader: "less-loader", options: {
+                            sourceMap: true
+                        }
+                    }]
                 }
-            }]
+            ]
         },
         resolve: {
-            extensions: ['*', '.js', '.jsx']
+            extensions: ['*', '.js', '.jsx', '.less']
         },
         output: {
             path: __dirname + '/dist',
