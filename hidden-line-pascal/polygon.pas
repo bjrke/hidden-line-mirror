@@ -1,6 +1,6 @@
 unit polygon;
 interface
-uses crt,vector,punkte,linien,dreiecke,graph,zeit;
+uses crt,vector,punkte,linien,dreiecke,ggigraph,zeit;
 type
   punr=1..3;
   richtung=(li,re,so,su,po,pu,pr,ne);

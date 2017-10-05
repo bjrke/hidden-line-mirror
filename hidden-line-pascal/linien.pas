@@ -1,6 +1,6 @@
 unit linien;
 interface
-uses graph,vector,punkte;
+uses ggigraph,vector,punkte;
 type
   linie=object
     a,e:ppunkt;

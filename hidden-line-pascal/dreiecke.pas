@@ -1,6 +1,6 @@
 unit dreiecke;
 interface
-uses graph,vector,punkte,linien;
+uses ggigraph,vector,punkte,linien;
 type
   dreiecktyp=object
     p:array[1..3] of ppunkt;

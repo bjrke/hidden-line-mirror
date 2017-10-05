@@ -1,5 +1,5 @@
 program dreidplot;
-uses crt,graph,vector,dreidext,projekt,dreiecke,polyswee,polygon,punkte,zeit;
+uses crt,ggigraph,vector,dreidext,projekt,dreiecke,polyswee,polygon,punkte,zeit;
 var
   bmx,bmy,m:int;
   ch:char;
