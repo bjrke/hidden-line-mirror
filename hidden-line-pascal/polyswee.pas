@@ -238,7 +238,7 @@ begin
         drawtree;
         repeat
           ch:=readkey
-        until ch in [#32,'1'..'9','a'];
+        until ch in [#32, #27, '1'..'9','a'];
         if ch in ['1'..'9'] then begin
           cls;
           if (ord(ch)-ord('0'))in zumalen then
@@ -247,7 +247,8 @@ begin
             zumalen:=zumalen+[(ord(ch)-ord('0'))]
         end;
         if ch='a' then abflachen;
-      until ch=#32;
+        if ch=#27 then drawmode:=1;
+      until ch in [#32, #27];
       cls
     end;
 {  end;}

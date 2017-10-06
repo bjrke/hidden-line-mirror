@@ -566,9 +566,10 @@ begin
       else
         xscan:=(xscan+p1^.p[3]^.b[x])/2;
 
-  {    marke(round(320+xscan),round(240-p1^.yscan),yellow,'p1^.yscan');
-      marke(round(320+xscan),round(240-p2^.yscan),lightmagenta,'p2^.yscan');}
-
+      if drawmode = 6 then begin
+        marke(round(320+xscan),round(240-p1^.yscan),yellow,'p1^.yscan');
+        marke(round(320+xscan),round(240-p2^.yscan),lightmagenta,'p2^.yscan');
+      end;
       if p1^.yscan>p2^.yscan then
         polytest:=1
       else
