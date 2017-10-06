@@ -18,9 +18,9 @@ var
   h:float;
 begin
   h:=sqrt(sqr(x)+sqr(y));
-{  fkt:=30*cos(h)/(2+h)}
+  fkt:=30*cos(h)/(2+h);
 {  fkt:=random;}
-  fkt:=sin(y)*x/10;
+{  fkt:=sin(y)*x/10;}
 end;
 
 const
@@ -34,13 +34,11 @@ var
   r1,r2,r3:float;
 
 begin
-  delay(1000);
+  tausgabe:=true;
 
-  tausgabe:=false;
-
-  auge[x]:=3;  auge[y]:=-15;  auge[z]:=3;
+  auge[x]:=30;  auge[y]:=40;  auge[z]:=50;
   blickR[x]:=-auge[x]/10;  blickR[y]:=-auge[y]/10;  blickR[z]:=-auge[z]/10;
-{  blickR[x]:=-3;  blickR[y]:=-6;  blickR[z]:=-12;}
+ { blickR[x]:=-3;  blickR[y]:=-6;  blickR[z]:=-12;}
   jv[x]:=0;  jv[y]:=0;  jv[z]:=1;
 
   setallpalette(bpal);
@@ -48,19 +46,19 @@ begin
 
   drawmode:=1;
 
-  tetraeder(0,0,0, -1,0,-2, 1,1,-2 ,1,-1,-2);
+ { tetraeder(0,0,0, -1,0,-2, 1,1,-2 ,1,-1,-2);
 
   cube(-4,2,-2, 3,0,0, 0,3,0, 0,0,3);
 
   kegel(1,3,-2, 1,0,0, 0,1,0, 0,0,2, 8);
 
-  kugel(0,8,0, 3, 32, 16);
+  kugel(0,8,0, 3, 32, 16); }
 
 {  kegel(0,0,0, 2,0,0, 0,2,0, 0,0,-4, 10);  }
 
 {  cube (0,0,0, 1,0,0, 0,1,0, 0,0,1);}
 
-{  begin
+  begin
     xx:=-ad;
     while xx<ad do begin
       new(qs,init(xx,-ad,fkt(xx,-ad),xx+sw,-ad,fkt(xx+sw,-ad),xx,-ad+sw,fkt(xx,-ad+sw),xx+sw,-ad+sw,fkt(xx+sw,-ad+sw)));
@@ -72,7 +70,7 @@ begin
       xx:=xx+sw;
       dispose(qs);
     end;
-  end;}
+  end;
 
 {  for a:=1 to 20 do begin
     triangle(-a/2,a,-w34*a, a/2,a,-w34*a, 0,a,w34*a);
@@ -167,11 +165,11 @@ begin
     end;
     repeat
       ch:=readkey;
-    until (upcase(ch) in [#27,'A','Y','K','L','S','X','D','C','F','T',',',';','.',':','O','I','0'..'9']);
+    until (upcase(ch) in [#27,'A','Y','Z','K','L','S','X','D','C','F','T',',',';','.',':','O','I','0'..'9']);
 
     case ch of
       'a':MoveVec(Auge,BlickR,1);       'A':MoveVec(Auge,BlickR,10);
-      'y':MoveVec(Auge,BlickR,-1);      'Y':MoveVec(Auge,BlickR,-10);
+      'y','z':MoveVec(Auge,BlickR,-1);  'Y','Z':MoveVec(Auge,BlickR,-10);
       'k':MoveVec(Auge,iv,-1);          'K':MoveVec(Auge,iv,-10);
       'l':MoveVec(Auge,iv,1);           'L':MoveVec(Auge,iv,10);
       's':MoveVec(Auge,jv,1);           'S':MoveVec(Auge,jv,10);
