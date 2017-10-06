@@ -35,7 +35,6 @@ procedure outfloat(name:string;f:float);
 procedure outvector2d(name:string;f:vector2d);
 procedure outvector3d(name:string;f:vector3d);
 procedure outint(name:string;c:int);
-procedure outschleife(s:string);
 procedure marke(x,y,c:int;s:string);
 procedure cls;
 function sgn(x:float):int;
@@ -232,16 +231,6 @@ begin
   line(x-4,y-4,x+4,y+4);
   line(x-4,y+4,x+4,y-4);
   outtextxy(x+5,y-4,s);
-end;
-procedure outschleife;
-begin
-  inc(sc);
-  if sc=80 then begin
-    sc:=0;
-    setfillstyle(1,0);
-    bar(0,0,639,31);
-  end;
-  outtextxy((sc mod 20)*32,(sc div 20)*8,s);
 end;
 Begin
   th:=10;
