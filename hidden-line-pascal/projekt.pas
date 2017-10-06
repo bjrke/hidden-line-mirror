@@ -6,6 +6,7 @@ procedure neukamera;
 procedure rechnung;
 
 var backface:boolean;
+  spal,bpal:palettetype;
 
 implementation
 

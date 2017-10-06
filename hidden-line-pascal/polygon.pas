@@ -22,7 +22,9 @@ var
   swurzel:ppoly;
   wurzel,first:array [punr] of ppoly;
   xscan:float;
-
+  colmode:boolean;
+  drawmode:integer;
+  rand:boolean;
 procedure initppoly(var p:ppoly;p1,p2,p3:ppunkt;ls:lset;u:pdreieck);
 procedure killppoly(var p:ppoly;aufr:string);
 function newpoly(d:pdreieck):ppoly;
@@ -668,10 +670,13 @@ begin
 end;
 
 begin
+  colmode:=false;
+  drawmode:=1;
   randomize;
   wurzel[1]:=nil;
   first[1]:=nil;
   wurzel[3]:=nil;
   first[3]:=nil;
   swurzel:=nil;
+  rand:=false;
 end.

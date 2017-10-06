@@ -42,19 +42,15 @@ function sgn(x:float):int;
 var
   Auge,BlickR,iv,jv:vector3d;
   bmx,bmy:float;
-  drawmode,th,tx:integer;
-  colmode:boolean;
-  spal,bpal:palettetype;
   palleiste:pointer;
-  sc:int;
-  tausgabe,rand:boolean;
+  tausgabe:boolean;
 
 implementation
 const
   MoveSpeed:float=1;
 var
-  RotVecLength,RotInc:float;
-
+  th,tx: integer;
+  sc:int;
 procedure sub3d;
 begin
   c[x]:=a[x]-b[x];
@@ -140,6 +136,7 @@ PROCEDURE RotVec;
 VAR
   Length1,Length2:Real;
   Copy1,Copy2:Vector3d;
+  RotVecLength,RotInc:float;
 BEGIN
   RotInc:=cos(t*Pi/180)/sin(t*pi/180);
   RotVecLength:=sqrt(sqr(RotInc)+1);
@@ -248,8 +245,5 @@ begin
 end;
 Begin
   th:=10;
-  colmode:=false;
-  drawmode:=1;
   sc:=-1;
-  rand:=false;
 end.

@@ -1,7 +1,7 @@
 program dreidplot;
 uses crt,ptcgraph,vector,dreidext,projekt,dreiecke,polyswee,polygon,punkte,zeit;
 var
-  bmx,bmy,m:int;
+  m:int;
   ch:char;
   h:vector3d;
   p:ppoly;
