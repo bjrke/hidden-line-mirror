@@ -49,7 +49,6 @@ const
   MoveSpeed:float=1;
 var
   th,tx: integer;
-  sc:int;
 procedure sub3d;
 begin
   c[x]:=a[x]-b[x];
@@ -233,6 +232,6 @@ begin
   outtextxy(x+5,y-4,s);
 end;
 Begin
+  tx:=20;
   th:=10;
-  sc:=-1;
 end.
