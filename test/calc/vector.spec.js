@@ -1,6 +1,13 @@
 import assert from 'assert';
 
-import {x, y, z, vector3d, vector2d, matrix3d, matrix2d, add2d, add3d} from '../../app/calc/vector';
+import {x, y, z, vector3d, vector2d, matrix3d, matrix2d, add2d, add3d, RotVec, epsilon1} from '../../app/calc/vector';
+
+function assertEpsilonEquals(a,b) {
+    if ( Math.abs(a-b) > epsilon1) {
+        assert.equal(a,b);
+    }
+}
+
 
 describe('vector', () => {
 
@@ -114,6 +121,22 @@ describe('vector', () => {
             add2d(v, new vector2d(1,2), new vector2d(10,20));
             assert.equal(v[x],11);
             assert.equal(v[y],22);
+        });
+    });
+
+    describe('RotVec', () => {
+        it('should work', () => {
+            const v1 = new vector3d(1,0,0);
+            const v2 = new vector3d(0,1,0);
+            RotVec(v1,v2, 90);
+
+            assertEpsilonEquals(v1[x],0);
+            assertEpsilonEquals(v1[y],1);
+            assertEpsilonEquals(v1[z],0); 
+
+            assertEpsilonEquals(v2[x],-1);
+            assertEpsilonEquals(v2[y],0);
+            assertEpsilonEquals(v2[z],0); 
         });
     });
 

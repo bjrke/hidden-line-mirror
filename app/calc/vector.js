@@ -137,14 +137,14 @@ export function MoveVec(/*vector3d*/ toMove, /*vector3d*/direction,/*float*/pola
 }
 
 export function RotVec(/*vector3d*/ToRot1,/*vector3d*/ToRot2,/*float*/t) {
-    const RotInc = Math.cos(t*Pi/180)/Math.sin(t*pi/180);
-    const RotVecLength=sqrt(sqr(RotInc)+1);
+    const RotInc = Math.cos(t*Math.PI/180)/Math.sin(t*Math.PI/180);
+    const RotVecLength=Math.sqrt(RotInc * RotInc + 1);
 
-    const Length1=Betrag3d(ToRot1);
-    const Length2=Betrag3d(ToRot2);
+    const Length1=betrag3d(ToRot1);
+    const Length2=betrag3d(ToRot2);
 
-    const Copy1=ToRot1.slice(0);
-    const Copy2=ToRot2.slice(0);
+    const Copy1=ToRot1.clone();
+    const Copy2=ToRot2.clone();
 
     if (RotVecLength==0) { console.error('RotVecLength=0'); }
     if (Length1==0) { console.error('Length1=0'); }
