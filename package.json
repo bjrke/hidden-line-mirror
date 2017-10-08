@@ -12,6 +12,8 @@
     "copy-webpack-plugin": "4.1.0",
     "css-loader": "0.28.7",
     "eslint": "4.8.0",
+    "eslint-plugin-css-modules": "^2.7.5",
+    "eslint-plugin-react": "7.4.0",
     "less": "2.7.2",
     "less-loader": "4.0.5",
     "mocha": "4.0.1",
@@ -24,7 +26,8 @@
   "scripts": {
     "start": "webpack-dev-server --progress --colors --hot --config ./webpack.config.js",
     "build": "rimraf dist && NODE_ENV=production webpack --config ./webpack.config.js --env production --progress --profile --colors",
-    "test": "NODE_ENV=test ./node_modules/.bin/mocha --require babel-register test/**/*.js --reporter spec"
+    "test": "NODE_ENV=test mocha --require babel-register test/**/*.js --reporter spec",
+    "lint": "eslint --fix --ext .jsx,.js app/** test/**"
   },
   "author": "bjrke",
   "license": "SEE LICENSE IN LICENSE",

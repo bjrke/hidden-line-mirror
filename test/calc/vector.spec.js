@@ -1,6 +1,8 @@
+/* eslint-env mocha */
+
 import assert from 'assert';
 
-import {x, y, z, vector3d, vector2d, matrix3d, matrix2d, add2d, add3d, RotVec, epsilon1} from '../../app/calc/vector';
+import {x, y, z, vector3d, vector2d, matrix3d, matrix2d, add2d, add3d, RotVec, epsilon1} from '../../js/calc/vector';
 
 function assertEpsilonEquals(a,b) {
     if ( Math.abs(a-b) > epsilon1) {

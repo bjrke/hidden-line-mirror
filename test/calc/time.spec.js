@@ -1,6 +1,6 @@
-import {ctyp, dtyp} from '../../app/calc/time';
+/* eslint-env mocha */
 
-import assert from 'assert';
+import {dtyp} from '../../js/calc/time';
 
 describe('time', () => {
 

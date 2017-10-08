@@ -11,7 +11,7 @@ module.exports = function(env) {
             ])
         ],
         entry: [
-            './app/index.jsx'
+            './js/index.jsx'
         ],
         module: {
             loaders: [
@@ -28,13 +28,13 @@ module.exports = function(env) {
                 {
                     test: /\.less$/,
                     use: [{
-                        loader: "style-loader"
+                        loader: 'style-loader'
                     }, {
-                        loader: "css-loader", options: {
+                        loader: 'css-loader', options: {
                             sourceMap: true
                         }
                     }, {
-                        loader: "less-loader", options: {
+                        loader: 'less-loader', options: {
                             sourceMap: true
                         }
                     }]

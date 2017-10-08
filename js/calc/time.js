@@ -32,7 +32,7 @@ export class dtyp {
     ausgabe(name /*string*/) {
         outstring(name);
         if ((this.insert==this.delete)&&(this.insert != 0)){
-            outint('  Einfügungen = Löschungen:',this.insert)
+            outint('  Einfügungen = Löschungen:',this.insert);
         } else {
             if (this.insert != 0) {
                 outint('  Einfügungen:',this.insert);
@@ -42,10 +42,10 @@ export class dtyp {
             }
         }
         if ((this.maximum != 0) && (this.maximum != this.aktuell)) {
-             outint('  Höchststand:',this.maximum);
+            outint('  Höchststand:',this.maximum);
         }
         if ((this.minimum!=0) && (this.minimum != this.aktuell))  {
-            outint('  Tiefststand:',minimum);
+            outint('  Tiefststand:',this.minimum);
         }
         if (this.aktuell != 0) {
             if ((this.aktuell != this.insert)) {
@@ -56,8 +56,8 @@ export class dtyp {
                 if ((this.aktuell==this.minimum)) { 
                     outint('  aktuell(Tiefst)Stand:',this.aktuell); }
             } else {
-                if ((this.minimum!=this.aktuell) && (maximum!=aktuell)) { 
-                    outint('  aktueller Stand = Einfügungen:',this.aktuell) 
+                if ((this.minimum!=this.aktuell) && (this.maximum!=this.aktuell)) { 
+                    outint('  aktueller Stand = Einfügungen:',this.aktuell); 
                 }
                 if ((this.aktuell==this.maximum)) { 
                     outint('  aktuell(Höchst)Stand = Einfügungen:',this.aktuell);
@@ -114,7 +114,7 @@ export function outtime() {
     const m=t.getMinutes();
     const s=t.getSeconds();
     if (h>0) {
-       s1 += h + 'h';
+        s1 += h + 'h';
     }
     if (h>0 || m>0) {
         if (m<10) {

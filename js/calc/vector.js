@@ -1,3 +1,5 @@
+/*eslint-disable no-console */
+
 export const x=0;
 export const y=1;
 export const z=2;
@@ -78,7 +80,7 @@ export function sub2d(/*vector3d*/ c,/*vector3d*/ a,/*vector3d*/ b) {
 
 export function det3d(/*matrix3d*/A) /*float*/ {
     return A[x][x]*A[y][y]*A[z][z]+A[y][x]*A[z][y]*A[x][z]+A[z][x]*A[x][y]*A[y][z]-
-         A[x][x]*A[z][y]*A[y][z]-A[y][x]*A[x][y]*A[z][z]-A[z][x]*A[y][y]*A[x][z]
+         A[x][x]*A[z][y]*A[y][z]-A[y][x]*A[x][y]*A[z][z]-A[z][x]*A[y][y]*A[x][z];
 }
 
 export function det2d(/*matrix2d*/A) /*float*/ {
@@ -159,7 +161,7 @@ export function RotVec(/*vector3d*/ToRot1,/*vector3d*/ToRot2,/*float*/t) {
     ToRot2[z]=(Length2/RotVecLength)*(-Copy1[Z]/Length1+RotInc*Copy2[Z]/Length2);
 }
 
-function sgn(x /*float*/) /* int */ {
+export function sgn(x /*float*/) /* int */ {
     if (x<-epsilon1) {
         return -1;
     } else if ( x>epsilon1 ) {
@@ -189,7 +191,8 @@ export function outvector3d(name /*string*/, f /*vector3d*/) {
     tausgabe && console.log(name, f);
 }
 
-export function marke(x,y,c/*int*/,s/*strin*/) {
+export function marke() {
+    //x,y,c/*int*/,s/*strin*/) {
     /*setcolor(c);
     line(x-4,y-4,x+4,y+4);
     line(x-4,y+4,x+4,y-4);
