@@ -3,6 +3,7 @@ interface
 uses crt,ptcgraph,polygon,vector,punkte,linien,dreiecke,zeit;
 var
   zumalen:set of byte;
+  mtf:longint;
 
 
 procedure sweep;

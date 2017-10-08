@@ -10,7 +10,6 @@ type
   punkt=object
     b:vector2d;
     gz:lset;
-    dummy:integer;
     procedure draw(c:color);
   end;
 

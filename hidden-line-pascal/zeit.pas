@@ -22,7 +22,6 @@ procedure starttime;
 procedure outtime;
 var
   zaehl:ctyp;
-  mtf:longint;
 implementation
 var time:longint;
 
