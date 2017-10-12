@@ -29,16 +29,11 @@ type
     function next:ppunkt3d;
   end;
 
-procedure newppunkt(var p:ppunkt);
 procedure disposeppunkt(var p:ppunkt);
 procedure initbppunkt(var p:ppunkt;bv:vector2d;ls:lset);
-procedure initbxyppunkt(var p:ppunkt;xw,yw:float;ls:lset);
 procedure copyppunkt(var p:ppunkt;q:punkt);
-procedure newppunkt3d(var p:ppunkt3d);
 procedure initppunkt3d(var p:ppunkt3d;ax,ay,az:float);
-procedure disposeppunkt3d(var p:ppunkt3d);
 procedure initpliste(var p:punktliste);
-procedure killpliste(var p:punktliste);
 
 
 function colinear(p1,p2,p3:punkt):boolean;
@@ -49,32 +44,22 @@ var
   points:punktliste;
 
 implementation
-procedure newppunkt3d;
+
+procedure newppunkt(var p:ppunkt);
 begin
   new(p);
-  zaehl.p3.ins;
+  zaehl.p2.ins;
 end;
 
 procedure initppunkt3d;
 begin
-  newppunkt3d(p);
+  new(p);
+  zaehl.p3.ins;
   p^.o[x]:=ax;
   p^.o[y]:=ay;
   p^.o[z]:=az;
   p^.next:=nil;
   newppunkt(p^.b);
-end;
-
-procedure disposeppunkt3d;
-begin
-  dispose(p);
-  zaehl.p3.del;
-end;
-
-procedure newppunkt;
-begin
-  new(p);
-  zaehl.p2.ins;
 end;
 
 procedure disposeppunkt;
@@ -95,14 +80,6 @@ begin
   newppunkt(p);
   p^.b:=q.b;
   p^.gz:=q.gz
-end;
-
-procedure initbxyppunkt;
-begin
-  newppunkt(p);
-  p^.b[x]:=xw;
-  p^.b[y]:=yw;
-  p^.gz:=ls
 end;
 
 procedure punkt.draw;
@@ -154,18 +131,6 @@ begin
   if aktuell<>nil then
     aktuell:=aktuell^.next;
   next:=aktuell
-end;
-
-procedure killpliste;
-var h:ppunkt3d;
-begin
-  while p^.anker<>nil do begin
-    h:=p^.anker;
-    p^.anker:=p^.anker^.next;
-    disposeppunkt3d(h);
-  end;
-  p^.last:=nil;
-  dispose(p);
 end;
 
 procedure initpliste;
