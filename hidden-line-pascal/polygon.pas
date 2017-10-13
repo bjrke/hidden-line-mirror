@@ -42,7 +42,7 @@ begin
 {  outstring(aufr,false);}
   for i:=1 to 3 do
     if p^.p[i]<>nil then
-      disposeppunkt(p^.p[i])
+      Dispose(p^.p[i], done)
     else
       outstring('p[i]=nil');
   dispose(p);

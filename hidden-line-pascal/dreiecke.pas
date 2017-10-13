@@ -33,7 +33,6 @@ type
   end;
 
 procedure initpdreieck(var p:pdreieck;p1,p2,p3:ppunkt3d;ls:lset);
-procedure disposepdreieck(var p:pdreieck);
 procedure initdliste(var p:dreieckliste);
 procedure killdliste(var p:dreieckliste);
 
@@ -66,10 +65,6 @@ begin
   p^.n[y]:=p^.n[y]/h;
   p^.n[z]:=p^.n[z]/h;
   p^.d:=skalar(p^.n,p^.o[1]^.o);
-end;
-procedure disposepdreieck;
-begin
-  dispose(p)
 end;
 
 procedure dreiecktyp.draw1;
@@ -143,7 +138,7 @@ begin
       25:punkttest:=11;          {eckpunkte}
       5:punkttest:=12;
       1:punkttest:=13;
-    else punkttest:=20;         {draußen}
+    else punkttest:=20;         {drauï¿½en}
     end;
   end else begin
     outstring('nullerdiv');
@@ -265,7 +260,7 @@ begin
   p^.last:=nil
 end;
 
-procedure killdliste;        {hier muß natürlich noch was hin}
+procedure killdliste;        {hier muï¿½ natï¿½rlich noch was hin}
 begin
   dispose(p);
 end;

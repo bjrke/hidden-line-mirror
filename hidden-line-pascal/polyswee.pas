@@ -125,7 +125,7 @@ begin
           o:=o^.po;
           sdelete(h);
           del(h,3);
-          outint('l5 ozähler ',h^.count);
+          outint('l5 ozï¿½hler ',h^.count);
           killppoly(h,'l5');
 
           h:=u;
@@ -133,7 +133,7 @@ begin
           sdelete(h);
           del(h,3);
           killppoly(h,'l52');
-          outint('l5 uzähler',h^.count);
+          outint('l5 uzï¿½hler',h^.count);
         end;
       end;
     end;
@@ -155,7 +155,7 @@ begin
     if drawmode=6 then begin
       p^.cols:=15;
       p^.draw2;
-      outint('zähler',zaehl.count);
+      outint('zï¿½hler',zaehl.count);
     end;
     tf:=0;
     a:=nil;
@@ -195,10 +195,10 @@ begin
               outstring('h is nil (fall4)');
           end;
         5:begin
-          outint('i5 pzähler',p^.count);
+          outint('i5 pzï¿½hler',p^.count);
           killppoly(p,'i5');
           p:=loesche(ak^);
-          outint('i5 akzähler',p^.count);
+          outint('i5 akzï¿½hler',p^.count);
           killppoly(p,'i52');
           goto ende;
         end;
@@ -347,7 +347,7 @@ begin
              h4:=gleicheseite(p1^.p[i]^,p1^.p[((i+1) mod 3)+1]^,p2^.p[(pip mod 3)+1]^,p1^.p[(i mod 3)+1]^);
              if (h1=-1)or(h2=-1)or(h3=-1)or(h4=-1) then addpl(p1^.p[i]^,p2^.gl*([1,2,3]-[pip-10]));
       end;
-    end;  {3 draußen brauchen wir nich}
+    end;  {3 drauï¿½en brauchen wir nich}
   end;
   for i:=1 to 3 do begin
     pip:=p1^.punkttest(p2^.p[i]^.b);
@@ -357,7 +357,7 @@ begin
          h2:=gleicheseite(p2^.p[i]^,p1^.l[pip].a^,p1^.p[pip]^,p2^.p[((i+1) mod 3)+1]^);
          if (h1=-1)or(h2=-1) then addpl(p2^.p[i]^,p2^.gl*([1,2,3]-[i]));
       end;
-      20:addpl(p2^.p[i]^,p2^.gl*([1,2,3]-[i])); {eckpunkte des unteren, die alle draußen sind}
+      20:addpl(p2^.p[i]^,p2^.gl*([1,2,3]-[i])); {eckpunkte des unteren, die alle drauï¿½en sind}
     end;
   end;
   begin
@@ -380,7 +380,7 @@ begin
             addppl(pl[i],pl[j],pl[k]);
   end;
   for i:=1 to plpos do
-    disposeppunkt(pl[i]);
+    Dispose(pl[i], done);
 end;
 
 procedure sweep;

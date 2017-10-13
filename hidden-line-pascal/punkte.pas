@@ -11,6 +11,8 @@ type
     b:vector2d;
     gz:lset;
     procedure draw(c:color);
+    constructor init;
+    destructor done;
   end;
 
   ppunkt3d=^punkt3d;
@@ -30,7 +32,6 @@ type
     constructor init;
   end;
 
-procedure disposeppunkt(var p:ppunkt);
 procedure initbppunkt(var p:ppunkt;bv:vector2d;ls:lset);
 procedure copyppunkt(var p:ppunkt;q:punkt);
 procedure initppunkt3d(var p:ppunkt3d;ax,ay,az:float);
@@ -44,9 +45,8 @@ var
 
 implementation
 
-procedure newppunkt(var p:ppunkt);
+constructor punkt.init;
 begin
-  new(p);
   zaehl.p2.ins;
 end;
 
@@ -58,25 +58,24 @@ begin
   p^.o[y]:=ay;
   p^.o[z]:=az;
   p^.next:=nil;
-  newppunkt(p^.b);
+  new(p^.b,init);
 end;
 
-procedure disposeppunkt;
+destructor punkt.done;
 begin
-  dispose(p);
   zaehl.p2.del;
 end;
 
 procedure initbppunkt;
 begin
-  newppunkt(p);
+  new(p, init);
   p^.b:=bv;
   p^.gz:=ls
 end;
 
 procedure copyppunkt;
 begin
-  newppunkt(p);
+  new(p, init);
   p^.b:=q.b;
   p^.gz:=q.gz
 end;
