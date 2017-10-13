@@ -21,6 +21,7 @@ type
     n:vector3d;
     d:float;
     function tiefe(k:vector2d;ausgabe:boolean):float;
+    constructor init(p1,p2,p3:ppunkt3d;ls:lset);
   end;
 
   dreieckliste=^dliste;
@@ -32,7 +33,6 @@ type
     private Anker,Last:pdreieck;
   end;
 
-procedure initpdreieck(var p:pdreieck;p1,p2,p3:ppunkt3d;ls:lset);
 procedure initdliste(var p:dreieckliste);
 procedure killdliste(var p:dreieckliste);
 
@@ -41,30 +41,29 @@ var
   mintiefe,maxtiefe,mt,nt:float;
 implementation
 
-procedure initpdreieck;
+constructor dreieck.init;
 var d1,d2:vector3d;
     h:float;
 begin
-  new(p);
-  p^.o[1]:=p1;
-  p^.o[2]:=p2;
-  p^.o[3]:=p3;
-  p^.p[1]:=p1^.b;
-  p^.p[2]:=p2^.b;
-  p^.p[3]:=p3^.b;
-  p^.gl:=ls;
-  initlinie(p^.l[1],p^.p[2],p^.p[3]);
-  initlinie(p^.l[2],p^.p[3],p^.p[1]);
-  initlinie(p^.l[3],p^.p[1],p^.p[2]);
-  p^.next:=nil;
-  sub3d(d1,p^.o[2]^.o,p^.o[1]^.o);
-  sub3d(d2,p^.o[3]^.o,p^.o[1]^.o);
-  kreuz(p^.n,d1,d2);
-  h:=sqrt(sqr(p^.n[x])+sqr(p^.n[y])+sqr(p^.n[z]));
-  p^.n[x]:=p^.n[x]/h;
-  p^.n[y]:=p^.n[y]/h;
-  p^.n[z]:=p^.n[z]/h;
-  p^.d:=skalar(p^.n,p^.o[1]^.o);
+  o[1]:=p1;
+  o[2]:=p2;
+  o[3]:=p3;
+  p[1]:=p1^.b;
+  p[2]:=p2^.b;
+  p[3]:=p3^.b;
+  gl:=ls;
+  initlinie(l[1],p[2],p[3]);
+  initlinie(l[2],p[3],p[1]);
+  initlinie(l[3],p[1],p[2]);
+  next:=nil;
+  sub3d(d1,o[2]^.o,o[1]^.o);
+  sub3d(d2,o[3]^.o,o[1]^.o);
+  kreuz(n,d1,d2);
+  h:=sqrt(sqr(n[x])+sqr(n[y])+sqr(n[z]));
+  n[x]:=n[x]/h;
+  n[y]:=n[y]/h;
+  n[z]:=n[z]/h;
+  d:=skalar(n,o[1]^.o);
 end;
 
 procedure dreiecktyp.draw1;
@@ -228,7 +227,7 @@ end;
 function dliste.add;
 var h:pdreieck;
 begin
-  initpdreieck(h,p1,p2,p3,ls);
+  New(h,init(p1,p2,p3,ls));
   if anker=nil then
     anker:=h;
   if last=nil then
