@@ -125,7 +125,7 @@ begin
           o:=o^.po;
           sdelete(h);
           del(h,3);
-          outint('l5 oz�hler ',h^.count);
+          outint('l5 ozähler ',h^.count);
           killppoly(h,'l5');
 
           h:=u;
@@ -133,7 +133,7 @@ begin
           sdelete(h);
           del(h,3);
           killppoly(h,'l52');
-          outint('l5 uz�hler',h^.count);
+          outint('l5 uzähler',h^.count);
         end;
       end;
     end;
@@ -151,7 +151,7 @@ label ende;
 begin
 {  schnitttest:=true;}
 {  if p^.flaechentest then begin}
-  inc(zaehl.count);
+    inc(zaehl.count);
     if drawmode=6 then begin
       p^.cols:=15;
       p^.draw2;
@@ -266,53 +266,53 @@ var
   li:linie;
   w:boolean;
 
-procedure addpl(p:punkt;ls:lset);
-var h:ppunkt;
-begin
-  inc(plpos);
-  new(h, init(p.b,ls));
-  pl[plpos]:=h;
-end;
-
-procedure addll(i,j:integer);
-begin
-  inc(llpos);
-  ll[llpos].a:=pl[i];
-  ll[llpos].e:=pl[j];
-  am[i,j]:=true;
-  am[j,i]:=true;
-end;
-
-procedure addppl(pu1,pu2,pu3:ppunkt);
-var
-  h:vector2d;
-  ls:lset;
-  ph:ppoly;
-
-begin
-  inc(zaehl.pp);
-  h[x]:=(pu1^.b[x]+pu2^.b[x]+pu3^.b[x])/3;
-  h[y]:=(pu1^.b[y]+pu2^.b[y]+pu3^.b[y])/3;
-  if (p1^.punkttest(h)=20)and not colinear(pu1^,pu2^,pu3^) then begin
-    ls:=[];
-    if pu2^.gz*pu3^.gz<>[] then      ls:=ls+[1];
-    if pu3^.gz*pu1^.gz<>[] then      ls:=ls+[2];
-    if pu1^.gz*pu2^.gz<>[] then      ls:=ls+[3];
-    initppoly(ph,pu1,pu2,pu3,ls,p2^.ur);
-    h[x]:=(p1^.p[1]^.b[x]+p1^.p[2]^.b[x]+p1^.p[3]^.b[x])/3;
-    h[y]:=(p1^.p[1]^.b[y]+p1^.p[2]^.b[y]+p1^.p[3]^.b[y])/3;
-    if (ph^.punkttest(h)=20) {and ((ph^.gl<>[]) or (ph^.flaechentest))} then begin
-      if ph^.p[1]^.b[x]>=xscan then begin
-        ph^.cols:=2; {15}
-        push(ph,1,zaehl.count)
-      end else begin
-        ph^.cols:=3;  {4}
-        push(ph,2,zaehl.count)
-      end
-    end else
-      killppoly(ph,'addppl 2');
+  procedure addpl(p:punkt;ls:lset);
+  var h:ppunkt;
+  begin
+    inc(plpos);
+    new(h, init(p.b,ls));
+    pl[plpos]:=h;
   end;
-end;
+
+  procedure addll(i,j:integer);
+  begin
+    inc(llpos);
+    ll[llpos].a:=pl[i];
+    ll[llpos].e:=pl[j];
+    am[i,j]:=true;
+    am[j,i]:=true;
+  end;
+
+  procedure addppl(pu1,pu2,pu3:ppunkt);
+  var
+    h:vector2d;
+    ls:lset;
+    ph:ppoly;
+
+  begin
+    inc(zaehl.pp);
+    h[x]:=(pu1^.b[x]+pu2^.b[x]+pu3^.b[x])/3;
+    h[y]:=(pu1^.b[y]+pu2^.b[y]+pu3^.b[y])/3;
+    if (p1^.punkttest(h)=20)and not colinear(pu1^,pu2^,pu3^) then begin
+      ls:=[];
+      if pu2^.gz*pu3^.gz<>[] then      ls:=ls+[1];
+      if pu3^.gz*pu1^.gz<>[] then      ls:=ls+[2];
+      if pu1^.gz*pu2^.gz<>[] then      ls:=ls+[3];
+      initppoly(ph,pu1,pu2,pu3,ls,p2^.ur);
+      h[x]:=(p1^.p[1]^.b[x]+p1^.p[2]^.b[x]+p1^.p[3]^.b[x])/3;
+      h[y]:=(p1^.p[1]^.b[y]+p1^.p[2]^.b[y]+p1^.p[3]^.b[y])/3;
+      if (ph^.punkttest(h)=20) {and ((ph^.gl<>[]) or (ph^.flaechentest))} then begin
+        if ph^.p[1]^.b[x]>=xscan then begin
+          ph^.cols:=2; {15}
+          push(ph,1,zaehl.count)
+        end else begin
+          ph^.cols:=3;  {4}
+          push(ph,2,zaehl.count)
+        end
+      end else
+        killppoly(ph,'addppl 2');
+    end;
+  end;
 
 begin
   plpos:=0;  llpos:=0;
@@ -355,7 +355,7 @@ begin
          h2:=gleicheseite(p2^.p[i]^,p1^.l[pip].a^,p1^.p[pip]^,p2^.p[((i+1) mod 3)+1]^);
          if (h1=-1)or(h2=-1) then addpl(p2^.p[i]^,p2^.gl*([1,2,3]-[i]));
       end;
-      20:addpl(p2^.p[i]^,p2^.gl*([1,2,3]-[i])); {eckpunkte des unteren, die alle drau�en sind}
+      20:addpl(p2^.p[i]^,p2^.gl*([1,2,3]-[i])); {eckpunkte des unteren, die alle draußen sind}
     end;
   end;
   begin
