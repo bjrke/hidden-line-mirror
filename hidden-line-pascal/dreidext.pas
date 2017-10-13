@@ -18,6 +18,7 @@ type
     l1,l2:ppunkt3d;
     constructor Init(ax,ay,az,bx,by,bz,dx,dy,dz,cx,cy,cz:float);
     procedure add(bx,by,bz,ax,ay,az:float);
+    destructor done;
   end;
 procedure tetraeder(ax,ay,az,bx,by,bz,cx,cy,cz,dx,dy,dz:float);
 procedure kugel(mx,my,mz,r:float;l,b:int);
@@ -76,6 +77,10 @@ begin
   l2:=points^.addo(dx,dy,dz);
   dreiecks^.add(h,points^.addo(bx,by,bz),l1,[1,3]);
   dreiecks^.add(h,l1,l2,[1,2]);
+end;
+
+Destructor QuadStrip.done;
+begin
 end;
 
 Procedure QuadStrip.add;

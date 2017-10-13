@@ -68,7 +68,7 @@ begin
         yy:=yy+sw;
       end;
       xx:=xx+sw;
-      dispose(qs);
+      dispose(qs, done);
     end;
   end;
 
@@ -138,7 +138,7 @@ begin
     outtime;
     zaehl.ausgabe;
 
-    OutInt('höchste Tiefe Suchbaum:',mtf);
+    OutInt('hï¿½chste Tiefe Suchbaum:',mtf);
     if wurzel[1]<>nil then outstring('wurzel[1]');
     if wurzel[2]<>nil then outstring('wurzel[2]');
     if wurzel[3]<>nil then outstring('wurzel[3]');
