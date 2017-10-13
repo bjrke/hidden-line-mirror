@@ -1,2 +1,2 @@
 #!/bin/sh
-fpc -So 3dplot.pas
+fpc -So -g -B 3dplot.pas

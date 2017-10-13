@@ -270,7 +270,7 @@ procedure addpl(p:punkt;ls:lset);
 var h:ppunkt;
 begin
   inc(plpos);
-  initbppunkt(h,p.b,ls);
+  new(h, init(p.b,ls));
   pl[plpos]:=h;
 end;
 
