@@ -187,6 +187,6 @@ begin
 end;
 
 begin
-  initpliste(points);
+  new(points,init);
   initdliste(dreiecks);
 end.

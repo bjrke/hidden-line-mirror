@@ -27,14 +27,13 @@ type
     procedure add(p:ppunkt3d);
     function first:ppunkt3d;
     function next:ppunkt3d;
+    constructor init;
   end;
 
 procedure disposeppunkt(var p:ppunkt);
 procedure initbppunkt(var p:ppunkt;bv:vector2d;ls:lset);
 procedure copyppunkt(var p:ppunkt;q:punkt);
 procedure initppunkt3d(var p:ppunkt3d;ax,ay,az:float);
-procedure initpliste(var p:punktliste);
-
 
 function colinear(p1,p2,p3:punkt):boolean;
 function gleicheseite(s,p2,p3,p4:punkt):int;
@@ -133,11 +132,10 @@ begin
   next:=aktuell
 end;
 
-procedure initpliste;
+constructor pliste.init;
 begin
-  new(p);
-  p^.Last:=nil;
-  p^.Anker:=nil;
+  Last:=nil;
+  Anker:=nil;
 end;
 
 begin
