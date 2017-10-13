@@ -12,6 +12,7 @@ type
     l1,l2:ppunkt3d;
     w:boolean;
     constructor Init(cx,cy,cz,ax,ay,az,bx,by,bz:float);
+    destructor done;
     function add(ax,ay,az:float):ppunkt3d;
   end;
   QuadStrip=Object
@@ -56,6 +57,10 @@ begin
   l2:=points^.addo(bx,by,bz);
   dreiecks^.add(points^.addo(cx,cy,cz),l1,l2,[1,2,3]);
   w:=true;
+end;
+
+Destructor TriStrip.done;
+begin
 end;
 
 function TriStrip.add;
@@ -103,7 +108,7 @@ begin
   h^.add(dx,dy,dz);
   h^.add(ax,ay,az);
   h^.add(cx,cy,cz);
-  dispose(h);
+  dispose(h, done);
 end;
 
 procedure kugel;
@@ -140,10 +145,10 @@ begin
         mx+r*sin(j*wb)*cos(i*wl),my+r*sin(j*wb)*sin(i*wl),mz+r*cos(j*wb),
         mx+r*sin(j*wb)*cos((i-1)*wl),my+r*sin(j*wb)*sin((i-1)*wl),mz+r*cos(j*wb));
     end;
-    dispose(land);
+    dispose(land, done);
   end;
-  dispose(npol);
-  dispose(spol);
+  dispose(npol, done);
+  dispose(spol, done);
 end;
 
 procedure kegel;
