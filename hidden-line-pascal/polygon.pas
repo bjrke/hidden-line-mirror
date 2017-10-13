@@ -158,13 +158,9 @@ begin
   if p2=nil then outstring('p2=nil');
   if p3=nil then outstring('p3=nil');
 
-  copyppunkt(p^.p[1],p1^);
-  copyppunkt(p^.p[2],p2^);
-  copyppunkt(p^.p[3],p3^);
-
-  if p^.p[1]=nil then outstring('p[1]=nil');
-  if p^.p[2]=nil then outstring('p[2]=nil');
-  if p^.p[3]=nil then outstring('p[3]=nil');
+  p^.p[1] := p1^.copy;
+  p^.p[2] := p2^.copy;
+  p^.p[3] := p3^.copy;
 
   if p^.p[1]^.b[x]>p^.p[2]^.b[x] then begin
     h:=p^.p[2];      p^.p[2]:=p^.p[1];      p^.p[1]:=h;

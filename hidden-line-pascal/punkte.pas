@@ -14,6 +14,7 @@ type
     constructor init(bv:vector2d;ls:lset);
     constructor init0;
     destructor done;
+    function copy:ppunkt;
   end;
 
   ppunkt3d=^punkt3d;
@@ -21,6 +22,7 @@ type
     b:ppunkt;
     o:vector3d;
     next:ppunkt3d;
+    constructor init(ax,ay,az:float);
   end;
 
   punktliste=^pliste;
@@ -32,9 +34,6 @@ type
     function next:ppunkt3d;
     constructor init;
   end;
-
-procedure copyppunkt(var p:ppunkt;q:punkt);
-procedure initppunkt3d(var p:ppunkt3d;ax,ay,az:float);
 
 function colinear(p1,p2,p3:punkt):boolean;
 function gleicheseite(s,p2,p3,p4:punkt):int;
@@ -57,15 +56,14 @@ begin
   zaehl.p2.ins;
 end;
 
-procedure initppunkt3d;
+constructor punkt3d.init;
 begin
-  new(p);
   zaehl.p3.ins;
-  p^.o[x]:=ax;
-  p^.o[y]:=ay;
-  p^.o[z]:=az;
-  p^.next:=nil;
-  new(p^.b, init0);
+  o[x]:=ax;
+  o[y]:=ay;
+  o[z]:=az;
+  next:=nil;
+  new(b, init0);
 end;
 
 destructor punkt.done;
@@ -73,9 +71,11 @@ begin
   zaehl.p2.del;
 end;
 
-procedure copyppunkt;
+function punkt.copy;
+var result: ^punkt;
 begin
-  new(p, init(q.b, q.gz));
+  new(result, init(b, gz));
+  copy := result;
 end;
 
 procedure punkt.draw;
@@ -111,7 +111,7 @@ end;
 function pliste.addo;
 var h:ppunkt3d;
 begin
-  initppunkt3d(h,ax,ay,az);
+  new(h, init(ax,ay,az));
   add(h);
   addo:=h
 end;
