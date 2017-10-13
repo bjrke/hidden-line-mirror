@@ -5,7 +5,7 @@ type
   TriFan=Object
     Center,Last,First:ppunkt3d;
     constructor Init(cx,cy,cz,ax,ay,az,bx,by,bz:float);
-    destructor Close;
+    destructor done;
     function add(ax,ay,az:float):ppunkt3d;
   end;
   TriStrip=Object
@@ -45,7 +45,7 @@ begin
   add:=Last
 end;
 
-Destructor Trifan.Close;
+Destructor Trifan.Done;
 begin
   dreiecks^.add(Center,Last,First,[1,2,3])
 end;
@@ -164,8 +164,8 @@ begin
       th^.add(mx+r1x*c+r2x*s, my+r1y*c+r2y*s, mz+r1z*c+r2z*s);
     end
   end;
-  dispose(tr);
-  dispose(th);
+  dispose(tr, done);
+  dispose(th, done);
 end;
 
 procedure cube;
@@ -174,11 +174,11 @@ begin
   new(q,init(ex,ey,ez, ex+bx, ey+by, ez+bz, ex+ax,ey+ay,ez+az, ex+ax+bx,ey+ay+by,ez+az+bz));
   q^.add(ex+ax+cx, ey+ay+cy, ez+az+cz, ex+ax+bx+cx, ey+ay+by+cy, ez+az+bz+cz);
   q^.add(ex+cx, ey+cy, ez+cz, ex+bx+cx, ey+by+cy, ez+bz+cz);
-  dispose(q);
+  dispose(q, done);
   new(q,init(ex+ax,ey+ay,ez+az,ex+ax+cx, ey+ay+cy, ez+az+cz,ex,ey,ez,ex+cx, ey+cy, ez+cz));
   q^.add(ex+bx, ey+by, ez+bz,ex+bx+cx, ey+by+cy, ez+bz+cz);
   q^.add(ex+ax+bx,ey+ay+by,ez+az+bz,ex+ax+bx+cx, ey+ay+by+cy, ez+az+bz+cz);
-  dispose(q);
+  dispose(q, done);
 end;
 
 procedure triangle;

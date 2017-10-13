@@ -1,15 +1,13 @@
 program dreidplot;
 uses crt,ptcgraph,vector,dreidext,projekt,dreiecke,polyswee,polygon,punkte,zeit;
 var
-  m:int;
   ch:char;
   h:vector3d;
   p:ppoly;
 
 procedure init;
-var a,b,c:int;
-    h:^triStrip;
-    tr,md:integer;
+var {a,b,c:int;}
+    {h:^triStrip;}
     qs:^quadstrip;
     xx,yy:float;
 
@@ -30,8 +28,8 @@ const
   ad=13;
   w34=0.43301270189221932338186158537647;
 
-var
-  r1,r2,r3:float;
+{var
+  r1,r2,r3:float;}
 
 begin
   tausgabe:=true;

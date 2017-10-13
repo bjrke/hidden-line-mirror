@@ -11,7 +11,6 @@ var backface:boolean;
 implementation
 
 procedure neukamera;
-var tr:int;
 begin
   cls;
   kreuz(iv,BlickR,jv);
@@ -45,7 +44,6 @@ var
   i:ppunkt3d;
   j:pdreieck;
   EA,EB,EC,ED:float;
-  w:boolean;
   h:ppoly;
 
 begin
@@ -70,7 +68,7 @@ begin
 {         if h^.flaechentest then}
            polygon.push(h,1,-2)
 {         else
-           dispose(h,kill('flächentest'));}
+           dispose(h,kill('flï¿½chentest'));}
        end;
     j:=dreiecks^.next
   end;

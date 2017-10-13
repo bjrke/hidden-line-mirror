@@ -53,7 +53,6 @@ procedure poly.draw;
 var my1,my2:float;
     wx,wy,xm1,xm2,ym1,ym2,bx,by:int;
     h:vector2d;
-    c:byte;
 begin
   if colmode then cols:=random(15)+1;
   case drawmode of
@@ -220,8 +219,9 @@ end;
 function newpoly;
 var
   p:ppoly;
-  A1,A2:float;
-  c,a,b,t:vector3d;
+{  A1,A2:float;
+  t:vector3d;}
+  c,a,b:vector3d;
 begin
 
   sub3d(a,d^.o[1]^.o,d^.o[2]^.o);
@@ -294,7 +294,6 @@ begin
 end;
 
 function pop;
-var h:ppoly;
 begin
   pop:=del(first[pnr],pnr);
 end;
@@ -414,7 +413,6 @@ var
 procedure test(p:vector2d);
 var
   d1,d2:float;
-  a1,a2:int;
 begin
   if (p1^.punkttest(h)=0)and(p2^.punkttest(h)=0)then begin
     d1:=p1^.ur^.tiefe(p,ausgabe);

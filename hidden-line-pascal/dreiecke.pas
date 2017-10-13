@@ -97,10 +97,9 @@ end;
 function dreiecktyp.punkttest;
 var
   K:matrix3d;
-  h,b1,b2,b3:vector3d;
+  h,b1:vector3d;
   kd,la:float;
-  xc,yc,l1,l2,l3:int;
-  s:string;
+  l1,l2,l3:int;
 
   function testl(l:float):int;
   begin
@@ -151,7 +150,6 @@ var
   h:vector2d;
   la,m:float;
   li1,li2,li3:int;
-  w:boolean;
 begin
   pa:=punkttest(li.a^.b);
   pe:=punkttest(li.e^.b);

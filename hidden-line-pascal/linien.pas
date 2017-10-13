@@ -23,10 +23,6 @@ begin
 end;
 
 procedure linie.draw1;
-var
-  x1,y1,x2,y2:int;
-  dx,dy:float;
-
 begin
   setcolor(c);
   if a^.gz*e^.gz<>[]  then
@@ -34,10 +30,10 @@ begin
 end;
 
 procedure linie.draw;
-var
-  w:boolean;
+{var
+  w:boolean;}
 begin
-  w:=true;
+{  w:=true;}
   setcolor(c);
   if a=nil then
     outstring('a=nil')
@@ -75,7 +71,6 @@ end;
 
 procedure linie.draw2;
 var
-  x1,y1,x2,y2:int;
   dx,dy:float;
 
 begin

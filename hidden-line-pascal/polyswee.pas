@@ -15,7 +15,7 @@ implementation
 
 function sdelete(p:ppoly):ppoly;
 var
-  h,h1,h2:ppoly;
+  h:ppoly;
 begin
   zaehl.s.del;
   sdelete:=p;
@@ -77,7 +77,7 @@ end;
 
 function loesche(p:ppoly):ppoly;
 var
-  o,u,h,h1:ppoly;
+  o,u,h:ppoly;
   fertig:boolean;
 begin
   loesche:=p;
@@ -260,7 +260,6 @@ var
   pl:array[1..20]of ppunkt;
   ll:array[1..20]of linie;
   am:array[1..20,1..20]of boolean;
-  s:lset;
   h1,h2,h3,h4,plpos,llpos,i,j,k,pip:int;
   l,m:float;
   h:punkt;
@@ -289,7 +288,6 @@ var
   h:vector2d;
   ls:lset;
   ph:ppoly;
-  pp:pppoly;
 
 begin
   inc(zaehl.pp);
