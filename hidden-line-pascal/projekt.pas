@@ -43,9 +43,8 @@ procedure rechnung;
 var
   i:ppunkt3d;
   j:pdreieck;
-  EA,EB,EC,ED:float;
+  ED:float;
   h:ppoly;
-
 begin
   i:=points^.first;
   while i<>nil do begin
@@ -53,16 +52,10 @@ begin
     i:=points^.next;
   end;
 
-//TODO EA-EC als vector?
-  EA:=BlickR.x;
-  EB:=BlickR.y;
-  EC:=BlickR.z;
-  ED:=-EA*auge.x-EB*auge.y-EC*auge.z;
+  ED:=skalar(BlickR,Auge)-epsilon1;
   j:=dreiecks^.first;
   while j<>nil do begin
-    if (EA*j^.o[1]^.o.x+EB*j^.o[1]^.o.y+EC*j^.o[1]^.o.z+ED+epsilon1>0) AND
-       (EA*j^.o[2]^.o.x+EB*j^.o[2]^.o.y+EC*j^.o[2]^.o.z+ED+epsilon1>0) AND
-       (EA*j^.o[3]^.o.x+EB*j^.o[3]^.o.y+EC*j^.o[3]^.o.z+ED+epsilon1>0) AND
+    if (skalar(BlickR, j^.o[1]^.o)>ED) AND (skalar(BlickR, j^.o[2]^.o)>ED) AND (skalar(BlickR, j^.o[3]^.o)>ED) AND // test if not behind view plane
        (not backface or ((j^.p[3]^.b[x]-j^.p[1]^.b[x])*(j^.p[2]^.b[y]-j^.p[1]^.b[y])+epsilon1<
        (j^.p[3]^.b[y]-j^.p[1]^.b[y])*(j^.p[2]^.b[x]-j^.p[1]^.b[x]))) then begin
          h:=newpoly(j);
