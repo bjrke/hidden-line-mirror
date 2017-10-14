@@ -23,12 +23,10 @@ end;
 
 procedure perspektive(p:punkt3d);
 var
-  help:vector3d;
   K:matrix3d;
   kd:float;
 begin
-  sub3d(help,Auge,p.o);
-  K.x:=iv; K.y:=jv; K.z:=help;
+  K.init(iv, jv, Auge.sub3d(p.o));
   kd:=det3d(K);
   if abs(kd)>epsilon3 then begin
     K.x:=BlickR;

@@ -207,12 +207,9 @@ var
   p:ppoly;
 {  A1,A2:float;
   t:vector3d;}
-  c,a,b:vector3d;
+  c:vector3d;
 begin
-
-  sub3d(a,d^.o[1]^.o,d^.o[2]^.o);
-  sub3d(b,d^.o[3]^.o,d^.o[2]^.o);
-  kreuz(c,a,b);
+  kreuz(c, d^.o[1]^.o.sub3d(d^.o[2]^.o), d^.o[3]^.o.sub3d(d^.o[2]^.o));
   d^.cols:=round(1+14*skalar(blickr,c)/(betrag3d(blickr)*betrag3d(c)));
 
 {  add3d(t,a,b);

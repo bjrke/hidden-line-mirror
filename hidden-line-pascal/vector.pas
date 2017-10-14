@@ -14,6 +14,7 @@ type
   vector3d=object
     x, y, z: float;
     constructor init(x,y,z: float);
+    function sub3d(v: vector3d): vector3d;
   end;
   matrix3d=object
     x, y, z: vector3d;
@@ -27,7 +28,6 @@ type
     x, y: vector2d;
     constructor init(x,y: vector2d);
   end;
-procedure sub3d(var c:vector3d;a,b:vector3d);
 procedure sub2d(var c:vector2d;a,b:vector2d);
 procedure add3d(var c:vector3d;a,b:vector3d);
 procedure add2d(var c:vector2d;a,b:vector2d);
@@ -71,12 +71,11 @@ begin
   self.z:=z;
 end;
 
-procedure sub3d;
+function vector3d.sub3d;
 begin
-  c.x:=a.x-b.x;
-  c.y:=a.y-b.y;
-  c.z:=a.z-b.z;
+  sub3d.init(x - v.x, y - v.y, z - v.z);
 end;
+
 procedure add3d;
 begin
   c.x:=a.x+b.x;

@@ -42,8 +42,6 @@ var
 implementation
 
 constructor dreieck.init;
-var d1,d2:vector3d;
-    h:float;
 begin
   o[1]:=p1;
   o[2]:=p2;
@@ -56,11 +54,8 @@ begin
   initlinie(l[2],p[3],p[1]);
   initlinie(l[3],p[1],p[2]);
   next:=nil;
-  sub3d(d1,o[2]^.o,o[1]^.o);
-  sub3d(d2,o[3]^.o,o[1]^.o);
-  kreuz(n,d1,d2);
-  h:=betrag3d(n);
-  div3d(n,h);
+  kreuz(n,o[2]^.o.sub3d(o[1]^.o),o[3]^.o.sub3d(o[1]^.o));
+  div3d(n,betrag3d(n));
   d:=skalar(n,o[1]^.o);
 end;
 
