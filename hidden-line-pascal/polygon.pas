@@ -15,6 +15,10 @@ type
     farbe:color;
     count:int;
     ymin,ymax:float;
+
+    constructor init(p1,p2,p3:ppunkt;ls:lset;u:pdreieck);
+    constructor newpoly(d:pdreieck);
+
     function yscan:float;
     procedure draw;
   end;
@@ -25,9 +29,8 @@ var
   colmode:boolean;
   drawmode:integer;
   rand:boolean;
-procedure initppoly(var p:ppoly;p1,p2,p3:ppunkt;ls:lset;u:pdreieck);
+
 procedure killppoly(var p:ppoly;aufr:string);
-function newpoly(d:pdreieck):ppoly;
 procedure push(p:ppoly;pnr:punr;c:int);
 function pop(pnr:punr):ppoly;
 function del(p:ppoly;pnr:punr):ppoly;
@@ -135,25 +138,24 @@ begin
   end;
 end;
 
-procedure initppoly;
+constructor poly.init;
 var
   h:ppunkt;
   lsneu:lset;
 
 begin
-  new(p);
   zaehl.p.ins;
 
   if p1=nil then outstring('p1=nil');
   if p2=nil then outstring('p2=nil');
   if p3=nil then outstring('p3=nil');
 
-  p^.p[1] := p1^.copy;
-  p^.p[2] := p2^.copy;
-  p^.p[3] := p3^.copy;
+  p[1] := p1^.copy;
+  p[2] := p2^.copy;
+  p[3] := p3^.copy;
 
-  if p^.p[1]^.b.x>p^.p[2]^.b.x then begin
-    h:=p^.p[2];      p^.p[2]:=p^.p[1];      p^.p[1]:=h;
+  if p[1]^.b.x>p[2]^.b.x then begin
+    h:=p[2];      p[2]:=p[1];      p[1]:=h;
     lsneu:=[];
     if 1 in ls then lsneu:=lsneu+[2];
     if 2 in ls then lsneu:=lsneu+[1];
@@ -161,8 +163,8 @@ begin
     ls:=lsneu
   end;
 
-  if p^.p[1]^.b.x>p^.p[3]^.b.x then begin
-    h:=p^.p[3];      p^.p[3]:=p^.p[1];      p^.p[1]:=h;
+  if p[1]^.b.x>p[3]^.b.x then begin
+    h:=p[3];      p[3]:=p[1];      p[1]:=h;
     lsneu:=[];
     if 1 in ls then lsneu:=lsneu+[3];
     if 2 in ls then lsneu:=lsneu+[2];
@@ -170,8 +172,8 @@ begin
     ls:=lsneu
   end;
 
-  if p^.p[2]^.b.x>p^.p[3]^.b.x then begin
-    h:=p^.p[3];      p^.p[3]:=p^.p[2];      p^.p[2]:=h;
+  if p[2]^.b.x>p[3]^.b.x then begin
+    h:=p[3];      p[3]:=p[2];      p[2]:=h;
     lsneu:=[];
     if 1 in ls then lsneu:=lsneu+[1];
     if 2 in ls then lsneu:=lsneu+[3];
@@ -179,32 +181,31 @@ begin
     ls:=lsneu
   end;
 
-  p^.gl:=ls;
+  gl:=ls;
 
-  p^.l[1].init(p^.p[2],p^.p[3]);
-  p^.l[2].init(p^.p[3],p^.p[1]);
-  p^.l[3].init(p^.p[1],p^.p[2]);
+  l[1].init(p[2],p[3]);
+  l[2].init(p[3],p[1]);
+  l[3].init(p[1],p[2]);
 
-  p^.ur:=u;
-  p^.cols:=green;
+  ur:=u;
+  cols:=green;
 
-  p^.ymin:=p^.p[1]^.b.y;
-  p^.ymax:=p^.p[1]^.b.y;
+  ymin:=p[1]^.b.y;
+  ymax:=p[1]^.b.y;
 
-  if p^.p[2]^.b.y<p^.ymin then
-    p^.ymin:=p^.p[2]^.b.y
-  else if p^.p[2]^.b.y>p^.ymax then
-    p^.ymax:=p^.p[2]^.b.y;
+  if p[2]^.b.y<ymin then
+    ymin:=p[2]^.b.y
+  else if p[2]^.b.y>ymax then
+    ymax:=p[2]^.b.y;
 
-  if p^.p[3]^.b.y<p^.ymin then
-    p^.ymin:=p^.p[3]^.b.y
-  else if p^.p[3]^.b.y>p^.ymax then
-    p^.ymax:=p^.p[3]^.b.y
+  if p[3]^.b.y<ymin then
+    ymin:=p[3]^.b.y
+  else if p[3]^.b.y>ymax then
+    ymax:=p[3]^.b.y
 end;
 
-function newpoly;
+constructor poly.newpoly;
 var
-  p:ppoly;
 {  A1,A2:float;
   t:vector3d;}
   c:vector3d;
@@ -223,8 +224,7 @@ begin
   if d^.cols>15 then d^.cols:=15;
   if d^.cols<1 then d^.cols:=1;
 
-  initppoly(p,d^.p[1],d^.p[2],d^.p[3],d^.gl,d);
-  newpoly:=p
+  init(d^.p[1],d^.p[2],d^.p[3],d^.gl,d);
 end;
 
 procedure push;

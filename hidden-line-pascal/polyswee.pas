@@ -298,7 +298,7 @@ var
       if pu2^.gz*pu3^.gz<>[] then      ls:=ls+[1];
       if pu3^.gz*pu1^.gz<>[] then      ls:=ls+[2];
       if pu1^.gz*pu2^.gz<>[] then      ls:=ls+[3];
-      initppoly(ph,pu1,pu2,pu3,ls,p2^.ur);
+      new(ph, init(pu1,pu2,pu3,ls,p2^.ur));
       h.x:=(p1^.p[1]^.b.x+p1^.p[2]^.b.x+p1^.p[3]^.b.x)/3;
       h.y:=(p1^.p[1]^.b.y+p1^.p[2]^.b.y+p1^.p[3]^.b.y)/3;
       if (ph^.punkttest(h)=20) {and ((ph^.gl<>[]) or (ph^.flaechentest))} then begin
