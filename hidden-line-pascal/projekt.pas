@@ -50,7 +50,7 @@ begin
   end;
 
   ED:=BlickR.skalar(Auge)-epsilon1;
-  j:=dreiecks^.first;
+  j:=dreiecks.first;
   while j<>nil do begin
     if (BlickR.skalar(j^.o[1]^.o)>ED) AND (BlickR.skalar(j^.o[2]^.o)>ED) AND (BlickR.skalar(j^.o[3]^.o)>ED) AND // test if not behind view plane
        (not backface or ((j^.p[3]^.b.x-j^.p[1]^.b.x)*(j^.p[2]^.b.y-j^.p[1]^.b.y)+epsilon1<
@@ -61,7 +61,7 @@ begin
 {         else
            dispose(h,kill('flächentest'));}
        end;
-    j:=dreiecks^.next
+    j:=dreiecks.next
   end;
 {  xscan:=-1e20;}
 end;

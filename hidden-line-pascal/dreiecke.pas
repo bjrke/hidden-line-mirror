@@ -26,21 +26,19 @@ type
       next:pdreieck;
   end;
 
-  dreieckliste=^dliste;
   dliste=object
     public
       function add(p1,p2,p3:ppunkt3d;ls:lset):pdreieck;
       function first:pdreieck;
       function next:pdreieck;
+      constructor init;
+      destructor done;
     private
       Anker,aktuell,Last:pdreieck;
   end;
 
-procedure initdliste(var p:dreieckliste);
-procedure killdliste(var p:dreieckliste);
-
 var
-  dreiecks:dreieckliste;
+  dreiecks:dliste;
   mintiefe,maxtiefe,mt,nt:float;
 implementation
 
@@ -214,6 +212,17 @@ begin
   tiefe:=t;
 end;
 
+constructor dliste.init;
+begin
+  Anker := nil;
+  Last := nil;
+end;
+
+destructor dliste.done;
+begin
+
+end;
+
 function dliste.add;
 var h:pdreieck;
 begin
@@ -242,16 +251,5 @@ begin
   next:=aktuell;
 end;
 
-procedure initdliste;
-begin
-  new(p);
-  p^.anker:=nil;
-  p^.last:=nil
-end;
-
-procedure killdliste;        {hier mu� nat�rlich noch was hin}
-begin
-  dispose(p);
-end;
 begin
 end.

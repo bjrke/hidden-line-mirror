@@ -34,28 +34,28 @@ begin
   Center:=points^.addo(cx,cy,cz);
   First:=points^.addo(ax,ay,az);
   Last:=points^.addo(bx,by,bz);
-  dreiecks^.add(Center,First,Last,[1,2,3])
+  dreiecks.add(Center,First,Last,[1,2,3])
 end;
 
 function Trifan.add;
 var help:ppunkt3d;
 begin
   help:=Points^.addo(ax,ay,az);
-  dreiecks^.add(Center,Last,help,[1,2,3]);
+  dreiecks.add(Center,Last,help,[1,2,3]);
   Last:=help;
   add:=Last
 end;
 
 Destructor Trifan.Done;
 begin
-  dreiecks^.add(Center,Last,First,[1,2,3])
+  dreiecks.add(Center,Last,First,[1,2,3])
 end;
 
 Constructor TriStrip.Init;
 begin
   l1:=points^.addo(ax,ay,az);
   l2:=points^.addo(bx,by,bz);
-  dreiecks^.add(points^.addo(cx,cy,cz),l1,l2,[1,2,3]);
+  dreiecks.add(points^.addo(cx,cy,cz),l1,l2,[1,2,3]);
   w:=true;
 end;
 
@@ -67,7 +67,10 @@ function TriStrip.add;
 var help:ppunkt3d;
 begin
   help:=points^.addo(ax,ay,az);
-  if w then dreiecks^.add(l1,help,l2,[1,2,3]) else dreiecks^.add(l1,l2,help,[1,2,3]);
+  if w then
+    dreiecks.add(l1,help,l2,[1,2,3])
+  else
+    dreiecks.add(l1,l2,help,[1,2,3]);
   w:=not w;
   l1:=l2;
   l2:=help;
@@ -80,8 +83,8 @@ begin
   h:=points^.addo(ax,ay,az);
   l1:=points^.addo(cx,cy,cz);
   l2:=points^.addo(dx,dy,dz);
-  dreiecks^.add(h,points^.addo(bx,by,bz),l1,[1,3]);
-  dreiecks^.add(h,l1,l2,[1,2]);
+  dreiecks.add(h,points^.addo(bx,by,bz),l1,[1,3]);
+  dreiecks.add(h,l1,l2,[1,2]);
 end;
 
 Destructor QuadStrip.done;
@@ -94,8 +97,8 @@ begin
   h1:=points^.addo(ax,ay,az);
   h2:=points^.addo(bx,by,bz);
 
-  dreiecks^.add(l2,l1,h1,[1,3]);
-  dreiecks^.add(l2,h1,h2,[1,2]);
+  dreiecks.add(l2,l1,h1,[1,3]);
+  dreiecks.add(l2,h1,h2,[1,2]);
 
   l1:=h1;
   l2:=h2;
@@ -193,10 +196,10 @@ begin
   c:=points^.addo(cx,cy,cz);
   a:=points^.addo(ax,ay,az);
   b:=points^.addo(bx,by,bz);
-  dreiecks^.add(c,a,b,[1,2,3])
+  dreiecks.add(c,a,b,[1,2,3])
 end;
 
 begin
   new(points,init);
-  initdliste(dreiecks);
+  dreiecks.init;
 end.
