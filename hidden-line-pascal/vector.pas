@@ -15,6 +15,12 @@ type
     function sub3d(v: vector3d): vector3d;
     function mul3d(f: float): vector3d;
     function div3d(d: float): vector3d;
+
+    function neg3d: vector3d;
+    function betrag3d: float;
+    function kreuz(v:vector3d): vector3d;
+    function skalar(v:vector3d): float;
+
   end;
   matrix3d=object
     x, y, z: vector3d;
@@ -32,12 +38,9 @@ procedure sub2d(var c:vector2d;a,b:vector2d);
 procedure add2d(var c:vector2d;a,b:vector2d);
 procedure mul2d(var v:vector2d;f:float);
 procedure div2d(var v:vector2d;d:float);
-procedure kreuz(var c:vector3d;a,b:vector3d);
-function skalar(a,b:vector3d):float;
-procedure neg3d(var v:vector3d);
+
 function det3d(A:matrix3d):float;
 function det2d(A:matrix2d):float;
-function betrag3d(v:vector3d):float;
 function betrag2d(v:vector2d):float;
 PROCEDURE RotVec(VAR ToRot1,ToRot2:Vector3d;t:float);
 PROCEDURE MoveVec(VAR ToMove:Vector3d;Direction:Vector3d;Polarisation:float);
@@ -87,6 +90,30 @@ function vector3d.div3d;
 begin
   if d=0 then outstring('d=0');
   div3d.init(x/d, y/d, z/d);
+end;
+
+function vector3d.neg3d;
+begin
+  neg3d.init( -x, -y, -z );
+end;
+
+function vector3d.kreuz;
+begin
+  kreuz.init(
+    y*v.z - z*v.y,
+    z*v.x - x*v.z,
+    x*v.y - y*v.x
+  );
+end;
+
+function vector3d.skalar;
+begin
+  skalar := x*v.x + y*v.y + z*v.z;
+end;
+
+function vector3d.betrag3d;
+begin
+  betrag3d:=sqrt(sqr(x)+sqr(y)+sqr(z));
 end;
 
 constructor vector2d.init;
@@ -141,29 +168,7 @@ function det2d;
 begin
   det2d:=A.x.x*A.y.y-A.x.y*A.y.x;
 end;
-procedure neg3d;
-begin
-  v.x:=-v.x;
-  v.y:=-v.y;
-  v.z:=-v.z;
-end;
 
-procedure kreuz;
-begin
-  c.x:=a.y*b.z-a.z*b.y;
-  c.y:=a.z*b.x-a.x*b.z;
-  c.z:=a.x*b.y-a.y*b.x;
-end;
-
-function skalar;
-begin
-  skalar:=a.x*b.x+a.y*b.y+a.z*b.z;
-end;
-
-function betrag3d;
-begin
-  betrag3d:=sqrt(sqr(v.x)+sqr(v.y)+sqr(v.z));
-end;
 function betrag2d;
 begin
   betrag2d:=sqrt(sqr(v.x)+sqr(v.y));
@@ -173,7 +178,7 @@ PROCEDURE MoveVec;
 VAR
   DirLength:Real;
 BEGIN
-  DirLength:=Betrag3d(Direction);
+  DirLength:=Direction.betrag3d;
   if DirLength=0 then outstring('DirLength=0');
   ToMove.x:=ToMove.X+Polarisation*MoveSpeed*Direction.X/DirLength;
   ToMove.y:=ToMove.Y+Polarisation*MoveSpeed*Direction.Y/DirLength;
@@ -188,8 +193,8 @@ BEGIN
   RotInc:=cos(t*Pi/180)/sin(t*pi/180);
   RotVecLength:=sqrt(sqr(RotInc)+1);
 
-  Length1:=Betrag3d(ToRot1);
-  Length2:=Betrag3d(ToRot2);
+  Length1:=ToRot1.betrag3d;
+  Length2:=ToRot2.Betrag3d;
 
   Copy1:=ToRot1;
   Copy2:=ToRot2;

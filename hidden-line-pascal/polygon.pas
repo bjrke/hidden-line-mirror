@@ -209,8 +209,9 @@ var
   t:vector3d;}
   c:vector3d;
 begin
-  kreuz(c, d^.o[1]^.o.sub3d(d^.o[2]^.o), d^.o[3]^.o.sub3d(d^.o[2]^.o));
-  d^.cols:=round(1+14*skalar(blickr,c)/(betrag3d(blickr)*betrag3d(c)));
+  c :=   d^.o[1]^.o.sub3d(d^.o[2]^.o)
+  .kreuz(d^.o[3]^.o.sub3d(d^.o[2]^.o));
+  d^.cols:=round(1+14*BlickR.skalar(c)/(BlickR.betrag3d*c.betrag3d));
 
 {  add3d(t,a,b);
   add3d(t,t,c);

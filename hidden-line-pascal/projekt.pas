@@ -13,12 +13,12 @@ implementation
 procedure neukamera;
 begin
   cls;
-  kreuz(iv,BlickR,jv);
-  if betrag3d(iv)=0 then outstring('i=0');
-  iv := iv.mul3d(0.4*betrag3d(BlickR)/(bmx*betrag3d(iv)));
-  kreuz(jv,iv,BlickR);
-  if betrag3d(jv)=0 then outstring('j=0');
-  jv := jv.mul3d(0.4*betrag3d(BlickR)/(bmx*betrag3d(jv)));
+  iv := BlickR.kreuz(jv);
+  if iv.betrag3d=0 then outstring('i=0');
+  iv := iv.mul3d(0.4*BlickR.betrag3d/(bmx*iv.betrag3d));
+  jv := iv.kreuz(BlickR);
+  if jv.betrag3d=0 then outstring('j=0');
+  jv := jv.mul3d(0.4*BlickR.betrag3d/(bmx*jv.betrag3d));
 end;
 
 procedure perspektive(p:punkt3d);
@@ -29,8 +29,7 @@ begin
   K.init(iv, jv, Auge.sub3d(p.o));
   kd:=det3d(K);
   if abs(kd)>epsilon3 then begin
-    K.x:=BlickR;
-    neg3d(K.x);
+    K.x:=BlickR.neg3d;
     p.b^.b.x:=det3d(k)/kd;
     K.y:=K.x; K.x:=iv;
     p.b^.b.y:=det3d(k)/kd
@@ -50,10 +49,10 @@ begin
     i:=points^.next;
   end;
 
-  ED:=skalar(BlickR,Auge)-epsilon1;
+  ED:=BlickR.skalar(Auge)-epsilon1;
   j:=dreiecks^.first;
   while j<>nil do begin
-    if (skalar(BlickR, j^.o[1]^.o)>ED) AND (skalar(BlickR, j^.o[2]^.o)>ED) AND (skalar(BlickR, j^.o[3]^.o)>ED) AND // test if not behind view plane
+    if (BlickR.skalar(j^.o[1]^.o)>ED) AND (BlickR.skalar(j^.o[2]^.o)>ED) AND (BlickR.skalar(j^.o[3]^.o)>ED) AND // test if not behind view plane
        (not backface or ((j^.p[3]^.b.x-j^.p[1]^.b.x)*(j^.p[2]^.b.y-j^.p[1]^.b.y)+epsilon1<
                          (j^.p[3]^.b.y-j^.p[1]^.b.y)*(j^.p[2]^.b.x-j^.p[1]^.b.x))) then begin
          h:=newpoly(j);

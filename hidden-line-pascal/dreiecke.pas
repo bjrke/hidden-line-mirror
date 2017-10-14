@@ -54,9 +54,10 @@ begin
   initlinie(l[2],p[3],p[1]);
   initlinie(l[3],p[1],p[2]);
   next:=nil;
-  kreuz(n,o[2]^.o.sub3d(o[1]^.o),o[3]^.o.sub3d(o[1]^.o));
-  n := n.div3d(betrag3d(n));
-  d:=skalar(n,o[1]^.o);
+  n :=     o[2]^.o.sub3d(o[1]^.o)
+    .kreuz(o[3]^.o.sub3d(o[1]^.o));
+  n := n.div3d(n.betrag3d);
+  d := n.skalar(o[1]^.o);
 end;
 
 procedure dreiecktyp.draw1;
@@ -185,20 +186,20 @@ begin
     outvector3d('j',h);
   end;
   bv := bv.add3d(h);
-  t:=skalar(n,bv);
+  t := n.skalar(bv);
   if ausgabe then begin
     outvector3d('bv',bv);
     outfloat('t',t);
   end;
   if abs(t)>epsilon3 then begin
-    la:=(d-skalar(n,auge))/t;
+    la:=(d-n.skalar(auge))/t;
     bv := bv.mul3d(la);
-    t:=betrag3d(bv);
+    t := bv.betrag3d;
     if ausgabe then begin
       outvector3d('bv',bv);
       outfloat('la',la);
       outfloat('d',d);
-      outfloat('skalar(n,auge)',skalar(n,auge));
+      outfloat('n.skalar(auge)',n.skalar(auge));
       outfloat('t',t);
     end;
   end else begin
