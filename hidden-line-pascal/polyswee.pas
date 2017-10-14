@@ -105,7 +105,7 @@ begin
           del(h,3);
           if h<>nil then begin
             polypoly(u^.ur,h);
-            killppoly(h,'lofall3')
+            dispose(h,done('lofall3'))
           end else
             outstring('h is nil (falls3)');
         end;
@@ -116,7 +116,7 @@ begin
           del(h,3);
           if h<>nil then begin
             polypoly(o^.ur,h);
-            killppoly(h,'lofall4')
+            dispose(h, done('lofall4'))
           end else
             outstring('h is nil (falls4)');
         end;
@@ -126,13 +126,13 @@ begin
           sdelete(h);
           del(h,3);
           outint('l5 ozähler ',h^.count);
-          killppoly(h,'l5');
+          dispose(h, done('l5'));
 
           h:=u;
           u:=u^.pu;
           sdelete(h);
           del(h,3);
-          killppoly(h,'l52');
+          dispose(h, done('l52'));
           outint('l5 uzähler',h^.count);
         end;
       end;
@@ -179,7 +179,7 @@ begin
         3:begin
             if p<>nil then begin
               polypoly(ak^^.ur,p);
-              killppoly(p,'insert fall3');
+              dispose(p, done('insert fall3'));
 {              outstring('f3u');}
             end else
               outstring('p is nil (fall3)');
@@ -190,16 +190,16 @@ begin
             h:=loesche(ak^);
             if h<>nil then begin
               polypoly(p^.ur,h);
-              killppoly(h,'insert fall4')
+              dispose(h, done('insert fall4'))
             end else
               outstring('h is nil (fall4)');
           end;
         5:begin
           outint('i5 pz�hler',p^.count);
-          killppoly(p,'i5');
+          dispose(p, done('i5'));
           p:=loesche(ak^);
           outint('i5 akz�hler',p^.count);
-          killppoly(p,'i52');
+          dispose(p, done('i52'));
           goto ende;
         end;
       end
@@ -310,7 +310,7 @@ var
           push(ph,2,zaehl.count)
         end
       end else
-        killppoly(ph,'addppl 2');
+        dispose(ph, done('addppl 2'));
     end;
   end;
 
@@ -407,7 +407,7 @@ begin
         p:=loesche(first[3]);
         p^.cols:=15; {5}
         p^.draw;
-        killppoly(p,'sweep ende');
+        dispose(p, done('sweep ende'));
       end;
     end else begin
       p:=polygon.pop(1);
@@ -425,7 +425,7 @@ begin
         p:=loesche(first[3]);
         p^.cols:=15; {6}
         p^.draw;
-        killppoly(p,'insert pop3');
+        dispose(p, done('insert pop3'));
       end;
     end;
     if not ende then begin

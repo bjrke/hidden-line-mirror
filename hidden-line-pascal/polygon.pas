@@ -19,6 +19,8 @@ type
     constructor init(p1,p2,p3:ppunkt;ls:lset;u:pdreieck);
     constructor newpoly(d:pdreieck);
 
+    destructor done(aufr: string);
+
     function yscan:float;
     procedure draw;
   end;
@@ -30,7 +32,6 @@ var
   drawmode:integer;
   rand:boolean;
 
-procedure killppoly(var p:ppoly;aufr:string);
 procedure push(p:ppoly;pnr:punr;c:int);
 function pop(pnr:punr):ppoly;
 function del(p:ppoly;pnr:punr):ppoly;
@@ -39,16 +40,15 @@ procedure verbinde(v,s:ppoly;r:richtung);
 
 implementation
 
-procedure killppoly;                   {hier druff guggn!}
+destructor poly.done;                   {hier druff guggn!}
 var i:integer;
 begin
 {  outstring(aufr,false);}
   for i:=1 to 3 do
-    if p^.p[i]<>nil then
-      Dispose(p^.p[i], done)
+    if p[i]<>nil then
+      dispose(p[i], done)
     else
       outstring('p[i]=nil');
-  dispose(p);
   zaehl.p.del;
 end;
 

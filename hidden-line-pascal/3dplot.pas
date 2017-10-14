@@ -145,19 +145,19 @@ begin
     while first[1]<>nil do begin
       p:=pop(1);
       p^.draw;
-      killppoly(p,'a');
+      dispose(p, done('a'));
       outstring('f1');
     end;
     while first[2]<>nil do begin
       p:=pop(2);
       p^.draw;
-      killppoly(p,'a');
+      dispose(p, done('a'));
       outstring('f2');
     end;
     while first[3]<>nil do begin
       p:=pop(3);
       p^.draw;
-      killppoly(p,'a');
+      dispose(p, done('a'));
       outstring('f3');
     end;
     repeat
