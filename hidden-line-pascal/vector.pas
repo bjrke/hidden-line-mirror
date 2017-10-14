@@ -8,6 +8,7 @@ const
 type
   float=real;
   int=longint;
+  pvector3d=^vector3d;
   vector3d=object
     x, y, z: float;
     constructor init(x,y,z: float);
@@ -44,7 +45,7 @@ type
     function det2d:float;
   end;
 
-PROCEDURE RotVec(VAR ToRot1,ToRot2:Vector3d;t:float);
+PROCEDURE RotVec(ToRot1,ToRot2:pvector3d;t:float);
 
 procedure outstring(s:string);
 procedure outfloat(name:string;f:float);
@@ -188,22 +189,22 @@ BEGIN
   RotInc:=cos(t*Pi/180)/sin(t*pi/180);
   RotVecLength:=sqrt(sqr(RotInc)+1);
 
-  Length1:=ToRot1.betrag3d;
-  Length2:=ToRot2.Betrag3d;
+  Copy1:=ToRot1^;
+  Copy2:=ToRot2^;
 
-  Copy1:=ToRot1;
-  Copy2:=ToRot2;
+  Length1:=Copy1.betrag3d;
+  Length2:=Copy2.Betrag3d;
 
   if RotVecLength=0 then writeln('RotVecLength=0');
   if Length1=0 then writeln('Length1=0');
   if Length2=0 then writeln('Length2=0');
-  ToRot1.X:=(Length1/RotVecLength)*(RotInc*Copy1.X/Length1+Copy2.X/Length2);
-  ToRot1.Y:=(Length1/RotVecLength)*(RotInc*Copy1.Y/Length1+Copy2.Y/Length2);
-  ToRot1.Z:=(Length1/RotVecLength)*(RotInc*Copy1.Z/Length1+Copy2.Z/Length2);
+  ToRot1^.X:=(Length1/RotVecLength)*(RotInc*Copy1.X/Length1+Copy2.X/Length2);
+  ToRot1^.Y:=(Length1/RotVecLength)*(RotInc*Copy1.Y/Length1+Copy2.Y/Length2);
+  ToRot1^.Z:=(Length1/RotVecLength)*(RotInc*Copy1.Z/Length1+Copy2.Z/Length2);
 
-  ToRot2.X:=(Length2/RotVecLength)*(-Copy1.X/Length1+RotInc*Copy2.X/Length2);
-  ToRot2.Y:=(Length2/RotVecLength)*(-Copy1.Y/Length1+RotInc*Copy2.Y/Length2);
-  ToRot2.Z:=(Length2/RotVecLength)*(-Copy1.Z/Length1+RotInc*Copy2.Z/Length2)
+  ToRot2^.X:=(Length2/RotVecLength)*(-Copy1.X/Length1+RotInc*Copy2.X/Length2);
+  ToRot2^.Y:=(Length2/RotVecLength)*(-Copy1.Y/Length1+RotInc*Copy2.Y/Length2);
+  ToRot2^.Z:=(Length2/RotVecLength)*(-Copy1.Z/Length1+RotInc*Copy2.Z/Length2)
 END;
 
 procedure outstring;

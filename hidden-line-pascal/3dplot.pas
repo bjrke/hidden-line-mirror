@@ -171,12 +171,12 @@ begin
       'l':auge := auge.move3d(iv,1);           'L':auge := auge.move3d(iv,10);
       's':auge := auge.move3d(jv,1);           'S':auge := auge.move3d(jv,10);
       'x':auge := auge.move3d(jv,-1);          'X':auge := auge.move3d(jv,-10);
-      'd':RotVec(BlickR,jv,1);          'D':RotVec(BlickR,jv,10);
-      'c':RotVec(jv,BlickR,1);          'C':RotVec(jv,BlickR,10);
-      ',':RotVec(iv,BlickR,1);          ';':RotVec(iv,BlickR,10);
-      '.':RotVec(BlickR,iv,1);          ':':RotVec(BlickR,iv,10);
-      'o':RotVec(jv,iv,1);              'O':RotVec(jv,iv,10);
-      'i':RotVec(iv,jv,1);              'I':RotVec(iv,jv,10);
+      'd':RotVec(@BlickR, @jv,1);              'D':RotVec(@BlickR, @jv, 10);
+      'c':RotVec(@jv, @BlickR, 1);             'C':RotVec(@jv, @BlickR, 10);
+      ',':RotVec(@iv, @BlickR, 1);             ';':RotVec(@iv, @BlickR, 10);
+      '.':RotVec(@BlickR, @iv, 1);             ':':RotVec(@BlickR, @iv, 10);
+      'o':RotVec(@jv, @iv, 1);                 'O':RotVec(@jv, @iv, 10);
+      'i':RotVec(@iv, @jv, 1);                 'I':RotVec(@iv, @jv, 10);
       'f','F':colmode:=not colmode;
       't','T':tausgabe:=not tausgabe;
       '0':drawmode:=1;
