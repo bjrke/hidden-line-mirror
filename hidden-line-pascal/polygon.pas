@@ -143,16 +143,6 @@ var
 begin
   new(p);
   zaehl.p.ins;
-  p^.ne:=nil;
-  p^.li:=nil;
-  p^.re:=nil;
-  p^.pr:=nil;
-
-  p^.so:=nil;
-  p^.su:=nil;
-
-  p^.ps:=nil;
-  p^.ss:=nil;
 
   if p1=nil then outstring('p1=nil');
   if p2=nil then outstring('p2=nil');
