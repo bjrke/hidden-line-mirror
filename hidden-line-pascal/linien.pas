@@ -4,21 +4,22 @@ uses ptcgraph,vector,punkte;
 type
   linie=object
     a,e:ppunkt;
+    constructor init(p1,p2: ppunkt);
     procedure draw(c:color);
     procedure draw1(c:color);
     procedure draw2(l1,l2:float;c:color);
   end;
 function intersect(l1,l2:linie;var lambda,mue:float):int;
-procedure initlinie(var p:linie;p1,p2:ppunkt);
+
 implementation
-procedure initlinie;
+constructor linie.init;
 begin
   if p1^.b.x<p2^.b.x then begin
-    p.a:=p1;
-    p.e:=p2
+    a:=p1;
+    e:=p2
   end else begin
-    p.a:=p2;
-    p.e:=p1
+    a:=p2;
+    e:=p1
   end;
 end;
 

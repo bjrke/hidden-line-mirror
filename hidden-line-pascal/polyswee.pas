@@ -362,7 +362,7 @@ begin
     for i:=1 to plpos do
       for j:=1 to i-1 do
         if j<>i then begin
-          initlinie(li,pl[i],pl[j]);
+          li.init(pl[i],pl[j]);
           if not p1^.linientest(li) then begin
             w:=false;
             for k:=1 to llpos do

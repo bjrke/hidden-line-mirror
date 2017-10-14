@@ -181,9 +181,9 @@ begin
 
   p^.gl:=ls;
 
-  initlinie(p^.l[1],p^.p[2],p^.p[3]);
-  initlinie(p^.l[2],p^.p[3],p^.p[1]);
-  initlinie(p^.l[3],p^.p[1],p^.p[2]);
+  p^.l[1].init(p^.p[2],p^.p[3]);
+  p^.l[2].init(p^.p[3],p^.p[1]);
+  p^.l[3].init(p^.p[1],p^.p[2]);
 
   p^.ur:=u;
   p^.cols:=green;

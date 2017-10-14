@@ -53,9 +53,9 @@ begin
   p[2]:=p2^.b;
   p[3]:=p3^.b;
   gl:=ls;
-  initlinie(l[1],p[2],p[3]);
-  initlinie(l[2],p[3],p[1]);
-  initlinie(l[3],p[1],p[2]);
+  l[1].init(p[2],p[3]);
+  l[2].init(p[3],p[1]);
+  l[3].init(p[1],p[2]);
   next:=nil;
   n :=     o[2]^.o.sub3d(o[1]^.o)
     .kreuz(o[3]^.o.sub3d(o[1]^.o));
@@ -133,7 +133,7 @@ begin
       25:punkttest:=11;          {eckpunkte}
       5:punkttest:=12;
       1:punkttest:=13;
-    else punkttest:=20;         {drau�en}
+    else punkttest:=20;         {draußen}
     end;
   end else begin
     outstring('nullerdiv');
