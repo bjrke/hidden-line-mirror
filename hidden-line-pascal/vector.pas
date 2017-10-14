@@ -29,19 +29,21 @@ type
   vector2d=object
     x, y: float;
     constructor init(x,y: float);
+
+    function sub2d(v: vector2d): vector2d;
+    function add2d(v: vector2d): vector2d;
+    function mul2d(f: float): vector2d;
+    function div2d(d: float): vector2d;
+    function betrag2d: float;
   end;
   matrix2d=object
     x, y: vector2d;
     constructor init(x,y: vector2d);
   end;
-procedure sub2d(var c:vector2d;a,b:vector2d);
-procedure add2d(var c:vector2d;a,b:vector2d);
-procedure mul2d(var v:vector2d;f:float);
-procedure div2d(var v:vector2d;d:float);
+
 
 function det3d(A:matrix3d):float;
 function det2d(A:matrix2d):float;
-function betrag2d(v:vector2d):float;
 PROCEDURE RotVec(VAR ToRot1,ToRot2:Vector3d;t:float);
 PROCEDURE MoveVec(VAR ToMove:Vector3d;Direction:Vector3d;Polarisation:float);
 procedure outstring(s:string);
@@ -122,28 +124,31 @@ begin
   self.y:=y;
 end;
 
-procedure mul2d;
+function vector2d.mul2d;
 begin
-  v.x:=v.x*f;
-  v.y:=v.y*f;
+  mul2d.init(x*f, y*f);
 end;
 
-procedure div2d;
+function vector2d.div2d;
 begin
-  v.x:=v.x/d;
-  v.y:=v.y/d;
+  div2d.init(x/d, y/d);
 end;
 
-procedure sub2d;
+function vector2d.sub2d;
 begin
-  c.x:=a.x-b.x;
-  c.y:=a.y-b.y;
+  sub2d.init( x-v.x, y-v.y );
 end;
-procedure add2d;
+
+function vector2d.add2d;
 begin
-  c.x:=a.x+b.x;
-  c.y:=a.y+b.y;
+  add2d.init( x+v.x, y+v.y );
 end;
+
+function vector2d.betrag2d;
+begin
+  betrag2d:=sqrt(sqr(x)+sqr(y));
+end;
+
 
 constructor matrix3d.init;
 begin
@@ -169,10 +174,6 @@ begin
   det2d:=A.x.x*A.y.y-A.x.y*A.y.x;
 end;
 
-function betrag2d;
-begin
-  betrag2d:=sqrt(sqr(v.x)+sqr(v.y));
-end;
 
 PROCEDURE MoveVec;
 VAR

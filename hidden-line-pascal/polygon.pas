@@ -416,7 +416,7 @@ var
 
   procedure addpl(v:vector2d);
   begin
-    add2d(h,h,v);
+    h := h.add2d(v);
     inc(k);
   end;
 
@@ -449,7 +449,7 @@ begin
         end;
       end;
 
-      div2d(h,2);
+      h := h.div2d(2);
 
       i:=1;
       while {(k<6)and}(i<=3)do begin
@@ -504,7 +504,7 @@ begin
         inc(i);
       end;}
       if k>0 then begin
-        div2d(h,k);
+        h := h.div2d(k);
 
         test(h);
 

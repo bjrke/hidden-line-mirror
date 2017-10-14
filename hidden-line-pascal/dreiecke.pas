@@ -162,13 +162,10 @@ begin
 end;
 
 function dreiecktyp.flaechentest;
-var
-  a,b,c:vector2d;
 begin
-  sub2d(a,p[1]^.b,p[3]^.b);
-  sub2d(b,p[1]^.b,p[2]^.b);
-  sub2d(c,p[2]^.b,p[3]^.b);
-  flaechentest:=betrag2d(a)*1.01<betrag2d(b)+betrag2d(c)
+  flaechentest:=p[1]^.b.sub2d(p[3]^.b).betrag2d * 1.01 <
+                p[1]^.b.sub2d(p[2]^.b).betrag2d +
+                p[2]^.b.sub2d(p[3]^.b).betrag2d
 end;
 
 function dreieck.tiefe;
