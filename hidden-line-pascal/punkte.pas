@@ -19,20 +19,24 @@ type
 
   ppunkt3d=^punkt3d;
   punkt3d=object
-    b:ppunkt;
-    o:vector3d;
-    next:ppunkt3d;
-    constructor init(ax,ay,az:float);
+    public
+      b:ppunkt;
+      o:vector3d;
+      constructor init(ax,ay,az:float);
+    private
+      next:ppunkt3d;
   end;
 
   punktliste=^pliste;
   pliste=object
-    aktuell,Anker,Last:ppunkt3d;
-    function addo(ax,ay,az:float):ppunkt3d;
-    procedure add(p:ppunkt3d);
-    function first:ppunkt3d;
-    function next:ppunkt3d;
-    constructor init;
+    private
+      aktuell,Anker,Last:ppunkt3d;
+    public
+      function addo(ax,ay,az:float):ppunkt3d;
+      procedure add(p:ppunkt3d);
+      function first:ppunkt3d;
+      function next:ppunkt3d;
+      constructor init;
   end;
 
 function colinear(p1,p2,p3:punkt):boolean;

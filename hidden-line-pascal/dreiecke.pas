@@ -16,21 +16,24 @@ type
   end;
   pdreieck=^dreieck;
   dreieck=object(dreiecktyp)
-    o:array[1..3] of ppunkt3d;
-    next:pdreieck;
-    n:vector3d;
-    d:float;
-    function tiefe(k:vector2d;ausgabe:boolean):float;
-    constructor init(p1,p2,p3:ppunkt3d;ls:lset);
+    public
+      o:array[1..3] of ppunkt3d;
+      n:vector3d;
+      d:float;
+      function tiefe(k:vector2d;ausgabe:boolean):float;
+      constructor init(p1,p2,p3:ppunkt3d;ls:lset);
+    private
+      next:pdreieck;
   end;
 
   dreieckliste=^dliste;
   dliste=object
-    aktuell:pdreieck;
-    function add(p1,p2,p3:ppunkt3d;ls:lset):pdreieck;
-    function first:pdreieck;
-    function next:pdreieck;
-    private Anker,Last:pdreieck;
+    public
+      function add(p1,p2,p3:ppunkt3d;ls:lset):pdreieck;
+      function first:pdreieck;
+      function next:pdreieck;
+    private
+      Anker,aktuell,Last:pdreieck;
   end;
 
 procedure initdliste(var p:dreieckliste);
