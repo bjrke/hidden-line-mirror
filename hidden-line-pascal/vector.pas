@@ -11,14 +11,20 @@ const
 type
   float=real;
   int=longint;
-  vector3d=array[x..z]of float;
-  matrix3d=array[x..z]of vector3d;
+  vector3d=object
+    x, y, z: float;
+    constructor init(x,y,z: float);
+  end;
+  matrix3d=object
+    x, y, z: vector3d;
+    constructor init(x,y,z: vector3d);
+  end;
   vector2d=array[x..y]of float;
   matrix2d=array[x..y]of vector2d;
 procedure sub3d(var c:vector3d;a,b:vector3d);
 procedure sub2d(var c:vector2d;a,b:vector2d);
 procedure add3d(var c:vector3d;a,b:vector3d);
-procedure add2d(var c:vector3d;a,b:vector3d);
+procedure add2d(var c:vector2d;a,b:vector2d);
 procedure mul3d(var v:vector3d;f:float);
 procedure div3d(var v:vector3d;d:float);
 procedure kreuz(var c:vector3d;a,b:vector3d);
@@ -49,17 +55,25 @@ const
   MoveSpeed:float=1;
 var
   th,tx: integer;
+
+constructor vector3d.init;
+begin
+  self.x:=x;
+  self.y:=y;
+  self.z:=z;
+end;
+
 procedure sub3d;
 begin
-  c[x]:=a[x]-b[x];
-  c[y]:=a[y]-b[y];
-  c[z]:=a[z]-b[z]
+  c.x:=a.x-b.x;
+  c.y:=a.y-b.y;
+  c.z:=a.z-b.z;
 end;
 procedure add3d;
 begin
-  c[x]:=a[x]+b[x];
-  c[y]:=a[y]+b[y];
-  c[z]:=a[z]+b[z]
+  c.x:=a.x+b.x;
+  c.y:=a.y+b.y;
+  c.z:=a.z+b.z;
 end;
 procedure sub2d;
 begin
@@ -71,10 +85,18 @@ begin
   c[x]:=a[x]+b[x];
   c[y]:=a[y]+b[y];
 end;
+
+constructor matrix3d.init;
+begin
+  self.x := x;
+  self.y := y;
+  self.z := z;
+end;
+
 function det3d;
 begin
-  det3d:=A[x,x]*A[y,y]*A[z,z]+A[y,x]*A[z,y]*A[x,z]+A[z,x]*A[x,y]*A[y,z]-
-         A[x,x]*A[z,y]*A[y,z]-A[y,x]*A[x,y]*A[z,z]-A[z,x]*A[y,y]*A[x,z]
+  det3d:=A.x.x*A.y.y*A.z.z+A.y.x*A.z.y*A.x.z+A.z.x*A.x.y*A.y.z-
+         A.x.x*A.z.y*A.y.z-A.y.x*A.x.y*A.z.z-A.z.x*A.y.y*A.x.z
 end;
 function det2d;
 begin
@@ -82,43 +104,43 @@ begin
 end;
 procedure neg3d;
 begin
-  v[x]:=-v[x];
-  v[y]:=-v[y];
-  v[z]:=-v[z];
+  v.x:=-v.x;
+  v.y:=-v.y;
+  v.z:=-v.z;
 end;
 
 procedure kreuz;
 begin
-  c[x]:=a[y]*b[z]-a[z]*b[y];
-  c[y]:=a[z]*b[x]-a[x]*b[z];
-  c[z]:=a[x]*b[y]-a[y]*b[x]
+  c.x:=a.y*b.z-a.z*b.y;
+  c.y:=a.z*b.x-a.x*b.z;
+  c.z:=a.x*b.y-a.y*b.x;
 end;
 
 function skalar;
 begin
-  skalar:=a[x]*b[x]+a[y]*b[y]+a[z]*b[z];
+  skalar:=a.x*b.x+a.y*b.y+a.z*b.z;
 end;
 
 function betrag3d;
 begin
-  betrag3d:=sqrt(sqr(v[x])+sqr(v[y])+sqr(v[z]))
+  betrag3d:=sqrt(sqr(v.x)+sqr(v.y)+sqr(v.z));
 end;
 function betrag2d;
 begin
-  betrag2d:=sqrt(sqr(v[x])+sqr(v[y]))
+  betrag2d:=sqrt(sqr(v[x])+sqr(v[y]));
 end;
 procedure mul3d;
 begin
-  v[x]:=v[x]*f;
-  v[y]:=v[y]*f;
-  v[z]:=v[z]*f
+  v.x:=v.x*f;
+  v.y:=v.y*f;
+  v.z:=v.z*f;
 end;
 procedure div3d;
 begin
   if d=0 then outstring('d=0');
-  v[x]:=v[x]/d;
-  v[y]:=v[y]/d;
-  v[z]:=v[z]/d
+  v.x:=v.x/d;
+  v.y:=v.y/d;
+  v.z:=v.z/d;
 end;
 PROCEDURE MoveVec;
 VAR
@@ -126,9 +148,9 @@ VAR
 BEGIN
   DirLength:=Betrag3d(Direction);
   if DirLength=0 then outstring('DirLength=0');
-  ToMove[X]:=ToMove[X]+Polarisation*MoveSpeed*Direction[X]/DirLength;
-  ToMove[Y]:=ToMove[Y]+Polarisation*MoveSpeed*Direction[Y]/DirLength;
-  ToMove[Z]:=ToMove[Z]+Polarisation*MoveSpeed*Direction[Z]/DirLength
+  ToMove.x:=ToMove.X+Polarisation*MoveSpeed*Direction.X/DirLength;
+  ToMove.y:=ToMove.Y+Polarisation*MoveSpeed*Direction.Y/DirLength;
+  ToMove.z:=ToMove.Z+Polarisation*MoveSpeed*Direction.Z/DirLength;
 END;
 PROCEDURE RotVec;
 VAR
@@ -148,13 +170,13 @@ BEGIN
   if RotVecLength=0 then writeln('RotVecLength=0');
   if Length1=0 then writeln('Length1=0');
   if Length2=0 then writeln('Length2=0');
-  ToRot1[X]:=(Length1/RotVecLength)*(RotInc*Copy1[X]/Length1+Copy2[X]/Length2);
-  ToRot1[Y]:=(Length1/RotVecLength)*(RotInc*Copy1[Y]/Length1+Copy2[Y]/Length2);
-  ToRot1[Z]:=(Length1/RotVecLength)*(RotInc*Copy1[Z]/Length1+Copy2[Z]/Length2);
+  ToRot1.X:=(Length1/RotVecLength)*(RotInc*Copy1.X/Length1+Copy2.X/Length2);
+  ToRot1.Y:=(Length1/RotVecLength)*(RotInc*Copy1.Y/Length1+Copy2.Y/Length2);
+  ToRot1.Z:=(Length1/RotVecLength)*(RotInc*Copy1.Z/Length1+Copy2.Z/Length2);
 
-  ToRot2[X]:=(Length2/RotVecLength)*(-Copy1[X]/Length1+RotInc*Copy2[X]/Length2);
-  ToRot2[Y]:=(Length2/RotVecLength)*(-Copy1[Y]/Length1+RotInc*Copy2[Y]/Length2);
-  ToRot2[Z]:=(Length2/RotVecLength)*(-Copy1[Z]/Length1+RotInc*Copy2[Z]/Length2)
+  ToRot2.X:=(Length2/RotVecLength)*(-Copy1.X/Length1+RotInc*Copy2.X/Length2);
+  ToRot2.Y:=(Length2/RotVecLength)*(-Copy1.Y/Length1+RotInc*Copy2.Y/Length2);
+  ToRot2.Z:=(Length2/RotVecLength)*(-Copy1.Z/Length1+RotInc*Copy2.Z/Length2)
 END;
 
 procedure outstring;
@@ -194,9 +216,9 @@ var
   s,s1,s2:string;
 begin
   setcolor(red);
-  str(f[x]:6:2,s);
-  str(f[y]:6:2,s1);
-  str(f[z]:6:2,s2);
+  str(f.x:6:2,s);
+  str(f.y:6:2,s1);
+  str(f.z:6:2,s2);
   outstring(name+'('+s+','+s1+','+s2+')');
 end;
 

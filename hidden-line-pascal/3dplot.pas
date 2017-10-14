@@ -34,10 +34,10 @@ const
 begin
   tausgabe:=true;
 
-  auge[x]:=30;  auge[y]:=40;  auge[z]:=50;
-  blickR[x]:=-auge[x]/10;  blickR[y]:=-auge[y]/10;  blickR[z]:=-auge[z]/10;
- { blickR[x]:=-3;  blickR[y]:=-6;  blickR[z]:=-12;}
-  jv[x]:=0;  jv[y]:=0;  jv[z]:=1;
+  auge.x:=30;  auge.y:=40;  auge.z:=50;
+  blickR.x:=-auge.x/10;  blickR.y:=-auge.y/10;  blickR.z:=-auge.z/10;
+ { blickR.x:=-3;  blickR.y:=-6;  blickR.z:=-12;}
+  jv.x:=0;  jv.y:=0;  jv.z:=1;
 
   setallpalette(bpal);
   backface:=true;

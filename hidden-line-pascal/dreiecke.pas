@@ -59,10 +59,8 @@ begin
   sub3d(d1,o[2]^.o,o[1]^.o);
   sub3d(d2,o[3]^.o,o[1]^.o);
   kreuz(n,d1,d2);
-  h:=sqrt(sqr(n[x])+sqr(n[y])+sqr(n[z]));
-  n[x]:=n[x]/h;
-  n[y]:=n[y]/h;
-  n[z]:=n[z]/h;
+  h:=betrag3d(n);
+  div3d(n,h);
   d:=skalar(n,o[1]^.o);
 end;
 
@@ -117,15 +115,15 @@ var
   end;
 
 begin
-  K[x][x]:=p[1]^.b[x];    K[y][x]:=p[2]^.b[x];    K[z][x]:=p[3]^.b[x];
-  K[x][y]:=p[1]^.b[y];    K[y][y]:=p[2]^.b[y];    K[z][y]:=p[3]^.b[y];
-  K[x][z]:=1;     K[y][z]:=1;     K[z][z]:=1;
-  b1[x]:=t[x];    b1[y]:=t[y];        b1[z]:=1;
+  K.x.x:=p[1]^.b[x];    K.y.x:=p[2]^.b[x];    K.z.x:=p[3]^.b[x];
+  K.x.y:=p[1]^.b[y];    K.y.y:=p[2]^.b[y];    K.z.y:=p[3]^.b[y];
+  K.x.z:=1;     K.y.z:=1;     K.z.z:=1;
+  b1.x:=t[x];    b1.y:=t[y];        b1.z:=1;
   kd:=det3d(K);
   if abs(kd)>epsilon1 then begin
-    h:=K[x];    K[x]:=b1;    la:=det3d(K)/kd;  K[x]:=h;        l1:=testl(la);
-    h:=K[y];    K[y]:=b1;    la:=det3d(K)/kd;  K[y]:=h;        l2:=testl(la);
-    h:=K[z];    K[z]:=b1;    la:=det3d(K)/kd;  K[z]:=h;        l3:=testl(la);
+    h:=K.x;    K.x:=b1;    la:=det3d(K)/kd;  K.x:=h;        l1:=testl(la);
+    h:=K.y;    K.y:=b1;    la:=det3d(K)/kd;  K.y:=h;        l2:=testl(la);
+    h:=K.z;    K.z:=b1;    la:=det3d(K)/kd;  K.z:=h;        l3:=testl(la);
     case l1*25+l2*5+l3 of
       124:punkttest:=0;          {drin}
 
@@ -211,9 +209,9 @@ begin
       outfloat('t',t);
     end;
   end else begin
-    h[x]:=(o[1]^.o[x]+o[2]^.o[x]+o[3]^.o[x])/3-auge[x];
-    h[y]:=(o[1]^.o[y]+o[2]^.o[y]+o[3]^.o[y])/3-auge[x];
-    h[x]:=(o[1]^.o[z]+o[2]^.o[z]+o[3]^.o[z])/3-auge[x];
+    h.x:=(o[1]^.o.x+o[2]^.o.x+o[3]^.o.x)/3-auge.x;
+    h.y:=(o[1]^.o.y+o[2]^.o.y+o[3]^.o.y)/3-auge.y;
+    h.x:=(o[1]^.o.z+o[2]^.o.z+o[3]^.o.z)/3-auge.z;
     t:=100000000;
   end;
 {  cols:=darkgray;}

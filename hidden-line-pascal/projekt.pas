@@ -28,13 +28,13 @@ var
   kd:float;
 begin
   sub3d(help,Auge,p.o);
-  K[x]:=iv; K[y]:=jv; K[z]:=help;
+  K.x:=iv; K.y:=jv; K.z:=help;
   kd:=det3d(K);
   if abs(kd)>epsilon3 then begin
-    K[x]:=BlickR;
-    neg3d(K[x]);
+    K.x:=BlickR;
+    neg3d(K.x);
     p.b^.b[x]:=det3d(k)/kd;
-    K[y]:=K[x]; K[x]:=iv;
+    K.y:=K.x; K.x:=iv;
     p.b^.b[y]:=det3d(k)/kd
   end;
 end;
@@ -53,22 +53,23 @@ begin
     i:=points^.next;
   end;
 
-  EA:=BlickR[x];
-  EB:=BlickR[y];
-  EC:=BlickR[z];
-  ED:=-EA*auge[x]-EB*auge[y]-EC*auge[z];
+//TODO EA-EC als vector?
+  EA:=BlickR.x;
+  EB:=BlickR.y;
+  EC:=BlickR.z;
+  ED:=-EA*auge.x-EB*auge.y-EC*auge.z;
   j:=dreiecks^.first;
   while j<>nil do begin
-    if (EA*j^.o[1]^.o[x]+EB*j^.o[1]^.o[y]+EC*j^.o[1]^.o[z]+ED+epsilon1>0) AND
-       (EA*j^.o[2]^.o[x]+EB*j^.o[2]^.o[y]+EC*j^.o[2]^.o[z]+ED+epsilon1>0) AND
-       (EA*j^.o[3]^.o[x]+EB*j^.o[3]^.o[y]+EC*j^.o[3]^.o[z]+ED+epsilon1>0) AND
+    if (EA*j^.o[1]^.o.x+EB*j^.o[1]^.o.y+EC*j^.o[1]^.o.z+ED+epsilon1>0) AND
+       (EA*j^.o[2]^.o.x+EB*j^.o[2]^.o.y+EC*j^.o[2]^.o.z+ED+epsilon1>0) AND
+       (EA*j^.o[3]^.o.x+EB*j^.o[3]^.o.y+EC*j^.o[3]^.o.z+ED+epsilon1>0) AND
        (not backface or ((j^.p[3]^.b[x]-j^.p[1]^.b[x])*(j^.p[2]^.b[y]-j^.p[1]^.b[y])+epsilon1<
        (j^.p[3]^.b[y]-j^.p[1]^.b[y])*(j^.p[2]^.b[x]-j^.p[1]^.b[x]))) then begin
          h:=newpoly(j);
 {         if h^.flaechentest then}
            polygon.push(h,1,-2)
 {         else
-           dispose(h,kill('fl�chentest'));}
+           dispose(h,kill('flächentest'));}
        end;
     j:=dreiecks^.next
   end;

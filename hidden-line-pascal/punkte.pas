@@ -59,9 +59,7 @@ end;
 constructor punkt3d.init;
 begin
   zaehl.p3.ins;
-  o[x]:=ax;
-  o[y]:=ay;
-  o[z]:=az;
+  o.init(ax,ay,az);
   next:=nil;
   new(b, init0);
 end;
