@@ -2,9 +2,6 @@ unit vector;
 interface
 uses ptcgraph,crt;
 const
-  x=0;
-  y=1;
-  z=2;
   epsilon1=0.000001;
   epsilon2=epsilon1*epsilon1;
   epsilon3=epsilon1*epsilon1*epsilon1;
