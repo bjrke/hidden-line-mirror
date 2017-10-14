@@ -15,10 +15,10 @@ begin
   cls;
   kreuz(iv,BlickR,jv);
   if betrag3d(iv)=0 then outstring('i=0');
-  mul3d(iv,0.4*betrag3d(BlickR)/(bmx*betrag3d(iv)));
+  iv := iv.mul3d(0.4*betrag3d(BlickR)/(bmx*betrag3d(iv)));
   kreuz(jv,iv,BlickR);
   if betrag3d(jv)=0 then outstring('j=0');
-  mul3d(jv,0.4*betrag3d(BlickR)/(bmx*betrag3d(jv)));
+  jv := jv.mul3d(0.4*betrag3d(BlickR)/(bmx*betrag3d(jv)));
 end;
 
 procedure perspektive(p:punkt3d);

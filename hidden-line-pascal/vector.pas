@@ -11,7 +11,10 @@ type
   vector3d=object
     x, y, z: float;
     constructor init(x,y,z: float);
+    function add3d(v: vector3d): vector3d;
     function sub3d(v: vector3d): vector3d;
+    function mul3d(f: float): vector3d;
+    function div3d(d: float): vector3d;
   end;
   matrix3d=object
     x, y, z: vector3d;
@@ -26,12 +29,9 @@ type
     constructor init(x,y: vector2d);
   end;
 procedure sub2d(var c:vector2d;a,b:vector2d);
-procedure add3d(var c:vector3d;a,b:vector3d);
 procedure add2d(var c:vector2d;a,b:vector2d);
 procedure mul2d(var v:vector2d;f:float);
 procedure div2d(var v:vector2d;d:float);
-procedure mul3d(var v:vector3d;f:float);
-procedure div3d(var v:vector3d;d:float);
 procedure kreuz(var c:vector3d;a,b:vector3d);
 function skalar(a,b:vector3d):float;
 procedure neg3d(var v:vector3d);
@@ -73,11 +73,20 @@ begin
   sub3d.init(x - v.x, y - v.y, z - v.z);
 end;
 
-procedure add3d;
+function vector3d.add3d;
 begin
-  c.x:=a.x+b.x;
-  c.y:=a.y+b.y;
-  c.z:=a.z+b.z;
+  add3d.init(x + v.x, y + v.y, z + v.z);
+end;
+
+function vector3d.mul3d;
+begin
+  mul3d.init(x*f, y*f, z*f);
+end;
+
+function vector3d.div3d;
+begin
+  if d=0 then outstring('d=0');
+  div3d.init(x/d, y/d, z/d);
 end;
 
 constructor vector2d.init;
@@ -159,19 +168,7 @@ function betrag2d;
 begin
   betrag2d:=sqrt(sqr(v.x)+sqr(v.y));
 end;
-procedure mul3d;
-begin
-  v.x:=v.x*f;
-  v.y:=v.y*f;
-  v.z:=v.z*f;
-end;
-procedure div3d;
-begin
-  if d=0 then outstring('d=0');
-  v.x:=v.x/d;
-  v.y:=v.y/d;
-  v.z:=v.z/d;
-end;
+
 PROCEDURE MoveVec;
 VAR
   DirLength:Real;

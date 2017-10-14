@@ -55,7 +55,7 @@ begin
   initlinie(l[3],p[1],p[2]);
   next:=nil;
   kreuz(n,o[2]^.o.sub3d(o[1]^.o),o[3]^.o.sub3d(o[1]^.o));
-  div3d(n,betrag3d(n));
+  n := n.div3d(betrag3d(n));
   d:=skalar(n,o[1]^.o);
 end;
 
@@ -175,18 +175,16 @@ var
   bv,h:vector3d;
   t,la:float;
 begin
-  h:=iv;
-  mul3d(h,k.x);
+  h := iv.mul3d(k.x);
   if ausgabe then begin
     outvector3d('i',h);
   end;
-  add3d(bv,blickr,h);
-  h:=jv;
-  mul3d(h,k.y);
+  bv := blickr.add3d(h);
+  h := jv.mul3d(k.y);
   if ausgabe then begin
     outvector3d('j',h);
   end;
-  add3d(bv,bv,h);
+  bv := bv.add3d(h);
   t:=skalar(n,bv);
   if ausgabe then begin
     outvector3d('bv',bv);
@@ -194,7 +192,7 @@ begin
   end;
   if abs(t)>epsilon3 then begin
     la:=(d-skalar(n,auge))/t;
-    mul3d(bv,la);
+    bv := bv.mul3d(la);
     t:=betrag3d(bv);
     if ausgabe then begin
       outvector3d('bv',bv);

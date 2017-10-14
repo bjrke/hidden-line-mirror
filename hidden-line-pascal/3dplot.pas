@@ -126,8 +126,7 @@ begin
     OutVector3d('Auge ',auge);
     OutVector3d('BlickR ',blickr);
 
-    h:=jv;
-    mul3d(h,10000);
+    h:=jv.mul3d(10000);
     OutVector3d('Oben x 10000 ',h);
     maxtiefe:=-1e20;
     mintiefe:=1e20;
