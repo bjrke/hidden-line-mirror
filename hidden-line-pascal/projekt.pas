@@ -27,12 +27,12 @@ var
   kd:float;
 begin
   K.init(iv, jv, Auge.sub3d(p.o));
-  kd:=det3d(K);
+  kd:=K.det3d;
   if abs(kd)>epsilon3 then begin
     K.x:=BlickR.neg3d;
-    p.b^.b.x:=det3d(k)/kd;
+    p.b^.b.x:=K.det3d/kd;
     K.y:=K.x; K.x:=iv;
-    p.b^.b.y:=det3d(k)/kd
+    p.b^.b.y:=K.det3d/kd
   end;
 end;
 

@@ -25,6 +25,7 @@ type
   matrix3d=object
     x, y, z: vector3d;
     constructor init(x,y,z: vector3d);
+    function det3d:float;
   end;
   vector2d=object
     x, y: float;
@@ -39,11 +40,9 @@ type
   matrix2d=object
     x, y: vector2d;
     constructor init(x,y: vector2d);
+    function det2d:float;
   end;
 
-
-function det3d(A:matrix3d):float;
-function det2d(A:matrix2d):float;
 PROCEDURE RotVec(VAR ToRot1,ToRot2:Vector3d;t:float);
 PROCEDURE MoveVec(VAR ToMove:Vector3d;Direction:Vector3d;Polarisation:float);
 procedure outstring(s:string);
@@ -157,10 +156,10 @@ begin
   self.z := z;
 end;
 
-function det3d;
+function matrix3d.det3d;
 begin
-  det3d:=A.x.x*A.y.y*A.z.z+A.y.x*A.z.y*A.x.z+A.z.x*A.x.y*A.y.z-
-         A.x.x*A.z.y*A.y.z-A.y.x*A.x.y*A.z.z-A.z.x*A.y.y*A.x.z
+  det3d := x.x*y.y*z.z + y.x*z.y*x.z + z.x*x.y*y.z-
+           x.x*z.y*y.z - y.x*x.y*z.z - z.x*y.y*x.z
 end;
 
 constructor matrix2d.init;
@@ -169,9 +168,9 @@ begin
   self.y := y;
 end;
 
-function det2d;
+function matrix2d.det2d;
 begin
-  det2d:=A.x.x*A.y.y-A.x.y*A.y.x;
+  det2d := x.x*y.y - x.y*y.x;
 end;
 
 

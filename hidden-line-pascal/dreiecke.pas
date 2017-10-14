@@ -115,11 +115,11 @@ begin
   K.x.y:=p[1]^.b.y;    K.y.y:=p[2]^.b.y;    K.z.y:=p[3]^.b.y;
   K.x.z:=1;            K.y.z:=1;            K.z.z:=1;
   b1.x:=t.x;    b1.y:=t.y;        b1.z:=1;
-  kd:=det3d(K);
+  kd:=K.det3d;
   if abs(kd)>epsilon1 then begin
-    h:=K.x;    K.x:=b1;    la:=det3d(K)/kd;  K.x:=h;        l1:=testl(la);
-    h:=K.y;    K.y:=b1;    la:=det3d(K)/kd;  K.y:=h;        l2:=testl(la);
-    h:=K.z;    K.z:=b1;    la:=det3d(K)/kd;  K.z:=h;        l3:=testl(la);
+    h:=K.x;    K.x:=b1;    la:=K.det3d/kd;  K.x:=h;        l1:=testl(la);
+    h:=K.y;    K.y:=b1;    la:=K.det3d/kd;  K.y:=h;        l2:=testl(la);
+    h:=K.z;    K.z:=b1;    la:=K.det3d/kd;  K.z:=h;        l3:=testl(la);
     case l1*25+l2*5+l3 of
       124:punkttest:=0;          {drin}
 
