@@ -165,12 +165,12 @@ begin
     until (upcase(ch) in [#27,'A','Y','Z','K','L','S','X','D','C','F','T',',',';','.',':','O','I','0'..'9']);
 
     case ch of
-      'a':MoveVec(Auge,BlickR,1);       'A':MoveVec(Auge,BlickR,10);
-      'y','z':MoveVec(Auge,BlickR,-1);  'Y','Z':MoveVec(Auge,BlickR,-10);
-      'k':MoveVec(Auge,iv,-1);          'K':MoveVec(Auge,iv,-10);
-      'l':MoveVec(Auge,iv,1);           'L':MoveVec(Auge,iv,10);
-      's':MoveVec(Auge,jv,1);           'S':MoveVec(Auge,jv,10);
-      'x':MoveVec(Auge,jv,-1);          'X':MoveVec(Auge,jv,-10);
+      'a':auge := auge.move3d(BlickR,1);       'A':auge := auge.move3d(BlickR,10);
+      'y','z':auge := auge.move3d(BlickR,-1);  'Y','Z':auge := auge.move3d(BlickR,-10);
+      'k':auge := auge.move3d(iv,-1);          'K':auge := auge.move3d(iv,-10);
+      'l':auge := auge.move3d(iv,1);           'L':auge := auge.move3d(iv,10);
+      's':auge := auge.move3d(jv,1);           'S':auge := auge.move3d(jv,10);
+      'x':auge := auge.move3d(jv,-1);          'X':auge := auge.move3d(jv,-10);
       'd':RotVec(BlickR,jv,1);          'D':RotVec(BlickR,jv,10);
       'c':RotVec(jv,BlickR,1);          'C':RotVec(jv,BlickR,10);
       ',':RotVec(iv,BlickR,1);          ';':RotVec(iv,BlickR,10);

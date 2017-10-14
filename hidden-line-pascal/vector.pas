@@ -21,6 +21,7 @@ type
     function kreuz(v:vector3d): vector3d;
     function skalar(v:vector3d): float;
 
+    function move3d(direction: Vector3d; polarisation: float): vector3d;
   end;
   matrix3d=object
     x, y, z: vector3d;
@@ -44,7 +45,7 @@ type
   end;
 
 PROCEDURE RotVec(VAR ToRot1,ToRot2:Vector3d;t:float);
-PROCEDURE MoveVec(VAR ToMove:Vector3d;Direction:Vector3d;Polarisation:float);
+
 procedure outstring(s:string);
 procedure outfloat(name:string;f:float);
 procedure outvector2d(name:string;f:vector2d);
@@ -117,6 +118,11 @@ begin
   betrag3d:=sqrt(sqr(x)+sqr(y)+sqr(z));
 end;
 
+function vector3d.move3d;
+begin
+  move3d := add3d(direction.mul3d(polarisation * MoveSpeed).div3d(direction.betrag3d));
+end;
+
 constructor vector2d.init;
 begin
   self.x:=x;
@@ -173,20 +179,9 @@ begin
   det2d := x.x*y.y - x.y*y.x;
 end;
 
-
-PROCEDURE MoveVec;
-VAR
-  DirLength:Real;
-BEGIN
-  DirLength:=Direction.betrag3d;
-  if DirLength=0 then outstring('DirLength=0');
-  ToMove.x:=ToMove.X+Polarisation*MoveSpeed*Direction.X/DirLength;
-  ToMove.y:=ToMove.Y+Polarisation*MoveSpeed*Direction.Y/DirLength;
-  ToMove.z:=ToMove.Z+Polarisation*MoveSpeed*Direction.Z/DirLength;
-END;
 PROCEDURE RotVec;
 VAR
-  Length1,Length2:Real;
+  Length1,Length2: float;
   Copy1,Copy2:Vector3d;
   RotVecLength,RotInc:float;
 BEGIN
