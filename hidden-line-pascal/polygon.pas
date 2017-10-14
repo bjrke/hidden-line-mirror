@@ -60,20 +60,20 @@ begin
        2:draw2;
        3:draw3(cols);
        4:begin
-           my1:=p[1]^.b[y];
+           my1:=p[1]^.b.y;
            my2:=my1;
-           if p[2]^.b[y]>my1 then
-             my2:=p[2]^.b[y]
+           if p[2]^.b.y>my1 then
+             my2:=p[2]^.b.y
            else
-             my1:=p[2]^.b[y];
-           if p[3]^.b[y]>my2 then
-             my2:=p[3]^.b[y]
-           else if p[3]^.b[y]<my1 then
-             my1:=p[3]^.b[y];
+             my1:=p[2]^.b.y;
+           if p[3]^.b.y>my2 then
+             my2:=p[3]^.b.y
+           else if p[3]^.b.y<my1 then
+             my1:=p[3]^.b.y;
            ym1:=round(my1);
            ym2:=round(my2);
-           xm1:=round(p[1]^.b[x]);
-           xm2:=round(p[3]^.b[x]);
+           xm1:=round(p[1]^.b.x);
+           xm2:=round(p[3]^.b.x);
            bx:=round(bmx);
            by:=round(bmy);
            my2:=xscan;
@@ -81,8 +81,8 @@ begin
              for wx:=xm1 to xm2 do begin
                xscan:=wx;
                for wy:=ym1 to ym2 do begin
-                 h[x]:=wx;
-                 h[y]:=wy;
+                 h.x:=wx;
+                 h.y:=wy;
                  if punkttest(h)=0 then begin
                    my1:=(bmy-yscan)/30;
                    if my1>15 then putpixel(wx+bx,by-wy,15) else
@@ -94,27 +94,27 @@ begin
            xscan:=my2;
          end;
        5:begin
-           my1:=p[1]^.b[y];
+           my1:=p[1]^.b.y;
            my2:=my1;
-           if p[2]^.b[y]>my1 then
-             my2:=p[2]^.b[y]
+           if p[2]^.b.y>my1 then
+             my2:=p[2]^.b.y
            else
-             my1:=p[2]^.b[y];
-           if p[3]^.b[y]>my2 then
-             my2:=p[3]^.b[y]
-           else if p[3]^.b[y]<my1 then
-             my1:=p[3]^.b[y];
+             my1:=p[2]^.b.y;
+           if p[3]^.b.y>my2 then
+             my2:=p[3]^.b.y
+           else if p[3]^.b.y<my1 then
+             my1:=p[3]^.b.y;
            ym1:=round(my1);
            ym2:=round(my2);
-           xm1:=round(p[1]^.b[x]);
-           xm2:=round(p[3]^.b[x]);
+           xm1:=round(p[1]^.b.x);
+           xm2:=round(p[3]^.b.x);
            bx:=round(bmx);
            by:=round(bmy);
            if (not keypressed) or (readkey<>#13) then
              for wx:=xm1 to xm2 do
                for wy:=ym1 to ym2 do begin
-                 h[x]:=wx;
-                 h[y]:=wy;
+                 h.x:=wx;
+                 h.y:=wy;
                  if punkttest(h)=0 then begin
                    my1:=mt*ur^.tiefe(h,false)+nt;
                    if my1>15 then putpixel(wx+bx,by-wy,15) else
@@ -152,7 +152,7 @@ begin
   p^.p[2] := p2^.copy;
   p^.p[3] := p3^.copy;
 
-  if p^.p[1]^.b[x]>p^.p[2]^.b[x] then begin
+  if p^.p[1]^.b.x>p^.p[2]^.b.x then begin
     h:=p^.p[2];      p^.p[2]:=p^.p[1];      p^.p[1]:=h;
     lsneu:=[];
     if 1 in ls then lsneu:=lsneu+[2];
@@ -161,7 +161,7 @@ begin
     ls:=lsneu
   end;
 
-  if p^.p[1]^.b[x]>p^.p[3]^.b[x] then begin
+  if p^.p[1]^.b.x>p^.p[3]^.b.x then begin
     h:=p^.p[3];      p^.p[3]:=p^.p[1];      p^.p[1]:=h;
     lsneu:=[];
     if 1 in ls then lsneu:=lsneu+[3];
@@ -170,7 +170,7 @@ begin
     ls:=lsneu
   end;
 
-  if p^.p[2]^.b[x]>p^.p[3]^.b[x] then begin
+  if p^.p[2]^.b.x>p^.p[3]^.b.x then begin
     h:=p^.p[3];      p^.p[3]:=p^.p[2];      p^.p[2]:=h;
     lsneu:=[];
     if 1 in ls then lsneu:=lsneu+[1];
@@ -188,18 +188,18 @@ begin
   p^.ur:=u;
   p^.cols:=green;
 
-  p^.ymin:=p^.p[1]^.b[y];
-  p^.ymax:=p^.p[1]^.b[y];
+  p^.ymin:=p^.p[1]^.b.y;
+  p^.ymax:=p^.p[1]^.b.y;
 
-  if p^.p[2]^.b[y]<p^.ymin then
-    p^.ymin:=p^.p[2]^.b[y]
-  else if p^.p[2]^.b[y]>p^.ymax then
-    p^.ymax:=p^.p[2]^.b[y];
+  if p^.p[2]^.b.y<p^.ymin then
+    p^.ymin:=p^.p[2]^.b.y
+  else if p^.p[2]^.b.y>p^.ymax then
+    p^.ymax:=p^.p[2]^.b.y;
 
-  if p^.p[3]^.b[y]<p^.ymin then
-    p^.ymin:=p^.p[3]^.b[y]
-  else if p^.p[3]^.b[y]>p^.ymax then
-    p^.ymax:=p^.p[3]^.b[y]
+  if p^.p[3]^.b.y<p^.ymin then
+    p^.ymin:=p^.p[3]^.b.y
+  else if p^.p[3]^.b.y>p^.ymax then
+    p^.ymax:=p^.p[3]^.b.y
 end;
 
 function newpoly;
@@ -250,7 +250,7 @@ begin
     a:=wurzel[pnr];
     fertig:=false;
     repeat
-      if p^.p[pnr]^.b[x]<=a^.p[pnr]^.b[x] then begin
+      if p^.p[pnr]^.b.x<=a^.p[pnr]^.b.x then begin
         if a^.li<>nil then begin
           a:=a^.li
         end else begin
@@ -351,10 +351,10 @@ var
   h:float;
   miny,maxy,x1,y1,x2,y2:float;
 begin
-  x1:=p[1]^.b[x];
-  y1:=p[1]^.b[y];
-  x2:=p[3]^.b[x];
-  y2:=p[3]^.b[y];
+  x1:=p[1]^.b.x;
+  y1:=p[1]^.b.y;
+  x2:=p[3]^.b.x;
+  y2:=p[3]^.b.y;
   if y1<y2 then begin
     miny:=y1;
     maxy:=y2;
@@ -362,20 +362,20 @@ begin
     miny:=y2;
     maxy:=y1;
   end;
-  if maxy<p[2]^.b[y] then
-    maxy:=p[2]^.b[y]
-  else if p[2]^.b[y]<miny then
-    miny:=p[2]^.b[y];
+  if maxy<p[2]^.b.y then
+    maxy:=p[2]^.b.y
+  else if p[2]^.b.y<miny then
+    miny:=p[2]^.b.y;
   if abs(x2-x1)<epsilon1 then
     h:=(y1+y2)
   else begin
     h:=y1+(y2-y1)*(xscan-x1)/(x2-x1);
-    if xscan<p[2]^.b[x] then begin
-      x2:=p[2]^.b[x];
-      y2:=p[2]^.b[y];
+    if xscan<p[2]^.b.x then begin
+      x2:=p[2]^.b.x;
+      y2:=p[2]^.b.y;
     end else begin
-      x1:=p[2]^.b[x];
-      y1:=p[2]^.b[y];
+      x1:=p[2]^.b.x;
+      y1:=p[2]^.b.y;
     end;
     if abs(x2-x1)<epsilon1 then
       h:=y1+y2
@@ -396,32 +396,31 @@ var
   h:vector2d;
   schnitt,v1,v2:boolean;
 
-procedure test(p:vector2d);
-var
-  d1,d2:float;
-begin
-  if (p1^.punkttest(h)=0)and(p2^.punkttest(h)=0)then begin
-    d1:=p1^.ur^.tiefe(p,ausgabe);
-    d2:=p2^.ur^.tiefe(p,ausgabe);
-    schnitt:=d1<>d2;
-    if p1^.ur=p2^.ur then begin
-      v2:=true;
-    end else
-      v1:=d1<d2;
-    if ausgabe then begin
-      outvector2d('p',p);
-      outfloat('d1',d1);
-      outfloat('d2',d2);
-    end;
-  end
-end;
+  procedure test(p:vector2d);
+  var
+    d1,d2:float;
+  begin
+    if (p1^.punkttest(h)=0)and(p2^.punkttest(h)=0)then begin
+      d1:=p1^.ur^.tiefe(p,ausgabe);
+      d2:=p2^.ur^.tiefe(p,ausgabe);
+      schnitt:=d1<>d2;
+      if p1^.ur=p2^.ur then begin
+        v2:=true;
+      end else
+        v1:=d1<d2;
+      if ausgabe then begin
+        outvector2d('p',p);
+        outfloat('d1',d1);
+        outfloat('d2',d2);
+      end;
+    end
+  end;
 
-procedure addpl(v:vector2d);
-begin
-  h[x]:=h[x]+v[x];
-  h[y]:=h[y]+v[y];
-  inc(k);
-end;
+  procedure addpl(v:vector2d);
+  begin
+    add2d(h,h,v);
+    inc(k);
+  end;
 
 begin
   inc(zaehl.ptest);
@@ -434,16 +433,15 @@ begin
     v2:=false;
     if schnitttest and (p1^.ur<>p2^.ur) then begin
       k:=0;
-      h[x]:=0;
-      h[y]:=0;
+      h.init(0,0);
       i:=1;
       j:=1;
       while (k<6)and(j<=3)do begin
         if linien.intersect(p1^.l[j],p2^.l[i],l,m)=1 then begin
-          h[x]:=h[x]+p1^.l[j].a^.b[x]+l*(p1^.l[j].e^.b[x]-p1^.l[j].a^.b[x])+
-                     p2^.l[i].a^.b[x]+m*(p2^.l[i].e^.b[x]-p2^.l[i].a^.b[x]);
-          h[y]:=h[y]+p1^.l[j].a^.b[y]+l*(p1^.l[j].e^.b[y]-p1^.l[j].a^.b[y])+
-                     p2^.l[i].a^.b[y]+m*(p2^.l[i].e^.b[y]-p2^.l[i].a^.b[y]);
+          h.x:=h.x+p1^.l[j].a^.b.x+l*(p1^.l[j].e^.b.x-p1^.l[j].a^.b.x)+
+                     p2^.l[i].a^.b.x+m*(p2^.l[i].e^.b.x-p2^.l[i].a^.b.x);
+          h.y:=h.y+p1^.l[j].a^.b.y+l*(p1^.l[j].e^.b.y-p1^.l[j].a^.b.y)+
+                     p2^.l[i].a^.b.y+m*(p2^.l[i].e^.b.y-p2^.l[i].a^.b.y);
           inc(k)
         end;
         inc(i);
@@ -453,8 +451,7 @@ begin
         end;
       end;
 
-      h[x]:=h[x]/2;
-      h[y]:=h[y]/2;
+      div2d(h,2);
 
       i:=1;
       while {(k<6)and}(i<=3)do begin
@@ -509,8 +506,7 @@ begin
         inc(i);
       end;}
       if k>0 then begin
-        h[x]:=h[x]/k;
-        h[y]:=h[y]/k;
+        div2d(h,k);
 
         test(h);
 
@@ -520,20 +516,20 @@ begin
     end;
 
     if not schnitt then begin
-      h[x]:=(p1^.p[1]^.b[x]+p1^.p[2]^.b[x]+p1^.p[3]^.b[x])/3;
-      h[y]:=(p1^.p[1]^.b[y]+p1^.p[2]^.b[y]+p1^.p[3]^.b[y])/3;
+      h.x:=(p1^.p[1]^.b.x+p1^.p[2]^.b.x+p1^.p[3]^.b.x)/3;
+      h.y:=(p1^.p[1]^.b.y+p1^.p[2]^.b.y+p1^.p[3]^.b.y)/3;
       test(h);
     end;
 
     if not schnitt then begin
-      h[x]:=(p2^.p[1]^.b[x]+p2^.p[2]^.b[x]+p2^.p[3]^.b[x])/3;
-      h[y]:=(p2^.p[1]^.b[y]+p2^.p[2]^.b[y]+p2^.p[3]^.b[y])/3;
+      h.x:=(p2^.p[1]^.b.x+p2^.p[2]^.b.x+p2^.p[3]^.b.x)/3;
+      h.y:=(p2^.p[1]^.b.y+p2^.p[2]^.b.y+p2^.p[3]^.b.y)/3;
       test(h);
     end;
 
     if not schnitt then begin
-      h[x]:=(p1^.p[1]^.b[x]+p1^.p[2]^.b[x]+p1^.p[3]^.b[x]+p2^.p[1]^.b[x]+p2^.p[2]^.b[x]+p2^.p[3]^.b[x])/6;
-      h[y]:=(p1^.p[1]^.b[y]+p1^.p[2]^.b[y]+p1^.p[3]^.b[y]+p2^.p[1]^.b[y]+p2^.p[2]^.b[y]+p2^.p[3]^.b[y])/6;
+      h.x:=(p1^.p[1]^.b.x+p1^.p[2]^.b.x+p1^.p[3]^.b.x+p2^.p[1]^.b.x+p2^.p[2]^.b.x+p2^.p[3]^.b.x)/6;
+      h.y:=(p1^.p[1]^.b.y+p1^.p[2]^.b.y+p1^.p[3]^.b.y+p2^.p[1]^.b.y+p2^.p[2]^.b.y+p2^.p[3]^.b.y)/6;
       test(h);
     end;
 
@@ -541,14 +537,14 @@ begin
       polytest:=5
     else if not schnitt then begin
       l:=xscan;
-      if p1^.p[1]^.b[x]<p2^.p[1]^.b[x] then
-        xscan:=p2^.p[1]^.b[x]
+      if p1^.p[1]^.b.x<p2^.p[1]^.b.x then
+        xscan:=p2^.p[1]^.b.x
       else
-        xscan:=p1^.p[1]^.b[x];
-      if p1^.p[3]^.b[x]>p2^.p[3]^.b[x] then
-        xscan:=(xscan+p2^.p[3]^.b[x])/2
+        xscan:=p1^.p[1]^.b.x;
+      if p1^.p[3]^.b.x>p2^.p[3]^.b.x then
+        xscan:=(xscan+p2^.p[3]^.b.x)/2
       else
-        xscan:=(xscan+p1^.p[3]^.b[x])/2;
+        xscan:=(xscan+p1^.p[3]^.b.x)/2;
 
       if drawmode = 6 then begin
         marke(round(320+xscan),round(240-p1^.yscan),yellow,'p1^.yscan');

@@ -33,9 +33,9 @@ begin
   if abs(kd)>epsilon3 then begin
     K.x:=BlickR;
     neg3d(K.x);
-    p.b^.b[x]:=det3d(k)/kd;
+    p.b^.b.x:=det3d(k)/kd;
     K.y:=K.x; K.x:=iv;
-    p.b^.b[y]:=det3d(k)/kd
+    p.b^.b.y:=det3d(k)/kd
   end;
 end;
 
@@ -56,8 +56,8 @@ begin
   j:=dreiecks^.first;
   while j<>nil do begin
     if (skalar(BlickR, j^.o[1]^.o)>ED) AND (skalar(BlickR, j^.o[2]^.o)>ED) AND (skalar(BlickR, j^.o[3]^.o)>ED) AND // test if not behind view plane
-       (not backface or ((j^.p[3]^.b[x]-j^.p[1]^.b[x])*(j^.p[2]^.b[y]-j^.p[1]^.b[y])+epsilon1<
-       (j^.p[3]^.b[y]-j^.p[1]^.b[y])*(j^.p[2]^.b[x]-j^.p[1]^.b[x]))) then begin
+       (not backface or ((j^.p[3]^.b.x-j^.p[1]^.b.x)*(j^.p[2]^.b.y-j^.p[1]^.b.y)+epsilon1<
+                         (j^.p[3]^.b.y-j^.p[1]^.b.y)*(j^.p[2]^.b.x-j^.p[1]^.b.x))) then begin
          h:=newpoly(j);
 {         if h^.flaechentest then}
            polygon.push(h,1,-2)

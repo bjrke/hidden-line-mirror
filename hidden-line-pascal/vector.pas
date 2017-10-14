@@ -19,12 +19,20 @@ type
     x, y, z: vector3d;
     constructor init(x,y,z: vector3d);
   end;
-  vector2d=array[x..y]of float;
-  matrix2d=array[x..y]of vector2d;
+  vector2d=object
+    x, y: float;
+    constructor init(x,y: float);
+  end;
+  matrix2d=object
+    x, y: vector2d;
+    constructor init(x,y: vector2d);
+  end;
 procedure sub3d(var c:vector3d;a,b:vector3d);
 procedure sub2d(var c:vector2d;a,b:vector2d);
 procedure add3d(var c:vector3d;a,b:vector3d);
 procedure add2d(var c:vector2d;a,b:vector2d);
+procedure mul2d(var v:vector2d;f:float);
+procedure div2d(var v:vector2d;d:float);
 procedure mul3d(var v:vector3d;f:float);
 procedure div3d(var v:vector3d;d:float);
 procedure kreuz(var c:vector3d;a,b:vector3d);
@@ -75,15 +83,34 @@ begin
   c.y:=a.y+b.y;
   c.z:=a.z+b.z;
 end;
+
+constructor vector2d.init;
+begin
+  self.x:=x;
+  self.y:=y;
+end;
+
+procedure mul2d;
+begin
+  v.x:=v.x*f;
+  v.y:=v.y*f;
+end;
+
+procedure div2d;
+begin
+  v.x:=v.x/d;
+  v.y:=v.y/d;
+end;
+
 procedure sub2d;
 begin
-  c[x]:=a[x]-b[x];
-  c[y]:=a[y]-b[y];
+  c.x:=a.x-b.x;
+  c.y:=a.y-b.y;
 end;
 procedure add2d;
 begin
-  c[x]:=a[x]+b[x];
-  c[y]:=a[y]+b[y];
+  c.x:=a.x+b.x;
+  c.y:=a.y+b.y;
 end;
 
 constructor matrix3d.init;
@@ -98,9 +125,16 @@ begin
   det3d:=A.x.x*A.y.y*A.z.z+A.y.x*A.z.y*A.x.z+A.z.x*A.x.y*A.y.z-
          A.x.x*A.z.y*A.y.z-A.y.x*A.x.y*A.z.z-A.z.x*A.y.y*A.x.z
 end;
+
+constructor matrix2d.init;
+begin
+  self.x := x;
+  self.y := y;
+end;
+
 function det2d;
 begin
-  det2d:=A[x,x]*A[y,y]-A[x,y]*A[y,x];
+  det2d:=A.x.x*A.y.y-A.x.y*A.y.x;
 end;
 procedure neg3d;
 begin
@@ -127,7 +161,7 @@ begin
 end;
 function betrag2d;
 begin
-  betrag2d:=sqrt(sqr(v[x])+sqr(v[y]));
+  betrag2d:=sqrt(sqr(v.x)+sqr(v.y));
 end;
 procedure mul3d;
 begin
@@ -206,8 +240,8 @@ var
   s,s1:string;
 begin
   setcolor(red);
-  str(f[x]:6:2,s);
-  str(f[y]:6:2,s1);
+  str(f.x:6:2,s);
+  str(f.y:6:2,s1);
   outstring(name+'('+s+','+s1+')');
 end;
 

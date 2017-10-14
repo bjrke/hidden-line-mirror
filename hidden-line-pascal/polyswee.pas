@@ -291,18 +291,18 @@ var
 
   begin
     inc(zaehl.pp);
-    h[x]:=(pu1^.b[x]+pu2^.b[x]+pu3^.b[x])/3;
-    h[y]:=(pu1^.b[y]+pu2^.b[y]+pu3^.b[y])/3;
+    h.x:=(pu1^.b.x+pu2^.b.x+pu3^.b.x)/3;
+    h.y:=(pu1^.b.y+pu2^.b.y+pu3^.b.y)/3;
     if (p1^.punkttest(h)=20)and not colinear(pu1^,pu2^,pu3^) then begin
       ls:=[];
       if pu2^.gz*pu3^.gz<>[] then      ls:=ls+[1];
       if pu3^.gz*pu1^.gz<>[] then      ls:=ls+[2];
       if pu1^.gz*pu2^.gz<>[] then      ls:=ls+[3];
       initppoly(ph,pu1,pu2,pu3,ls,p2^.ur);
-      h[x]:=(p1^.p[1]^.b[x]+p1^.p[2]^.b[x]+p1^.p[3]^.b[x])/3;
-      h[y]:=(p1^.p[1]^.b[y]+p1^.p[2]^.b[y]+p1^.p[3]^.b[y])/3;
+      h.x:=(p1^.p[1]^.b.x+p1^.p[2]^.b.x+p1^.p[3]^.b.x)/3;
+      h.y:=(p1^.p[1]^.b.y+p1^.p[2]^.b.y+p1^.p[3]^.b.y)/3;
       if (ph^.punkttest(h)=20) {and ((ph^.gl<>[]) or (ph^.flaechentest))} then begin
-        if ph^.p[1]^.b[x]>=xscan then begin
+        if ph^.p[1]^.b.x>=xscan then begin
           ph^.cols:=2; {15}
           push(ph,1,zaehl.count)
         end else begin
@@ -322,10 +322,10 @@ begin
   for i:=1 to 3 do
     for j:=1 to 3 do
       if linien.intersect(p1^.l[j],p2^.l[i],l,m)=1 then begin
-        h.b[x]:=(p1^.l[j].a^.b[x]+l*(p1^.l[j].e^.b[x]-p1^.l[j].a^.b[x])+
-                 p2^.l[i].a^.b[x]+m*(p2^.l[i].e^.b[x]-p2^.l[i].a^.b[x]))/2;
-        h.b[y]:=(p1^.l[j].a^.b[y]+l*(p1^.l[j].e^.b[y]-p1^.l[j].a^.b[y])+
-                 p2^.l[i].a^.b[y]+m*(p2^.l[i].e^.b[y]-p2^.l[i].a^.b[y]))/2;
+        h.b.x:=(p1^.l[j].a^.b.x+l*(p1^.l[j].e^.b.x-p1^.l[j].a^.b.x)+
+                p2^.l[i].a^.b.x+m*(p2^.l[i].e^.b.x-p2^.l[i].a^.b.x))/2;
+        h.b.y:=(p1^.l[j].a^.b.y+l*(p1^.l[j].e^.b.y-p1^.l[j].a^.b.y)+
+                p2^.l[i].a^.b.y+m*(p2^.l[i].e^.b.y-p2^.l[i].a^.b.y))/2;
         addpl(h,p2^.gl*[i]);
       end;
   for i:=1 to 3 do begin
@@ -396,7 +396,7 @@ begin
     swurzel^.po:=nil;
     swurzel^.pu:=nil;
     push(swurzel,3,swurzel^.count);
-    xscan:=swurzel^.p[1]^.b[x]
+    xscan:=swurzel^.p[1]^.b.x
   end;
   ende:=false;
   while not ende do begin
@@ -411,12 +411,12 @@ begin
       end;
     end else begin
       p:=polygon.pop(1);
-      xscan:=p^.p[1]^.b[x];
+      xscan:=p^.p[1]^.b.x;
       insert(p,true);
 
-      if first[1]<>nil then xscan:=first[1]^.p[1]^.b[x];
+      if first[1]<>nil then xscan:=first[1]^.p[1]^.b.x;
 
-      while(first[3]<>nil)and(first[3]^.p[3]^.b[x]<=xscan+epsilon1)do begin
+      while(first[3]<>nil)and(first[3]^.p[3]^.b.x<=xscan+epsilon1)do begin
 
         while first[2]<>nil do begin
           p:=polygon.pop(2);

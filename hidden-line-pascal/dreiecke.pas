@@ -76,12 +76,12 @@ var tri:array[1..3]of pointtype;
 begin
   setfillstyle(1,cols);
   setcolor(cols);
-  tri[1].x:=round(bmx+p[1]^.b[x]);
-  tri[1].y:=round(bmy-p[1]^.b[y]);
-  tri[2].x:=round(bmx+p[2]^.b[x]);
-  tri[2].y:=round(bmy-p[2]^.b[y]);
-  tri[3].x:=round(bmx+p[3]^.b[x]);
-  tri[3].y:=round(bmy-p[3]^.b[y]);
+  tri[1].x:=round(bmx+p[1]^.b.x);
+  tri[1].y:=round(bmy-p[1]^.b.y);
+  tri[2].x:=round(bmx+p[2]^.b.x);
+  tri[2].y:=round(bmy-p[2]^.b.y);
+  tri[3].x:=round(bmx+p[3]^.b.x);
+  tri[3].y:=round(bmy-p[3]^.b.y);
   fillpoly(3,tri)
 end;
 
@@ -115,10 +115,10 @@ var
   end;
 
 begin
-  K.x.x:=p[1]^.b[x];    K.y.x:=p[2]^.b[x];    K.z.x:=p[3]^.b[x];
-  K.x.y:=p[1]^.b[y];    K.y.y:=p[2]^.b[y];    K.z.y:=p[3]^.b[y];
-  K.x.z:=1;     K.y.z:=1;     K.z.z:=1;
-  b1.x:=t[x];    b1.y:=t[y];        b1.z:=1;
+  K.x.x:=p[1]^.b.x;    K.y.x:=p[2]^.b.x;    K.z.x:=p[3]^.b.x;
+  K.x.y:=p[1]^.b.y;    K.y.y:=p[2]^.b.y;    K.z.y:=p[3]^.b.y;
+  K.x.z:=1;            K.y.z:=1;            K.z.z:=1;
+  b1.x:=t.x;    b1.y:=t.y;        b1.z:=1;
   kd:=det3d(K);
   if abs(kd)>epsilon1 then begin
     h:=K.x;    K.x:=b1;    la:=det3d(K)/kd;  K.x:=h;        l1:=testl(la);
@@ -154,8 +154,8 @@ begin
   if (pa=0)or(pe=0)then
     linientest:=true
   else if (pa<20)and(pe<20)then begin
-    h[x]:=(li.a^.b[x]+li.e^.b[x])/2;
-    h[y]:=(li.a^.b[y]+li.e^.b[y])/2;
+    h.x:=(li.a^.b.x+li.e^.b.x)/2;
+    h.y:=(li.a^.b.y+li.e^.b.y)/2;
     linientest:=(punkttest(h)=0);
   end else begin
     li1:=linien.intersect(li,l[1],la,m);
@@ -181,13 +181,13 @@ var
   t,la:float;
 begin
   h:=iv;
-  mul3d(h,k[x]);
+  mul3d(h,k.x);
   if ausgabe then begin
     outvector3d('i',h);
   end;
   add3d(bv,blickr,h);
   h:=jv;
-  mul3d(h,k[y]);
+  mul3d(h,k.y);
   if ausgabe then begin
     outvector3d('j',h);
   end;

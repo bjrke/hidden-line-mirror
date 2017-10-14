@@ -79,18 +79,18 @@ end;
 procedure punkt.draw;
 begin
   setcolor(c);
-  circle(round(bmx+b[x]),round(bmy-b[y]),2);
+  circle(round(bmx+b.x),round(bmy-b.y),2);
 end;
 
 function colinear;
 begin
-  colinear:=abs((p1.b[y]-p2.b[y])*(p3.b[x]-p2.b[x])-(p1.b[x]-p2.b[x])*(p3.b[y]-p2.b[y]))<epsilon1
+  colinear:=abs((p1.b.y-p2.b.y)*(p3.b.x-p2.b.x)-(p1.b.x-p2.b.x)*(p3.b.y-p2.b.y))<epsilon1
 end;
 
 function gleicheseite;
 begin
-  gleicheseite:=sgn(((p3.b[y]-s.b[y])*(p2.b[x]-s.b[x])-(p3.b[x]-s.b[x])*(p2.b[y]-s.b[y]))
-               *((p4.b[y]-s.b[y])*(p2.b[x]-s.b[x])-(p4.b[x]-s.b[x])*(p2.b[y]-s.b[y])))
+  gleicheseite:=sgn(((p3.b.y-s.b.y)*(p2.b.x-s.b.x)-(p3.b.x-s.b.x)*(p2.b.y-s.b.y))
+                   *((p4.b.y-s.b.y)*(p2.b.x-s.b.x)-(p4.b.x-s.b.x)*(p2.b.y-s.b.y)))
 end;
 
 
