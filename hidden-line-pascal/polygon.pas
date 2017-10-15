@@ -10,19 +10,19 @@ type
     li,re,ne,pr:ppoly;
     so,su,pu,po:ppoly;
     ss,ps:pppoly;
-    ur:pdreieck;
+    originalTriangle: pdreieck;
     drx,dry:integer;
     farbe:color;
     count:int;
     ymin,ymax:float;
 
-    constructor init(p1,p2,p3:ppunkt;ls:lset;u:pdreieck);
-    constructor newpoly(d:pdreieck);
+    constructor initpoly( p1,p2,p3:ppunkt; ls:lset; aOriginalTriangle:pdreieck);
+    constructor newpoly( aOriginalTriangle:pdreieck );
 
     destructor done(aufr: string);
 
     function yscan:float;
-    procedure draw;
+    procedure drawpoly;
   end;
 var
   swurzel:ppoly;
@@ -31,6 +31,7 @@ var
   colmode:boolean;
   drawmode:integer;
   rand:boolean;
+  tiefePerspektive: minmax;
 
 procedure push(p:ppoly;pnr:punr;c:int);
 function pop(pnr:punr):ppoly;
@@ -52,7 +53,7 @@ begin
   zaehl.p.del;
 end;
 
-procedure poly.draw;
+procedure poly.drawpoly;
 var my1,my2:float;
     wx,wy,xm1,xm2,ym1,ym2,bx,by:int;
     h:vector2d;
@@ -122,19 +123,13 @@ begin
             h.x:=wx;
             h.y:=wy;
             if punkttest(h)=0 then begin
-              my1:=mt*ur^.tiefe(h,false)+nt;
-              if my1>15 then
-                putpixel(wx+bx,by-wy,15)
-              else if my1<1 then
-                putpixel(wx+bx,by-wy,1)
-              else
-                putpixel(bx+wx,by-wy,round(my1))
+              putpixel(bx+wx,by-wy,round(1 + 14 * tiefePerspektive.relative( originalTriangle^.tiefe(h,false) )))
             end;
           end;
     end;
     6:draw1;
     7:begin
-      cols:=ur^.cols;
+      cols:=originalTriangle^.cols;
       draw2
     end;
     8:begin
@@ -144,7 +139,7 @@ begin
   end;
 end;
 
-constructor poly.init;
+constructor poly.initpoly;
 var
   h:ppunkt;
   lsneu:lset;
@@ -193,7 +188,7 @@ begin
   l[2].init(p[3],p[1]);
   l[3].init(p[1],p[2]);
 
-  ur:=u;
+  originalTriangle:=aOriginalTriangle;
   cols:=green;
 
   ymin:=p[1]^.b.y;
@@ -216,21 +211,21 @@ var
   t:vector3d;}
   c:vector3d;
 begin
-  c :=   d^.o[1]^.o.sub3d(d^.o[2]^.o)
-  .kreuz(d^.o[3]^.o.sub3d(d^.o[2]^.o));
-  d^.cols:=round(1+14*BlickR.skalar(c)/(BlickR.betrag3d*c.betrag3d));
+  c :=   aOriginalTriangle^.o[1]^.o.sub3d(aOriginalTriangle^.o[2]^.o)
+  .kreuz(aOriginalTriangle^.o[3]^.o.sub3d(aOriginalTriangle^.o[2]^.o));
+  aOriginalTriangle^.cols:=round(1+14*BlickR.skalar(c)/(BlickR.betrag3d*c.betrag3d));
 
 {  add3d(t,a,b);
   add3d(t,t,c);
 
   A1:=betrag3d(c)*betrag3d(t);
-  A2:=abs((d^.p[1]^.b[x]-d^.p[2]^.b[x])*(d^.p[3]^.b[y]-d^.p[2]^.b[y])
-         -(d^.p[1]^.b[y]-d^.p[2]^.b[y])*(d^.p[3]^.b[x]-d^.p[2]^.b[x]));}
+  A2:=abs((aOriginalTriangle^.p[1]^.b.x-d^.p[2]^.b.x)*(d^.p[3]^.b.y-d^.p[2]^.b.y)
+         -(aOriginalTriangle^.p[1]^.b.y-d^.p[2]^.b.y)*(d^.p[3]^.b.x-d^.p[2]^.b.x));}
 {  d^.cols:=round(1+A2/(10*A1));}
-  if d^.cols>15 then d^.cols:=15;
-  if d^.cols<1 then d^.cols:=1;
+  if aOriginalTriangle^.cols>15 then aOriginalTriangle^.cols:=15;
+  if aOriginalTriangle^.cols<1 then aOriginalTriangle^.cols:=1;
 
-  init(d^.p[1],d^.p[2],d^.p[3],d^.gl,d);
+  initpoly(aOriginalTriangle^.p[1],aOriginalTriangle^.p[2],aOriginalTriangle^.p[3],aOriginalTriangle^.gl,aOriginalTriangle);
 end;
 
 procedure push;
@@ -405,10 +400,10 @@ var
     d1,d2:float;
   begin
     if (p1^.punkttest(h)=0)and(p2^.punkttest(h)=0)then begin
-      d1:=p1^.ur^.tiefe(p,ausgabe);
-      d2:=p2^.ur^.tiefe(p,ausgabe);
+      d1:=p1^.originalTriangle^.tiefe(p,ausgabe);
+      d2:=p2^.originalTriangle^.tiefe(p,ausgabe);
       schnitt:=d1<>d2;
-      if p1^.ur=p2^.ur then begin
+      if p1^.originalTriangle=p2^.originalTriangle then begin
         v2:=true;
       end else
         v1:=d1<d2;
@@ -435,7 +430,7 @@ begin
   else begin
     schnitt:=false;
     v2:=false;
-    if schnitttest and (p1^.ur<>p2^.ur) then begin
+    if schnitttest and (p1^.originalTriangle<>p2^.originalTriangle) then begin
       k:=0;
       h.init(0,0);
       i:=1;
@@ -572,9 +567,9 @@ begin
       outvector2d('p2^.p[1]^.b',p2^.p[1]^.b);
       outvector2d('p2^.p[2]^.b',p2^.p[2]^.b);
       outvector2d('p2^.p[3]^.b',p2^.p[3]^.b);
-      outvector2d('ur^.p[1]^.b',p2^.ur^.p[1]^.b);
-      outvector2d('ur^.p[2]^.b',p2^.ur^.p[2]^.b);
-      outvector2d('ur^.p[3]^.b',p2^.ur^.p[3]^.b);
+      outvector2d('originalTriangle^.p[1]^.b',p2^.originalTriangle^.p[1]^.b);
+      outvector2d('originalTriangle^.p[2]^.b',p2^.originalTriangle^.p[2]^.b);
+      outvector2d('originalTriangle^.p[3]^.b',p2^.originalTriangle^.p[3]^.b);
       p1^.draw3(1);
       p2^.draw3(2);
 

@@ -18,11 +18,19 @@ type
     procedure ausgabe;
   end;
 
+  minmax=object
+    minValue, maxValue: float;
+    constructor init;
+    procedure update(f: float);
+    function toString: String;
+    function relative(f: float): float;
+  end;
+
+  cset = set of char;
+
 function gettime2: LongInt;
 procedure starttime;
 procedure outtime;
-
-type cset = set of char;
 function readkey2( include: cset): char;
 
 var
@@ -101,6 +109,30 @@ begin
   p.ausgabe('Polygone insgesamt');
   p2.ausgabe('Punkte in Bildeben');
   p3.ausgabe('Punkte im Raum');
+end;
+
+constructor minmax.init;
+begin
+  minValue := 1e20;
+  maxValue := -1e20;
+end;
+
+procedure minmax.update;
+begin
+  if ( f < minValue ) then
+    minValue := f;
+  if ( f > maxValue ) then
+    maxValue := f;
+end;
+
+function minmax.toString;
+begin
+  toString := 'min: ' + floatToString( minValue ) + ' max: ' + floatToString( maxValue );
+end;
+
+function minmax.relative;
+begin
+  relative := (f - minValue) / (maxValue - minValue);
 end;
 
 procedure starttime;

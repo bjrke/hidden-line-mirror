@@ -104,7 +104,7 @@ begin
           sdelete(h);
           del(h,3);
           if h<>nil then begin
-            polypoly(u^.ur,h);
+            polypoly(u^.originalTriangle,h);
             dispose(h,done('lofall3'))
           end else
             outstring('h is nil (falls3)');
@@ -115,7 +115,7 @@ begin
           sdelete(h);
           del(h,3);
           if h<>nil then begin
-            polypoly(o^.ur,h);
+            polypoly(o^.originalTriangle,h);
             dispose(h, done('lofall4'))
           end else
             outstring('h is nil (falls4)');
@@ -178,7 +178,7 @@ begin
           end;
         3:begin
             if p<>nil then begin
-              polypoly(ak^^.ur,p);
+              polypoly(ak^^.originalTriangle,p);
               dispose(p, done('insert fall3'));
 {              outstring('f3u');}
             end else
@@ -189,7 +189,7 @@ begin
 {            outstring('f4o');}
             h:=loesche(ak^);
             if h<>nil then begin
-              polypoly(p^.ur,h);
+              polypoly(p^.originalTriangle,h);
               dispose(h, done('insert fall4'))
             end else
               outstring('h is nil (fall4)');
@@ -296,7 +296,7 @@ var
       if pu2^.gz*pu3^.gz<>[] then      ls:=ls+[1];
       if pu3^.gz*pu1^.gz<>[] then      ls:=ls+[2];
       if pu1^.gz*pu2^.gz<>[] then      ls:=ls+[3];
-      new(ph, init(pu1,pu2,pu3,ls,p2^.ur));
+      new(ph, initpoly(pu1,pu2,pu3,ls,p2^.originalTriangle));
       h.x:=(p1^.p[1]^.b.x+p1^.p[2]^.b.x+p1^.p[3]^.b.x)/3;
       h.y:=(p1^.p[1]^.b.y+p1^.p[2]^.b.y+p1^.p[3]^.b.y)/3;
       if (ph^.punkttest(h)=20) {and ((ph^.gl<>[]) or (ph^.flaechentest))} then begin
@@ -404,7 +404,7 @@ begin
       else begin
         p:=loesche(first[3]);
         p^.cols:=15; {5}
-        p^.draw;
+        p^.drawpoly;
         dispose(p, done('sweep ende'));
       end;
     end else begin
@@ -422,7 +422,7 @@ begin
         end;
         p:=loesche(first[3]);
         p^.cols:=15; {6}
-        p^.draw;
+        p^.drawpoly;
         dispose(p, done('insert pop3'));
       end;
     end;

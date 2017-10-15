@@ -18,8 +18,8 @@ type
   dreieck=object(dreiecktyp)
     public
       o:array[1..3] of ppunkt3d;
-      n:vector3d;
-      d:float;
+      planeNorm: vector3d;
+      planeDist: float;
       function tiefe(k:vector2d;ausgabe:boolean):float;
       constructor init(p1,p2,p3:ppunkt3d;ls:lset);
     private
@@ -39,7 +39,6 @@ type
 
 var
   dreiecks:dliste;
-  mintiefe,maxtiefe,mt,nt:float;
 implementation
 
 constructor dreieck.init;
@@ -55,10 +54,10 @@ begin
   l[2].init(p[3],p[1]);
   l[3].init(p[1],p[2]);
   next:=nil;
-  n :=     o[2]^.o.sub3d(o[1]^.o)
-    .kreuz(o[3]^.o.sub3d(o[1]^.o));
-  n := n.div3d(n.betrag3d);
-  d := n.skalar(o[1]^.o);
+  planeNorm := o[2]^.o.sub3d(o[1]^.o)
+        .kreuz(o[3]^.o.sub3d(o[1]^.o));
+  planeNorm := planeNorm.div3d(planeNorm.betrag3d);
+  planeDist := planeNorm.skalar(o[1]^.o);
 end;
 
 procedure dreiecktyp.draw1;
@@ -172,45 +171,17 @@ end;
 
 function dreieck.tiefe;
 var
-  bv,h:vector3d;
-  t,la:float;
+  bv:vector3d;
+  t:float;
 begin
-  h := iv.mul3d(k.x);
-  if ausgabe then begin
-    outvector3d('i',h);
-  end;
-  bv := blickr.add3d(h);
-  h := jv.mul3d(k.y);
-  if ausgabe then begin
-    outvector3d('j',h);
-  end;
-  bv := bv.add3d(h);
-  t := n.skalar(bv);
-  if ausgabe then begin
-    outvector3d('bv',bv);
-    outfloat('t',t);
-  end;
-  if abs(t)>epsilon3 then begin
-    la:=(d-n.skalar(auge))/t;
-    bv := bv.mul3d(la);
-    t := bv.betrag3d;
-    if ausgabe then begin
-      outvector3d('bv',bv);
-      outfloat('la',la);
-      outfloat('d',d);
-      outfloat('n.skalar(auge)',n.skalar(auge));
-      outfloat('t',t);
-    end;
-  end else begin
-    h.x:=(o[1]^.o.x+o[2]^.o.x+o[3]^.o.x)/3-auge.x;
-    h.y:=(o[1]^.o.y+o[2]^.o.y+o[3]^.o.y)/3-auge.y;
-    h.x:=(o[1]^.o.z+o[2]^.o.z+o[3]^.o.z)/3-auge.z;
-    t:=100000000;
-  end;
+  bv := blickr.add3d(iv.mul3d(k.x))
+              .add3d(jv.mul3d(k.y));
+  t := planeNorm.skalar(bv);
+  if abs(t)>epsilon3 then
+    tiefe := bv.betrag3d * ( planeDist - planeNorm.skalar(auge) ) / t
+  else
+    tiefe := 100000000;
 {  cols:=darkgray;}
-  if t>maxtiefe then maxtiefe:=t;
-  if t<mintiefe then mintiefe:=t;
-  tiefe:=t;
 end;
 
 constructor dliste.init;

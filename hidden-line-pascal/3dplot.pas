@@ -2,7 +2,6 @@ program dreidplot;
 uses crt,ptcgraph,vector,dreidext,projekt,dreiecke,polyswee,polygon,punkte,zeit;
 var
   ch:char;
-  h:vector3d;
   p:ppoly;
   palettePos: Integer;
 
@@ -122,14 +121,12 @@ begin
   zaehl.init;
   neukamera;
   rechnung;
+
   outint(' Anzahl Polygone: ',zaehl.q[1].maximum);
   OutVector3d('Auge ',auge);
   OutVector3d('BlickR ',blickr);
+  OutVector3d('Oben x 10000 ', jv.mul3d(10000));
 
-  h:=jv.mul3d(10000);
-  OutVector3d('Oben x 10000 ',h);
-  maxtiefe:=-1e20;
-  mintiefe:=1e20;
   starttime;
   sweep;
   outtime;
@@ -144,19 +141,19 @@ begin
   if first[3]<>nil then outstring('first[3]');
   while first[1]<>nil do begin
     p:=pop(1);
-    p^.draw;
+    p^.drawpoly;
     dispose(p, done('a'));
     outstring('f1');
   end;
   while first[2]<>nil do begin
     p:=pop(2);
-    p^.draw;
+    p^.drawpoly;
     dispose(p, done('a'));
     outstring('f2');
   end;
   while first[3]<>nil do begin
     p:=pop(3);
-    p^.draw;
+    p^.drawpoly;
     dispose(p, done('a'));
     outstring('f3');
   end;

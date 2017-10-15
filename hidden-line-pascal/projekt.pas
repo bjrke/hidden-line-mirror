@@ -1,6 +1,6 @@
 unit projekt;
 interface
-uses crt,ptcgraph,vector,polygon,dreiecke,punkte,linien;
+uses crt,ptcgraph,vector,polygon,dreiecke,punkte,linien,zeit;
 
 procedure neukamera;
 procedure rechnung;
@@ -32,7 +32,11 @@ begin
     K.x:=BlickR.neg3d;
     p.b^.b.x:=K.det3d/kd;
     K.y:=K.x; K.x:=iv;
-    p.b^.b.y:=K.det3d/kd
+    p.b^.b.y:=K.det3d/kd;
+
+    if ( drawmode = 5 ) then begin
+      tiefePerspektive.update( p.o.sub3d( Auge ).betrag3d );
+    end;
   end;
 end;
 
@@ -43,21 +47,22 @@ var
   ED:float;
   h:ppoly;
 begin
+  tiefePerspektive.init;
   i:=points^.first;
   while i<>nil do begin
     perspektive(i^);
     i:=points^.next;
   end;
 
-  ED:=BlickR.skalar(Auge)-epsilon1;
+  ED:=BlickR.skalar(Auge) + epsilon1;
   j:=dreiecks.first;
   while j<>nil do begin
     if (BlickR.skalar(j^.o[1]^.o)>ED) AND (BlickR.skalar(j^.o[2]^.o)>ED) AND (BlickR.skalar(j^.o[3]^.o)>ED) AND // test if not behind view plane
        (not backface or ((j^.p[3]^.b.x-j^.p[1]^.b.x)*(j^.p[2]^.b.y-j^.p[1]^.b.y)+epsilon1<
                          (j^.p[3]^.b.y-j^.p[1]^.b.y)*(j^.p[2]^.b.x-j^.p[1]^.b.x))) then begin
-         new(h, newpoly(j));
-{         if h^.flaechentest then}
-           polygon.push(h,1,-2)
+        new(h, newpoly(j));
+//         if h^.flaechentest then TODO
+            polygon.push(h,1,-2)
 {         else
            dispose(h,kill('flächentest'));}
        end;
