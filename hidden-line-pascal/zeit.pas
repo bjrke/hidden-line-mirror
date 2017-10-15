@@ -1,6 +1,6 @@
 unit zeit;
 interface
-uses dos, vector;
+uses crt, dos, vector;
 type
   dtyp=object
     insert,delete,maximum,minimum,aktuell:longint;
@@ -18,8 +18,13 @@ type
     procedure ausgabe;
   end;
 
+function gettime2: LongInt;
 procedure starttime;
 procedure outtime;
+
+type cset = set of char;
+function readkey2( include: cset): char;
+
 var
   zaehl:ctyp;
 implementation
@@ -52,21 +57,21 @@ procedure dtyp.ausgabe;
 begin
   outstring(name);
   if (insert=delete)and(insert<>0)then
-    outint('  Einfügungen = Löschungen:',insert)
+    outint('  EinfÃ¼gungen = LÃ¶schungen:',insert)
   else begin
-    if insert<>0 then outint('  Einfügungen:',insert);
-    if delete<>0 then outint('  Löschungen:',delete);
+    if insert<>0 then outint('  EinfÃ¼gungen:',insert);
+    if delete<>0 then outint('  LÃ¶schungen:',delete);
   end;
-  if (maximum<>0) and (maximum<>aktuell) then outint('  Höchststand:',maximum);
+  if (maximum<>0) and (maximum<>aktuell) then outint('  HÃ¶chststand:',maximum);
   if (minimum<>0) and (minimum<>aktuell) then outint('  Tiefststand:',minimum);
   if (aktuell<>insert)then begin
     if (aktuell<>0) and (minimum<>aktuell) and (maximum<>aktuell) then outint('  aktueller Stand:',aktuell);
-    if (aktuell=maximum)and (aktuell<>0)then outint('  aktuell(Höchst)Stand:',aktuell);
+    if (aktuell=maximum)and (aktuell<>0)then outint('  aktuell(HÃ¶chst)Stand:',aktuell);
     if (aktuell=minimum)and (aktuell<>0)then outint('  aktuell(Tiefst)Stand:',aktuell);
   end else begin
-    if (aktuell<>0) and (minimum<>aktuell) and (maximum<>aktuell) then outint('  aktueller Stand = Einfügungen:',aktuell);
-    if (aktuell=maximum)and (aktuell<>0)then outint('  aktuell(Höchst)Stand = Einfügungen:',aktuell);
-    if (aktuell=minimum)and (aktuell<>0)then outint('  aktuell(Tiefst)Stand = Einfügungen:',aktuell);
+    if (aktuell<>0) and (minimum<>aktuell) and (maximum<>aktuell) then outint('  aktueller Stand = EinfÃ¼gungen:',aktuell);
+    if (aktuell=maximum)and (aktuell<>0)then outint('  aktuell(HÃ¶chst)Stand = EinfÃ¼gungen:',aktuell);
+    if (aktuell=minimum)and (aktuell<>0)then outint('  aktuell(Tiefst)Stand = EinfÃ¼gungen:',aktuell);
   end;
   outstring('--------------------------');
 end;
@@ -99,11 +104,16 @@ begin
 end;
 
 procedure starttime;
+begin
+  time := gettime2;
+end;
+
+function gettime2;
 var
   h,m,s,s100:word;
 begin
   gettime(h,m,s,s100);
-  time:=360000*h+6000*m+s*100+s100;
+  gettime2:=360000*h+6000*m+s*100+s100;
 end;
 
 procedure outtime;
@@ -135,6 +145,33 @@ begin
   str(s:0:2,s2);
   s1:=s1+s2+'s';
   outstring('Zeit: '+s1);
+end;
+
+function readkey2;
+var
+  start: LongInt;
+  ch, res: Char;
+begin
+  repeat
+    res := ReadKey;
+    if ( res = #0 ) then
+      ReadKey
+  until ( Upcase(res) in include);
+
+  if KeyPressed then
+  begin
+    start := gettime2;
+    repeat
+      ch := ReadKey;
+      if ( ch = #0 ) then
+        ReadKey
+    until ((not KeyPressed) or (ch <> res) or ((gettime2 - start) > 500))
+  end;
+
+  if ( Upcase(ch) in include ) then
+    exit(ch)
+  else
+    exit(res);
 end;
 
 begin

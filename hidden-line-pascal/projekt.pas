@@ -5,9 +5,9 @@ uses crt,ptcgraph,vector,polygon,dreiecke,punkte,linien;
 procedure neukamera;
 procedure rechnung;
 
-var backface:boolean;
-  spal,bpal:palettetype;
-
+var
+  backface:boolean;
+  palette: array [0..1] of palettetype;
 implementation
 
 procedure neukamera;
@@ -73,7 +73,7 @@ begin
   initgraph(tr,md,'');
   bmx:=getmaxx div 2;
   bmy:=getmaxy div 2;
-  getdefaultpalette(spal);
+  getdefaultpalette(palette[0]);
   setrgbpalette(32,0,0,0);
   setpalette(32,32);
 
@@ -82,8 +82,7 @@ begin
     setrgbpalette(tr+32,trunc(4.02*tr),trunc(4.02*tr),trunc(4.02*tr));
     setpalette(tr,tr+32);
   end;
-  getpalette(bpal);
-  setallpalette(spal);
+  getpalette(palette[1]);
   for tr:=0 to 15 do begin
     setcolor(tr);
     setfillstyle(1,tr);

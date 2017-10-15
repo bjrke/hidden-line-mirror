@@ -237,9 +237,7 @@ begin
     if drawmode=6 then begin
       repeat
         drawtree;
-        repeat
-          ch:=readkey
-        until ch in [#32, #27, '1'..'9','a'];
+        ch:=readkey2([#32, #27, '1'..'9','a']);
         if ch in ['1'..'9'] then begin
           cls;
           if (ord(ch)-ord('0'))in zumalen then
