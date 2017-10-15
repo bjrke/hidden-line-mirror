@@ -21,21 +21,21 @@ begin
   jv := jv.mul3d(0.4*BlickR.betrag3d/(bmx*jv.betrag3d));
 end;
 
-procedure perspektive(p:punkt3d);
+procedure perspektive(p:ppunkt3d);
 var
   K:matrix3d;
   kd:float;
 begin
-  K.init(iv, jv, Auge.sub3d(p.o));
+  K.init(iv, jv, Auge.sub3d(p^.o));
   kd:=K.det3d;
   if abs(kd)>epsilon3 then begin
     K.x:=BlickR.neg3d;
-    p.b^.b.x:=K.det3d/kd;
+    p^.b^.b.x:=K.det3d/kd;
     K.y:=K.x; K.x:=iv;
-    p.b^.b.y:=K.det3d/kd;
+    p^.b^.b.y:=K.det3d/kd;
 
     if ( drawmode = 5 ) then begin
-      tiefePerspektive.update( p.o.sub3d( Auge ).betrag3d );
+      tiefePerspektive.update( p^.o.sub3d( Auge ).betrag3d );
     end;
   end;
 end;
@@ -50,7 +50,7 @@ begin
   tiefePerspektive.init;
   i:=points^.first;
   while i<>nil do begin
-    perspektive(i^);
+    perspektive(i);
     i:=points^.next;
   end;
 
