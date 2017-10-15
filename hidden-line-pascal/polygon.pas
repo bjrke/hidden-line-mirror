@@ -81,23 +81,22 @@ begin
       bx:=round(bmx);
       by:=round(bmy);
       my2:=xscan;
-      if (not keypressed) or (readkey<>#13) then
-        for wx:=xm1 to xm2 do begin
-          xscan:=wx;
-          for wy:=ym1 to ym2 do begin
-            h.x:=wx;
-            h.y:=wy;
-            if punkttest(h)=0 then begin
-              my1:=(bmy-yscan)/30;
-              if my1>15 then
-                putpixel(wx+bx,by-wy,15)
-              else if my1<1 then
-                putpixel(wx+bx,by-wy,1)
-              else
-                putpixel(bx+wx,by-wy,round(my1))
-            end
+      for wx:=xm1 to xm2 do begin
+        xscan:=wx;
+        for wy:=ym1 to ym2 do begin
+          h.x:=wx;
+          h.y:=wy;
+          if punkttest(h)=0 then begin
+            my1:=(bmy-yscan)/30;
+            if my1>15 then
+              putpixel(wx+bx,by-wy,15)
+            else if my1<1 then
+              putpixel(wx+bx,by-wy,1)
+            else
+              putpixel(bx+wx,by-wy,round(my1))
           end
-        end;
+        end
+      end;
       xscan:=my2;
       end;
     5:begin
@@ -117,15 +116,14 @@ begin
       xm2:=round(p[3]^.b.x);
       bx:=round(bmx);
       by:=round(bmy);
-      if (not keypressed) or (readkey<>#13) then
-        for wx:=xm1 to xm2 do
-          for wy:=ym1 to ym2 do begin
-            h.x:=wx;
-            h.y:=wy;
-            if punkttest(h)=0 then begin
-              putpixel(bx+wx,by-wy,round(1 + 14 * tiefePerspektive.relative( originalTriangle^.tiefe(h,false) )))
-            end;
+      for wx:=xm1 to xm2 do
+        for wy:=ym1 to ym2 do begin
+          h.x:=wx;
+          h.y:=wy;
+          if punkttest(h)=0 then begin
+            putpixel(bx+wx,by-wy,round(1 + 14 * tiefePerspektive.relative( originalTriangle^.tiefe(h,false) )))
           end;
+        end;
     end;
     6:draw1;
     7:begin

@@ -441,23 +441,23 @@ var
   f:color;
 procedure dp(p:ppoly;dx,dy:integer);
 begin
-  if (dy<480) and (p<>nil) then begin
+  if (dy<bmy*2) and (p<>nil) then begin
     inc(f);
     p^.cols:=f;
     p^.drx:=dx;
     p^.dry:=dy;
-    dp(p^.so,dx+320 shr (dy div 10),dy+10);
-    dp(p^.su,dx-320 shr (dy div 10),dy+10);
+    dp(p^.so,dx+bmx shr (dy div 10),dy+10);
+    dp(p^.su,dx-bmx shr (dy div 10),dy+10);
     dec(f);
   end;
 end;
 
 procedure verbindung(s,z:ppoly;c:color);
 begin
-  if (z<>nil)and(z^.dry<480) then begin
+  if (z<>nil)and(z^.dry<bmy*2) then begin
     setcolor(c);
     line(s^.drx,s^.dry,z^.drx,z^.dry);
-    line(200-4*s^.dry+round(xscan),240-round(s^.yscan),200-4*z^.dry+round(xscan),240-round(z^.yscan));
+    line(bmx-4*s^.dry+round(xscan),bmy-round(s^.yscan),bmx-4*z^.dry+round(xscan),bmy-round(z^.yscan));
   end;
 end;
 
@@ -481,7 +481,7 @@ begin
       setcolor(p^.cols);
     ys:=round(p^.yscan);
     str(ys,s);
-    outtextxy(200-4*p^.dry+round(xscan)-4*length(s),240-ys,s);
+    outtextxy(bmx-4*p^.dry+round(xscan)-4*length(s),bmy-ys,s);
     outtextxy(p^.drx-12,p^.dry,s)
   end;
 end;
@@ -490,7 +490,7 @@ begin
   setcolor(white);
   line(round(xscan+bmx),0,round(xscan+bmx),479);
   f:=0;
-  dp(swurzel,320,10);
+  dp(swurzel,bmx,10);
   zeichne(swurzel);
 end;
 

@@ -62,7 +62,7 @@ procedure cls;
 function sgn(x:float):int;
 var
   Auge,BlickR,iv,jv:vector3d;
-  bmx,bmy:float;
+  bmx,bmy: Integer;
   palleiste:pointer;
   tausgabe:boolean;
 
