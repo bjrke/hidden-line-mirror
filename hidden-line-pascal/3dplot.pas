@@ -33,7 +33,6 @@ const
   r1,r2,r3:float;}
 
 begin
-  palettePos := 1;
   tausgabe:=true;
 
   auge.x:=30;  auge.y:=40;  auge.z:=50;
@@ -166,7 +165,7 @@ end;
 procedure tastatur;
 begin
   repeat
-    ch:=readkey2([#27,'A','Y','Z','K','L','S','X','D','C','F','T','P',',',';','.',':','O','I','0'..'9']);
+    ch:=readkey2([#27,'A','B','Y','Z','K','L','S','X','D','C','F','T','P',',',';','.',':','O','I','0'..'9']);
     case ch of
       'a':auge := auge.move3d(BlickR,1);       'A':auge := auge.move3d(BlickR,10);
       'y','z':auge := auge.move3d(BlickR,-1);  'Y','Z':auge := auge.move3d(BlickR,-10);
@@ -182,6 +181,7 @@ begin
       'i':RotVec(@iv, @jv, 1);                 'I':RotVec(@iv, @jv, 10);
       'f','F':colmode:=not colmode;
       't','T':tausgabe:=not tausgabe;
+      'b','B':backface:=not backface;
       'p':begin
         palettePos := (palettePos + 1) MOD Length(palette);
         SetAllPalette(palette[palettePos]);

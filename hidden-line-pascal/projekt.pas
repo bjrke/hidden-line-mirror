@@ -7,7 +7,7 @@ procedure rechnung;
 
 var
   backface:boolean;
-  palette: array [0..1] of palettetype;
+  palette: array [0..2] of palettetype;
 implementation
 
 procedure neukamera;
@@ -65,31 +65,36 @@ begin
   end;
 {  xscan:=-1e20;}
 end;
+
+procedure initGraphic;
 var
-  tr,md:integer;
+  tr,md: Integer;
 begin
-  tr:=9;{installuserdriver('bgi256',nil);}
-  md:=2;
+  tr:=D8bit;
+  md:=m1280x1024;
   initgraph(tr,md,'');
+end;
+
+const colors = 16;
+var p, i, f: Integer;
+begin
+  initGraphic;
   bmx:=getmaxx div 2;
   bmy:=getmaxy div 2;
-  getdefaultpalette(palette[0]);
-  setrgbpalette(32,0,0,0);
-  setpalette(32,32);
 
-  for tr:=1 to 15 do begin
-{    setrgbpalette(tr+32,32+trunc(2.05*tr),trunc(2.05*tr),trunc(0*tr));}
-    setrgbpalette(tr+32,trunc(4.02*tr),trunc(4.02*tr),trunc(4.02*tr));
-    setpalette(tr,tr+32);
+  for p := 0 to Length(palette) - 1 do begin
+    for i:=1 to (colors - 1) do begin
+      setpalette(i,i+p*colors);
+    end;
+    getpalette(palette[p]);
   end;
-  getpalette(palette[1]);
-  for tr:=0 to 15 do begin
-    setcolor(tr);
-    setfillstyle(1,tr);
-    bar(0,tr*30,10,tr*30+29)
+
+  SetAllPalette(palette[0]);
+  for i:=0 to (colors - 1) do begin
+    setcolor(i);
+    setfillstyle(1,i);
+    bar(0,i*480 div colors,10,((i+1)*480 div colors) -1 )
   end;
   getmem(palleiste,imagesize(0,0,10,479));
   getimage(0,0,10,479,palleiste^);
-  setcolor(15);
-  delay(300);
 end.
