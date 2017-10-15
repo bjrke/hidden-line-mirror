@@ -87,7 +87,7 @@ begin
           h.x:=wx;
           h.y:=wy;
           if punkttest(h)=0 then begin
-            my1:=(bmy-yscan)/30;
+            my1:= 1 + 7 * ((bmy + yscan) / bmy);
             if my1>15 then
               putpixel(wx+bx,by-wy,15)
             else if my1<1 then
