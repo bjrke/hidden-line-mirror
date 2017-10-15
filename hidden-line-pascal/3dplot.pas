@@ -196,7 +196,7 @@ begin
       '6':begin drawmode:=6;zumalen:=[0..255];tausgabe:=true;end;
       '7':drawmode:=7;
       '8':drawmode:=8;
-      '9':drawmode:=1;
+      '9':drawmode:=9;
     end;
   until (not (Upcase(ch) in ['U']));
 end;

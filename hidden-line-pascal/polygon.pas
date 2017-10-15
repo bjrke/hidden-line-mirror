@@ -134,6 +134,10 @@ begin
       cols:=farbe;
       draw1;
     end;
+    9:begin
+      cols:=originalTriangle^.cols;
+      draw1;
+    end;
   end;
 end;
 
@@ -210,7 +214,7 @@ var
   ergebnis: float;
 begin
 
-  if (drawmode =7) then
+  if ((drawmode =7) or (drawmode = 9)) then
   begin
     c :=   aOriginalTriangle^.o[1]^.o.sub3d(aOriginalTriangle^.o[2]^.o)
     .kreuz(aOriginalTriangle^.o[3]^.o.sub3d(aOriginalTriangle^.o[2]^.o));
