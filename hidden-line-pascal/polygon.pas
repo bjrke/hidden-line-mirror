@@ -59,82 +59,88 @@ var my1,my2:float;
 begin
   if colmode then cols:=random(15)+1;
   case drawmode of
-       1:draw1;
-       2:draw2;
-       3:draw3(cols);
-       4:begin
-           my1:=p[1]^.b.y;
-           my2:=my1;
-           if p[2]^.b.y>my1 then
-             my2:=p[2]^.b.y
-           else
-             my1:=p[2]^.b.y;
-           if p[3]^.b.y>my2 then
-             my2:=p[3]^.b.y
-           else if p[3]^.b.y<my1 then
-             my1:=p[3]^.b.y;
-           ym1:=round(my1);
-           ym2:=round(my2);
-           xm1:=round(p[1]^.b.x);
-           xm2:=round(p[3]^.b.x);
-           bx:=round(bmx);
-           by:=round(bmy);
-           my2:=xscan;
-           if (not keypressed) or (readkey<>#13) then
-             for wx:=xm1 to xm2 do begin
-               xscan:=wx;
-               for wy:=ym1 to ym2 do begin
-                 h.x:=wx;
-                 h.y:=wy;
-                 if punkttest(h)=0 then begin
-                   my1:=(bmy-yscan)/30;
-                   if my1>15 then putpixel(wx+bx,by-wy,15) else
-                     if my1<0 then putpixel(wx+bx,by-wy,0) else
-                       putpixel(bx+wx,by-wy,round(my1))
-                 end
-               end
-             end;
-           xscan:=my2;
-         end;
-       5:begin
-           my1:=p[1]^.b.y;
-           my2:=my1;
-           if p[2]^.b.y>my1 then
-             my2:=p[2]^.b.y
-           else
-             my1:=p[2]^.b.y;
-           if p[3]^.b.y>my2 then
-             my2:=p[3]^.b.y
-           else if p[3]^.b.y<my1 then
-             my1:=p[3]^.b.y;
-           ym1:=round(my1);
-           ym2:=round(my2);
-           xm1:=round(p[1]^.b.x);
-           xm2:=round(p[3]^.b.x);
-           bx:=round(bmx);
-           by:=round(bmy);
-           if (not keypressed) or (readkey<>#13) then
-             for wx:=xm1 to xm2 do
-               for wy:=ym1 to ym2 do begin
-                 h.x:=wx;
-                 h.y:=wy;
-                 if punkttest(h)=0 then begin
-                   my1:=mt*ur^.tiefe(h,false)+nt;
-                   if my1>15 then putpixel(wx+bx,by-wy,15) else
-                     if my1<0 then putpixel(wx+bx,by-wy,0) else
-                       putpixel(bx+wx,by-wy,round(my1))
-                 end;
-               end;
-       end;
-       6:draw1;
-       7:begin
-         cols:=ur^.cols;
-         draw2
-       end;
-       8:begin
-         cols:=farbe;
-         draw1;
-       end;
+    1:draw1;
+    2:draw2;
+    3:draw3(cols);
+    4:begin
+      my1:=p[1]^.b.y;
+      my2:=my1;
+      if p[2]^.b.y>my1 then
+        my2:=p[2]^.b.y
+      else
+        my1:=p[2]^.b.y;
+      if p[3]^.b.y>my2 then
+        my2:=p[3]^.b.y
+      else if p[3]^.b.y<my1 then
+        my1:=p[3]^.b.y;
+      ym1:=round(my1);
+      ym2:=round(my2);
+      xm1:=round(p[1]^.b.x);
+      xm2:=round(p[3]^.b.x);
+      bx:=round(bmx);
+      by:=round(bmy);
+      my2:=xscan;
+      if (not keypressed) or (readkey<>#13) then
+        for wx:=xm1 to xm2 do begin
+          xscan:=wx;
+          for wy:=ym1 to ym2 do begin
+            h.x:=wx;
+            h.y:=wy;
+            if punkttest(h)=0 then begin
+              my1:=(bmy-yscan)/30;
+              if my1>15 then
+                putpixel(wx+bx,by-wy,15)
+              else if my1<0 then
+                putpixel(wx+bx,by-wy,0)
+              else
+                putpixel(bx+wx,by-wy,round(my1))
+            end
+          end
+        end;
+      xscan:=my2;
+      end;
+    5:begin
+      my1:=p[1]^.b.y;
+      my2:=my1;
+      if p[2]^.b.y>my1 then
+        my2:=p[2]^.b.y
+      else
+        my1:=p[2]^.b.y;
+      if p[3]^.b.y>my2 then
+        my2:=p[3]^.b.y
+      else if p[3]^.b.y<my1 then
+        my1:=p[3]^.b.y;
+      ym1:=round(my1);
+      ym2:=round(my2);
+      xm1:=round(p[1]^.b.x);
+      xm2:=round(p[3]^.b.x);
+      bx:=round(bmx);
+      by:=round(bmy);
+      if (not keypressed) or (readkey<>#13) then
+        for wx:=xm1 to xm2 do
+          for wy:=ym1 to ym2 do begin
+            h.x:=wx;
+            h.y:=wy;
+            if punkttest(h)=0 then begin
+              my1:=mt*ur^.tiefe(h,false)+nt;
+              if my1>15 then
+                putpixel(wx+bx,by-wy,15)
+              else if my1<0 then
+                putpixel(wx+bx,by-wy,0)
+              else
+                putpixel(bx+wx,by-wy,round(my1))
+            end;
+          end;
+    end;
+    6:draw1;
+    7:begin
+      cols:=ur^.cols;
+      draw2
+    end;
+    8:begin
+      cols:=farbe;
+      draw1;
+    end;
   end;
 end;
 
