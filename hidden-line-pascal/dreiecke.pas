@@ -131,10 +131,11 @@ begin
       25:punkttest:=11;          {eckpunkte}
       5:punkttest:=12;
       1:punkttest:=13;
-    else punkttest:=20;         {draußen}
+    else
+      punkttest:=20;         {draußen}
     end;
   end else begin
-    outstring('nullerdiv');
+    outstring('nullerdiv ' + K.toString);
     punkttest:=0;
   end;
 end;

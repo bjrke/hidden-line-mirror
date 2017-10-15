@@ -76,7 +76,7 @@ begin
 end;
 
 const colors = 16;
-var p, i, f: Integer;
+var p, i: Integer;
 begin
   initGraphic;
   bmx:=getmaxx div 2;

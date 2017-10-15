@@ -23,11 +23,13 @@ type
     function skalar(v:vector3d): float;
 
     function move3d(direction: Vector3d; polarisation: float): vector3d;
+    function toString: String;
   end;
   matrix3d=object
     x, y, z: vector3d;
     constructor init(x,y,z: vector3d);
-    function det3d:float;
+    function det3d: float;
+    function toString: String;
   end;
   vector2d=object
     x, y: float;
@@ -38,13 +40,16 @@ type
     function mul2d(f: float): vector2d;
     function div2d(d: float): vector2d;
     function betrag2d: float;
+    function toString: String;
   end;
   matrix2d=object
     x, y: vector2d;
     constructor init(x,y: vector2d);
     function det2d:float;
+    function toString: String;
   end;
 
+function floatToString(f: float): String;
 PROCEDURE RotVec(ToRot1,ToRot2:pvector3d;t:float);
 
 procedure outstring(s:string);
@@ -124,6 +129,11 @@ begin
   move3d := add3d(direction.mul3d(polarisation * MoveSpeed).div3d(direction.betrag3d));
 end;
 
+function vector3d.toString;
+begin
+  toString := '(' + floatToString(x) + ',' + floatToString(y) + ',' + floatToString(z) + ')';
+end;
+
 constructor vector2d.init;
 begin
   self.x:=x;
@@ -155,6 +165,10 @@ begin
   betrag2d:=sqrt(sqr(x)+sqr(y));
 end;
 
+function vector2d.toString;
+begin
+  toString := '(' + floatToString(x) + ',' + floatToString(y) + ')';
+end;
 
 constructor matrix3d.init;
 begin
@@ -169,6 +183,11 @@ begin
            x.x*z.y*y.z - y.x*x.y*z.z - z.x*y.y*x.z
 end;
 
+function matrix3d.toString;
+begin
+  toString := '(' + x.toString + ',' + y.toString + ',' + z.toString + ')';
+end;
+
 constructor matrix2d.init;
 begin
   self.x := x;
@@ -178,6 +197,11 @@ end;
 function matrix2d.det2d;
 begin
   det2d := x.x*y.y - x.y*y.x;
+end;
+
+function matrix2d.toString;
+begin
+  toString := '(' + x.toString + ',' + y.toString + ')';
 end;
 
 PROCEDURE RotVec;
@@ -220,34 +244,29 @@ begin
   end;
 end;
 
+function floatToString;
+var s: String;
+begin
+  Str(f:6:2,s);
+  floatToString := s;
+end;
+
 procedure outfloat;
-var
-  s:string;
 begin
   setcolor(red);
-  str(f:6:2,s);
-  outstring(name+s);
+  outstring(name + floatToString(f));
 end;
 
 procedure outvector2d;
-var
-  s,s1:string;
 begin
   setcolor(red);
-  str(f.x:6:2,s);
-  str(f.y:6:2,s1);
-  outstring(name+'('+s+','+s1+')');
+  outstring(name+f.toString);
 end;
 
 procedure outvector3d;
-var
-  s,s1,s2:string;
 begin
   setcolor(red);
-  str(f.x:6:2,s);
-  str(f.y:6:2,s1);
-  str(f.z:6:2,s2);
-  outstring(name+'('+s+','+s1+','+s2+')');
+  outstring(name+f.toString);
 end;
 
 procedure outint;
