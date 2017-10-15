@@ -39,7 +39,20 @@ type
 
 var
   dreiecks:dliste;
+
+function calcColor(f: float): color;
+
 implementation
+
+function calcColor;
+begin
+  if ( f < 0 ) then
+    calcColor := 1
+  else if ( f > 1 ) then
+    calcColor := 15
+  else
+    calcColor := Round(f*14.0);
+end;
 
 constructor dreieck.init;
 begin

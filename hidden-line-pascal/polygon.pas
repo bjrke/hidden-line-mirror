@@ -121,7 +121,7 @@ begin
           h.x:=wx;
           h.y:=wy;
           if punkttest(h)=0 then begin
-            putpixel(bx+wx,by-wy,round(1 + 14 * tiefePerspektive.relative( originalTriangle^.tiefe(h,false) )))
+            putpixel(bx+wx,by-wy, calcColor(tiefePerspektive.relative( originalTriangle^.tiefe(h,false) )));
           end;
         end;
     end;
@@ -205,23 +205,21 @@ end;
 
 constructor poly.newpoly;
 var
-{  A1,A2:float;
-  t:vector3d;}
   c:vector3d;
+  divisor: float;
+  ergebnis: float;
 begin
-  c :=   aOriginalTriangle^.o[1]^.o.sub3d(aOriginalTriangle^.o[2]^.o)
-  .kreuz(aOriginalTriangle^.o[3]^.o.sub3d(aOriginalTriangle^.o[2]^.o));
-  aOriginalTriangle^.cols:=round(1+14*BlickR.skalar(c)/(BlickR.betrag3d*c.betrag3d));
 
-{  add3d(t,a,b);
-  add3d(t,t,c);
-
-  A1:=betrag3d(c)*betrag3d(t);
-  A2:=abs((aOriginalTriangle^.p[1]^.b.x-d^.p[2]^.b.x)*(d^.p[3]^.b.y-d^.p[2]^.b.y)
-         -(aOriginalTriangle^.p[1]^.b.y-d^.p[2]^.b.y)*(d^.p[3]^.b.x-d^.p[2]^.b.x));}
-{  d^.cols:=round(1+A2/(10*A1));}
-  if aOriginalTriangle^.cols>15 then aOriginalTriangle^.cols:=15;
-  if aOriginalTriangle^.cols<1 then aOriginalTriangle^.cols:=1;
+  if (drawmode =7) then
+  begin
+    c :=   aOriginalTriangle^.o[1]^.o.sub3d(aOriginalTriangle^.o[2]^.o)
+    .kreuz(aOriginalTriangle^.o[3]^.o.sub3d(aOriginalTriangle^.o[2]^.o));
+    divisor := (BlickR.betrag3d*c.betrag3d);
+    if (abs(divisor) < epsilon1) then
+      aOriginalTriangle^.cols := 15
+    else
+      aOriginalTriangle^.cols := calcColor(BlickR.skalar(c)/divisor);
+  end;
 
   initpoly(aOriginalTriangle^.p[1],aOriginalTriangle^.p[2],aOriginalTriangle^.p[3],aOriginalTriangle^.gl,aOriginalTriangle);
 end;
