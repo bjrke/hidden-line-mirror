@@ -90,8 +90,8 @@ begin
               my1:=(bmy-yscan)/30;
               if my1>15 then
                 putpixel(wx+bx,by-wy,15)
-              else if my1<0 then
-                putpixel(wx+bx,by-wy,0)
+              else if my1<1 then
+                putpixel(wx+bx,by-wy,1)
               else
                 putpixel(bx+wx,by-wy,round(my1))
             end
@@ -125,8 +125,8 @@ begin
               my1:=mt*ur^.tiefe(h,false)+nt;
               if my1>15 then
                 putpixel(wx+bx,by-wy,15)
-              else if my1<0 then
-                putpixel(wx+bx,by-wy,0)
+              else if my1<1 then
+                putpixel(wx+bx,by-wy,1)
               else
                 putpixel(bx+wx,by-wy,round(my1))
             end;
