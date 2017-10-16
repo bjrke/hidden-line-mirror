@@ -60,8 +60,8 @@ var my1,my2:float;
 begin
   if colmode then cols:=random(15)+1;
   case drawmode of
-    1:draw1;
-    2:draw2;
+    1:draw1(cols);
+    2:draw2(cols);
     3:draw3(cols);
     4:begin
       my1:=p[1]^.b.y;
@@ -125,18 +125,15 @@ begin
           end;
         end;
     end;
-    6:draw1;
+    6:draw1(cols);
     7:begin
-      cols:=originalTriangle^.cols;
-      draw2
+      draw2(originalTriangle^.cols)
     end;
     8:begin
-      cols:=farbe;
-      draw1;
+      draw1(farbe);
     end;
     9:begin
-      cols:=originalTriangle^.cols;
-      draw1;
+      draw1(originalTriangle^.cols);
     end;
   end;
 end;
@@ -580,7 +577,7 @@ end;
 procedure verbinde;
 begin
     case r of
-        so:begin
+      so:begin
           if v<>nil then
             v^.so:=s;
           if s<>nil then begin

@@ -7,8 +7,8 @@ type
     l:array[1..3] of linie;
     gl:lset;
     cols:color;
-    procedure draw1;
-    procedure draw2;
+    procedure draw1(c:color);
+    procedure draw2(c:color);
     procedure draw3(c:color);
     function linientest(li:linie):boolean;
     function punkttest(t:vector2d):int;
@@ -75,16 +75,16 @@ end;
 
 procedure dreiecktyp.draw1;
 begin
-  if (gl*[1])<>[] then l[1].draw(cols);
-  if (gl*[2])<>[] then l[2].draw(cols);
-  if (gl*[3])<>[] then l[3].draw(cols);
+  if (gl*[1])<>[] then l[1].draw(c);
+  if (gl*[2])<>[] then l[2].draw(c);
+  if (gl*[3])<>[] then l[3].draw(c);
 end;
 
 procedure dreiecktyp.draw2;
 var tri:array[1..3]of pointtype;
 begin
-  setfillstyle(1,cols);
-  setcolor(cols);
+  setfillstyle(1,c);
+  setcolor(c);
   tri[1].x:=round(bmx+p[1]^.b.x);
   tri[1].y:=round(bmy-p[1]^.b.y);
   tri[2].x:=round(bmx+p[2]^.b.x);

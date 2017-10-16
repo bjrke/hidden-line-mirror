@@ -387,8 +387,7 @@ begin
 {  if p^.flaechentest then begin}
     inc(zaehl.count);
     if drawmode=6 then begin
-      p^.cols:=15;
-      p^.draw2;
+      p^.draw2(15);
       outint('zähler',zaehl.count);
     end;
     tf:=0;
