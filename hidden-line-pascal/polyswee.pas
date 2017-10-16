@@ -115,7 +115,7 @@ var
 
 begin
   setcolor(white);
-  line(round(xscan+bmx),0,round(xscan+bmx),479);
+  line(round(xscan+bmx),0,round(xscan+bmx),2*bmy-1);
   f:=0;
   dp(swurzel,bmx,10);
   zeichne(swurzel);
