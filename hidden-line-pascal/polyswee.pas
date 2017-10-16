@@ -16,33 +16,33 @@ var
   pa:^fettesfeld;
   c:int;
   p,q:ppoly;
-  t:int;
+  maxtiefe: Integer;
 
-  function newtree(a,e:int):ppoly;
+  function newtree(a,e: int; tiefe: Integer):ppoly;
   var
     h,h1,h2:ppoly;
     x:int;
   begin
+    if ( tiefe > maxtiefe ) then maxtiefe := tiefe;
     x:=a+((e-a)div 2);
     h:=pa^[x];
     h^.so:=nil;
     h^.su:=nil;
-    inc(t);
     if a<=(x-1) then
-      h1:=newtree(a,x-1)
+      h1:=newtree(a,x-1, tiefe+1)
     else
       h1:=nil;
     if (x+1)<=e then
-      h2:=newtree(x+1,e)
+      h2:=newtree(x+1,e, tiefe+1)
     else
       h2:=nil;
-    dec(t);
     verbinde(h,h1,so);
     verbinde(h,h2,su);
     newtree:=h;
   end;
 
 begin
+  maxtiefe := 0;
   if swurzel<>nil then begin
     new(pa);
     p:=swurzel;
@@ -56,11 +56,11 @@ begin
       inc(c);
       q:=q^.pu;
     end;
-    t:=1;
-    swurzel:=newtree(0,c-1);
+    swurzel:=newtree(0,c-1, 1);
     swurzel^.ss:=@swurzel;
     dispose(pa);
   end;
+  mtf := 2 * maxtiefe + 5;
 end;
 
 procedure drawtree;
@@ -465,7 +465,6 @@ begin
   ende:
     if tf>mtf then begin
       abflachen;
-      inc(mtf);
     end;
     if drawmode=6 then begin
       repeat

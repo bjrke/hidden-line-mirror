@@ -6,7 +6,7 @@ const
   epsilon2=epsilon1*epsilon1;
   epsilon3=epsilon1*epsilon1*epsilon1;
 type
-  float=Real;
+  float=Double;
   int=longint;
   pvector3d=^vector3d;
   vector3d=object
