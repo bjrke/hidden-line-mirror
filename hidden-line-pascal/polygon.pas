@@ -222,7 +222,7 @@ begin
     if (abs(divisor) < epsilon1) then
       aOriginalTriangle^.cols := 15
     else
-      aOriginalTriangle^.cols := calcColor(BlickR.skalar(c)/divisor);
+      aOriginalTriangle^.cols := calcColor(abs(BlickR.skalar(c)/divisor));
   end;
 
   initpoly(aOriginalTriangle^.p[1],aOriginalTriangle^.p[2],aOriginalTriangle^.p[3],aOriginalTriangle^.gl,aOriginalTriangle);
