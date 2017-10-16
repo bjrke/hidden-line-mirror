@@ -5,13 +5,121 @@ var
   zumalen:set of byte;
   mtf:longint;
 
-
 procedure sweep;
-procedure polypoly(p1:pdreieck;p2:ppoly);
-procedure drawtree;
-procedure abflachen;
 
 implementation
+
+procedure abflachen;
+type
+  fettesfeld=array[0..16382]of ppoly;
+var
+  pa:^fettesfeld;
+  c:int;
+  p,q:ppoly;
+  t:int;
+
+  function newtree(a,e:int):ppoly;
+  var
+    h,h1,h2:ppoly;
+    x:int;
+  begin
+    x:=a+((e-a)div 2);
+    h:=pa^[x];
+    h^.so:=nil;
+    h^.su:=nil;
+    inc(t);
+    if a<=(x-1) then
+      h1:=newtree(a,x-1)
+    else
+      h1:=nil;
+    if (x+1)<=e then
+      h2:=newtree(x+1,e)
+    else
+      h2:=nil;
+    dec(t);
+    verbinde(h,h1,so);
+    verbinde(h,h2,su);
+    newtree:=h;
+  end;
+
+begin
+  if swurzel<>nil then begin
+    new(pa);
+    p:=swurzel;
+    while p<>nil do begin
+      q:=p;
+      p:=p^.so;
+    end;
+    c:=0;
+    while q<>nil do begin
+      pa^[c]:=q;
+      inc(c);
+      q:=q^.pu;
+    end;
+    t:=1;
+    swurzel:=newtree(0,c-1);
+    swurzel^.ss:=@swurzel;
+    dispose(pa);
+  end;
+end;
+
+procedure drawtree;
+var
+  f:color;
+  procedure dp(p:ppoly;dx,dy:integer);
+  begin
+    if (dy<bmy*2) and (p<>nil) then begin
+      inc(f);
+      p^.cols:=f;
+      p^.drx:=dx;
+      p^.dry:=dy;
+      dp(p^.so,dx+bmx shr (dy div 10),dy+10);
+      dp(p^.su,dx-bmx shr (dy div 10),dy+10);
+      dec(f);
+    end;
+  end;
+
+  procedure verbindung(s,z:ppoly;c:color);
+  begin
+    if (z<>nil)and(z^.dry<bmy*2) then begin
+      setcolor(c);
+      line(s^.drx,s^.dry,z^.drx,z^.dry);
+      line(bmx-4*s^.dry+round(xscan),bmy-round(s^.yscan),bmx-4*z^.dry+round(xscan),bmy-round(z^.yscan));
+    end;
+  end;
+
+  procedure zeichne(p:ppoly);
+  var
+    s:string;
+    ys:int;
+  begin
+    if p<>nil then begin
+      setcolor(p^.cols);
+      circle(p^.drx,p^.dry,3);
+      verbindung(p,p^.so,1);
+      verbindung(p,p^.su,2);
+  {    verbindung(p,p^.pu,4);
+      verbindung(p,p^.po,4);}
+      zeichne(p^.so);
+      zeichne(p^.su);
+      if p^.cols in zumalen then
+        p^.draw3(p^.cols)
+      else
+        setcolor(p^.cols);
+      ys:=round(p^.yscan);
+      str(ys,s);
+      outtextxy(bmx-4*p^.dry+round(xscan)-4*length(s),bmy-ys,s);
+      outtextxy(p^.drx-12,p^.dry,s)
+    end;
+  end;
+
+begin
+  setcolor(white);
+  line(round(xscan+bmx),0,round(xscan+bmx),479);
+  f:=0;
+  dp(swurzel,bmx,10);
+  zeichne(swurzel);
+end;
 
 function sdelete(p:ppoly):ppoly;
 var
@@ -75,185 +183,7 @@ begin
   end else outstring('sdelete(nil)');
 end;
 
-function loesche(p:ppoly):ppoly;
-var
-  o,u,h:ppoly;
-  fertig:boolean;
-begin
-  loesche:=p;
-  if p<>nil then begin
-    o:=p^.po;
-    u:=p^.pu;
-    sdelete(p);
-    del(p,3);
-    fertig:=false;
-    while (not fertig) and (o<>nil)and(u<>nil) do begin
-      case polytest(o,u,true,false) of
-        1:begin
-          h:=o;
-          o:=o^.po;
-          sdelete(h);
-          del(h,3);
-          push(h,2,h^.count);
-          fertig:=false;
-        end;
-        2:fertig:=true;
-        4:begin
-          h:=o;
-          o:=o^.po;
-          sdelete(h);
-          del(h,3);
-          if h<>nil then begin
-            polypoly(u^.originalTriangle,h);
-            dispose(h,done('lofall3'))
-          end else
-            outstring('h is nil (falls3)');
-        end;
-        3:begin
-          h:=u;
-          u:=u^.pu;
-          sdelete(h);
-          del(h,3);
-          if h<>nil then begin
-            polypoly(o^.originalTriangle,h);
-            dispose(h, done('lofall4'))
-          end else
-            outstring('h is nil (falls4)');
-        end;
-        5:begin
-          h:=o;
-          o:=o^.po;
-          sdelete(h);
-          del(h,3);
-          outint('l5 ozähler ',h^.count);
-          dispose(h, done('l5'));
-
-          h:=u;
-          u:=u^.pu;
-          sdelete(h);
-          del(h,3);
-          dispose(h, done('l52'));
-          outint('l5 uzähler',h^.count);
-        end;
-      end;
-    end;
-  end else outstring('p ist nil');
-end;
-
-procedure insert(p:ppoly;schnitttest:boolean);
-var
-  h,o,u,a:ppoly;
-  ak:pppoly;
-  typ:richtung;
-  ch:char;
-  tf:int;
-label ende;
-begin
-{  schnitttest:=true;}
-{  if p^.flaechentest then begin}
-    inc(zaehl.count);
-    if drawmode=6 then begin
-      p^.cols:=15;
-      p^.draw2;
-      outint('z�hler',zaehl.count);
-    end;
-    tf:=0;
-    a:=nil;
-    ak:=@swurzel;
-    while ak^<>nil do begin
-      case polytest(ak^,p,schnitttest,false) of
-        1:begin
-            a:=ak^;
-            ak:=@ak^^.so;
-            typ:=so;
-            inc(tf);
-{            outstring('f1so');}
-          end;
-        2:begin
-            a:=ak^;
-            ak:=@ak^^.su;
-            typ:=su;
-            inc(tf);
-{            outstring('f2su');}
-          end;
-        3:begin
-            if p<>nil then begin
-              polypoly(ak^^.originalTriangle,p);
-              dispose(p, done('insert fall3'));
-{              outstring('f3u');}
-            end else
-              outstring('p is nil (fall3)');
-            goto ende
-          end;
-        4:begin
-{            outstring('f4o');}
-            h:=loesche(ak^);
-            if h<>nil then begin
-              polypoly(p^.originalTriangle,h);
-              dispose(h, done('insert fall4'))
-            end else
-              outstring('h is nil (fall4)');
-          end;
-        5:begin
-          outint('i5 pz�hler',p^.count);
-          dispose(p, done('i5'));
-          p:=loesche(ak^);
-          outint('i5 akz�hler',p^.count);
-          dispose(p, done('i52'));
-          goto ende;
-        end;
-      end
-    end;
-    if a<>nil then begin
-      verbinde(a,p,typ);
-      if typ=so then begin
-        o:=a^.po;
-        u:=a
-      end else begin
-        o:=a;
-        u:=a^.pu
-      end;
-      verbinde(o,p,pu);
-      verbinde(p,u,pu);
-      p^.so:=nil;
-      p^.su:=nil;
-      push(p,3,p^.count);
-    end else begin
-      swurzel:=p;
-      p^.po:=nil;
-      p^.pu:=nil;
-      p^.so:=nil;
-      p^.su:=nil;
-      p^.pr:=nil;
-      p^.ss:=@swurzel;
-      push(swurzel,3,p^.count);
-    end;
-    zaehl.s.ins;
-  ende:
-    if tf>mtf then begin
-      abflachen;
-      inc(mtf);
-    end;
-    if drawmode=6 then begin
-      repeat
-        drawtree;
-        ch:=readkey2([#32, #27, '1'..'9','a']);
-        if ch in ['1'..'9'] then begin
-          cls;
-          if (ord(ch)-ord('0'))in zumalen then
-            zumalen:=zumalen-[(ord(ch)-ord('0'))]
-          else
-            zumalen:=zumalen+[(ord(ch)-ord('0'))]
-        end;
-        if ch='a' then abflachen;
-        if ch=#27 then drawmode:=1;
-      until ch in [#32, #27];
-      cls
-    end;
-{  end;}
-end;
-
-procedure polypoly;
+procedure polypoly(p1:pdreieck;p2:ppoly);
 var
   pl:array[1..20]of ppunkt;
   ll:array[1..20]of linie;
@@ -379,6 +309,184 @@ begin
     Dispose(pl[i], done);
 end;
 
+function loesche(p:ppoly):ppoly;
+var
+  o,u,h:ppoly;
+  fertig:boolean;
+begin
+  loesche:=p;
+  if p<>nil then begin
+    o:=p^.po;
+    u:=p^.pu;
+    sdelete(p);
+    del(p,3);
+    fertig:=false;
+    while (not fertig) and (o<>nil)and(u<>nil) do begin
+      case polytest(o,u,true,false) of
+        1:begin
+          h:=o;
+          o:=o^.po;
+          sdelete(h);
+          del(h,3);
+          push(h,2,h^.count);
+          fertig:=false;
+        end;
+        2:fertig:=true;
+        4:begin
+          h:=o;
+          o:=o^.po;
+          sdelete(h);
+          del(h,3);
+          if h<>nil then begin
+            polypoly(u^.originalTriangle,h);
+            dispose(h,done('lofall3'))
+          end else
+            outstring('h is nil (falls3)');
+        end;
+        3:begin
+          h:=u;
+          u:=u^.pu;
+          sdelete(h);
+          del(h,3);
+          if h<>nil then begin
+            polypoly(o^.originalTriangle,h);
+            dispose(h, done('lofall4'))
+          end else
+            outstring('h is nil (falls4)');
+        end;
+        5:begin
+          h:=o;
+          o:=o^.po;
+          sdelete(h);
+          del(h,3);
+          outint('l5 ozähler ',h^.count);
+          dispose(h, done('l5'));
+
+          h:=u;
+          u:=u^.pu;
+          sdelete(h);
+          del(h,3);
+          dispose(h, done('l52'));
+          outint('l5 uzähler',h^.count);
+        end;
+      end;
+    end;
+  end else outstring('p ist nil');
+end;
+
+procedure insert(p:ppoly;schnitttest:boolean);
+var
+  h,o,u,a:ppoly;
+  ak:pppoly;
+  typ:richtung;
+  ch:char;
+  tf:int;
+label ende;
+begin
+{  schnitttest:=true;}
+{  if p^.flaechentest then begin}
+    inc(zaehl.count);
+    if drawmode=6 then begin
+      p^.cols:=15;
+      p^.draw2;
+      outint('zähler',zaehl.count);
+    end;
+    tf:=0;
+    a:=nil;
+    ak:=@swurzel;
+    while ak^<>nil do begin
+      case polytest(ak^,p,schnitttest,false) of
+        1:begin
+            a:=ak^;
+            ak:=@ak^^.so;
+            typ:=so;
+            inc(tf);
+{            outstring('f1so');}
+          end;
+        2:begin
+            a:=ak^;
+            ak:=@ak^^.su;
+            typ:=su;
+            inc(tf);
+{            outstring('f2su');}
+          end;
+        3:begin
+            if p<>nil then begin
+              polypoly(ak^^.originalTriangle,p);
+              dispose(p, done('insert fall3'));
+{              outstring('f3u');}
+            end else
+              outstring('p is nil (fall3)');
+            goto ende
+          end;
+        4:begin
+{            outstring('f4o');}
+            h:=loesche(ak^);
+            if h<>nil then begin
+              polypoly(p^.originalTriangle,h);
+              dispose(h, done('insert fall4'))
+            end else
+              outstring('h is nil (fall4)');
+          end;
+        5:begin
+          outint('i5 pzähler',p^.count);
+          dispose(p, done('i5'));
+          p:=loesche(ak^);
+          outint('i5 akzähler',p^.count);
+          dispose(p, done('i52'));
+          goto ende;
+        end;
+      end
+    end;
+    if a<>nil then begin
+      verbinde(a,p,typ);
+      if typ=so then begin
+        o:=a^.po;
+        u:=a
+      end else begin
+        o:=a;
+        u:=a^.pu
+      end;
+      verbinde(o,p,pu);
+      verbinde(p,u,pu);
+      p^.so:=nil;
+      p^.su:=nil;
+      push(p,3,p^.count);
+    end else begin
+      swurzel:=p;
+      p^.po:=nil;
+      p^.pu:=nil;
+      p^.so:=nil;
+      p^.su:=nil;
+      p^.pr:=nil;
+      p^.ss:=@swurzel;
+      push(swurzel,3,p^.count);
+    end;
+    zaehl.s.ins;
+  ende:
+    if tf>mtf then begin
+      abflachen;
+      inc(mtf);
+    end;
+    if drawmode=6 then begin
+      repeat
+        drawtree;
+        ch:=readkey2([#32, #27, '1'..'9','a']);
+        if ch in ['1'..'9'] then begin
+          cls;
+          if (ord(ch)-ord('0'))in zumalen then
+            zumalen:=zumalen-[(ord(ch)-ord('0'))]
+          else
+            zumalen:=zumalen+[(ord(ch)-ord('0'))]
+        end;
+        if ch='a' then abflachen;
+        if ch=#27 then drawmode:=1;
+      until ch in [#32, #27];
+      cls
+    end;
+{  end;}
+end;
+
 procedure sweep;
 var
   p:ppoly;
@@ -436,116 +544,6 @@ begin
   end;
 end;
 
-procedure drawtree;
-var
-  f:color;
-procedure dp(p:ppoly;dx,dy:integer);
-begin
-  if (dy<bmy*2) and (p<>nil) then begin
-    inc(f);
-    p^.cols:=f;
-    p^.drx:=dx;
-    p^.dry:=dy;
-    dp(p^.so,dx+bmx shr (dy div 10),dy+10);
-    dp(p^.su,dx-bmx shr (dy div 10),dy+10);
-    dec(f);
-  end;
-end;
 
-procedure verbindung(s,z:ppoly;c:color);
-begin
-  if (z<>nil)and(z^.dry<bmy*2) then begin
-    setcolor(c);
-    line(s^.drx,s^.dry,z^.drx,z^.dry);
-    line(bmx-4*s^.dry+round(xscan),bmy-round(s^.yscan),bmx-4*z^.dry+round(xscan),bmy-round(z^.yscan));
-  end;
-end;
-
-procedure zeichne(p:ppoly);
-var
-  s:string;
-  ys:int;
-begin
-  if p<>nil then begin
-    setcolor(p^.cols);
-    circle(p^.drx,p^.dry,3);
-    verbindung(p,p^.so,1);
-    verbindung(p,p^.su,2);
-{    verbindung(p,p^.pu,4);
-    verbindung(p,p^.po,4);}
-    zeichne(p^.so);
-    zeichne(p^.su);
-    if p^.cols in zumalen then
-      p^.draw3(p^.cols)
-    else
-      setcolor(p^.cols);
-    ys:=round(p^.yscan);
-    str(ys,s);
-    outtextxy(bmx-4*p^.dry+round(xscan)-4*length(s),bmy-ys,s);
-    outtextxy(p^.drx-12,p^.dry,s)
-  end;
-end;
-
-begin
-  setcolor(white);
-  line(round(xscan+bmx),0,round(xscan+bmx),479);
-  f:=0;
-  dp(swurzel,bmx,10);
-  zeichne(swurzel);
-end;
-
-procedure abflachen;
-type
-  fettesfeld=array[0..16382]of ppoly;
-var
-  pa:^fettesfeld;
-  c:int;
-  p,q:ppoly;
-  t:int;
-
-function newtree(a,e:int):ppoly;
-var
-  h,h1,h2:ppoly;
-  x:int;
-begin
-  x:=a+((e-a)div 2);
-  h:=pa^[x];
-  h^.so:=nil;
-  h^.su:=nil;
-  inc(t);
-  if a<=(x-1) then
-    h1:=newtree(a,x-1)
-  else
-    h1:=nil;
-  if (x+1)<=e then
-    h2:=newtree(x+1,e)
-  else
-    h2:=nil;
-  dec(t);
-  verbinde(h,h1,so);
-  verbinde(h,h2,su);
-  newtree:=h;
-end;
-
-begin
-  if swurzel<>nil then begin
-    new(pa);
-    p:=swurzel;
-    while p<>nil do begin
-      q:=p;
-      p:=p^.so;
-    end;
-    c:=0;
-    while q<>nil do begin
-      pa^[c]:=q;
-      inc(c);
-      q:=q^.pu;
-    end;
-    t:=1;
-    swurzel:=newtree(0,c-1);
-    swurzel^.ss:=@swurzel;
-    dispose(pa);
-  end;
-end;
 
 end.
