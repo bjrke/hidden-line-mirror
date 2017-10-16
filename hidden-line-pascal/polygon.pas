@@ -211,7 +211,6 @@ constructor poly.newpoly;
 var
   c:vector3d;
   divisor: float;
-  ergebnis: float;
 begin
 
   if ((drawmode =7) or (drawmode = 9)) then
