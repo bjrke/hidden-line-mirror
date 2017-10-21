@@ -62,10 +62,10 @@ begin
        (not backface or ((j^.p[3]^.b.x-j^.p[1]^.b.x)*(j^.p[2]^.b.y-j^.p[1]^.b.y)+epsilon1<
                          (j^.p[3]^.b.y-j^.p[1]^.b.y)*(j^.p[2]^.b.x-j^.p[1]^.b.x))) then begin
         new(h, newpoly(j));
-//         if h^.flaechentest then TODO
-            polygon.push(h,1,-2)
-{         else
-           dispose(h,kill('flächentest'));}
+        if h^.flaechentest then
+          polygon.push(h,1,-2)
+        else
+          dispose(h,done('flächentest'));
        end;
     j:=dreiecks.next
   end;

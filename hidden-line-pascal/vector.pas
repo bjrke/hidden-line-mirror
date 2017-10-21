@@ -40,6 +40,7 @@ type
     function mul2d(f: float): vector2d;
     function div2d(d: float): vector2d;
     function betrag2d: float;
+    function sqrbetrag2d: float;
     function toString: String;
   end;
   matrix2d=object
@@ -160,9 +161,15 @@ begin
   add2d.init( x+v.x, y+v.y );
 end;
 
+function vector2d.sqrbetrag2d;
+begin
+  sqrbetrag2d:= sqr(x)+sqr(y);
+end;
+
+
 function vector2d.betrag2d;
 begin
-  betrag2d:= sqrt(sqr(x)+sqr(y));
+  betrag2d:= sqrt(self.sqrbetrag2d);
 end;
 
 function vector2d.toString;

@@ -229,7 +229,7 @@ var
       new(ph, initpoly(pu1,pu2,pu3,ls,p2^.originalTriangle));
       h.x:=(p1^.p[1]^.b.x+p1^.p[2]^.b.x+p1^.p[3]^.b.x)/3;
       h.y:=(p1^.p[1]^.b.y+p1^.p[2]^.b.y+p1^.p[3]^.b.y)/3;
-      if (ph^.punkttest(h)=20) {and ((ph^.gl<>[]) or (ph^.flaechentest))} then begin
+      if (ph^.punkttest(h)=20) and ((ph^.gl<>[]) or (ph^.flaechentest)) then begin
         if ph^.p[1]^.b.x>=xscan then begin
           ph^.cols:=2; {15}
           push(ph,1,zaehl.count)
@@ -384,7 +384,7 @@ var
 label ende;
 begin
 {  schnitttest:=true;}
-{  if p^.flaechentest then begin}
+  if p^.flaechentest then begin
     inc(zaehl.count);
     if drawmode=6 then begin
       p^.draw2(15);
@@ -482,7 +482,7 @@ begin
       until ch in [#32, #27];
       cls
     end;
-{  end;}
+  end;
 end;
 
 procedure sweep;

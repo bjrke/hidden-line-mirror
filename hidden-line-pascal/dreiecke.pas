@@ -177,9 +177,9 @@ end;
 
 function dreiecktyp.flaechentest;
 begin
-  flaechentest:=p[1]^.b.sub2d(p[3]^.b).betrag2d * 1.01 <
-                p[1]^.b.sub2d(p[2]^.b).betrag2d +
-                p[2]^.b.sub2d(p[3]^.b).betrag2d
+  flaechentest:=(p[1]^.b.sub2d(p[3]^.b).sqrbetrag2d > epsilon1) AND
+                (p[1]^.b.sub2d(p[2]^.b).sqrbetrag2d > epsilon1) AND
+                (p[2]^.b.sub2d(p[3]^.b).sqrbetrag2d > epsilon1)
 end;
 
 function dreieck.tiefe;
