@@ -69,7 +69,7 @@ begin
   next:=nil;
   planeNorm := o[2]^.o.sub3d(o[1]^.o)
         .kreuz(o[3]^.o.sub3d(o[1]^.o));
-  planeNorm := planeNorm.div3d(planeNorm.betrag3d);
+  planeNorm := planeNorm.mul3d(planeNorm.invBetrag3d);
   planeDist := planeNorm.skalar(o[1]^.o);
 end;
 
@@ -191,7 +191,7 @@ begin
               .add3d(jv.mul3d(k.y));
   t := planeNorm.skalar(bv);
   if abs(t)>epsilon3 then
-    tiefe := bv.betrag3d * ( planeDist - planeNorm.skalar(auge) ) / t
+    tiefe := ( planeDist - planeNorm.skalar(auge) ) / ( t * bv.invBetrag3d )
   else
     tiefe := 100000000;
 {  cols:=darkgray;}

@@ -18,7 +18,7 @@ type
     function div3d(d: float): vector3d;
 
     function neg3d: vector3d;
-    function betrag3d: float;
+    function invBetrag3d: float;
     function kreuz(v:vector3d): vector3d;
     function skalar(v:vector3d): float;
 
@@ -119,14 +119,14 @@ begin
   skalar := x*v.x + y*v.y + z*v.z;
 end;
 
-function vector3d.betrag3d;
+function vector3d.invBetrag3d;
 begin
-  betrag3d:=sqrt(sqr(x)+sqr(y)+sqr(z));
+  invBetrag3d := 1.0/sqrt(sqr(x)+sqr(y)+sqr(z));
 end;
 
 function vector3d.move3d;
 begin
-  move3d := add3d(direction.mul3d(polarisation * MoveSpeed).div3d(direction.betrag3d));
+  move3d := add3d(direction.mul3d(polarisation * MoveSpeed).mul3d(direction.invBetrag3d));
 end;
 
 function vector3d.toString;
@@ -162,7 +162,7 @@ end;
 
 function vector2d.betrag2d;
 begin
-  betrag2d:=sqrt(sqr(x)+sqr(y));
+  betrag2d:= sqrt(sqr(x)+sqr(y));
 end;
 
 function vector2d.toString;
@@ -206,29 +206,29 @@ end;
 
 PROCEDURE RotVec;
 VAR
-  Length1,Length2: float;
+  InvLength1,InvLength2,InvRotVecLength,RotInc:float;
   Copy1,Copy2:Vector3d;
-  RotVecLength,RotInc:float;
+
 BEGIN
   RotInc:=cos(t*Pi/180)/sin(t*pi/180);
-  RotVecLength:=sqrt(sqr(RotInc)+1);
+  InvRotVecLength:=1.0 / sqrt(sqr(RotInc)+1);
 
   Copy1:=ToRot1^;
   Copy2:=ToRot2^;
 
-  Length1:=Copy1.betrag3d;
-  Length2:=Copy2.Betrag3d;
+  InvLength1:=Copy1.invBetrag3d;
+  InvLength2:=Copy2.invBetrag3d;
 
-  if RotVecLength=0 then writeln('RotVecLength=0');
-  if Length1=0 then writeln('Length1=0');
-  if Length2=0 then writeln('Length2=0');
-  ToRot1^.X:=(Length1/RotVecLength)*(RotInc*Copy1.X/Length1+Copy2.X/Length2);
-  ToRot1^.Y:=(Length1/RotVecLength)*(RotInc*Copy1.Y/Length1+Copy2.Y/Length2);
-  ToRot1^.Z:=(Length1/RotVecLength)*(RotInc*Copy1.Z/Length1+Copy2.Z/Length2);
+  if InvRotVecLength=0 then writeln('InvRotVecLength=0');
+  if InvLength1=0 then writeln('InvLength1=0');
+  if InvLength2=0 then writeln('InvLength2=0');
+  ToRot1^.X:=(InvRotVecLength/InvLength1)*(RotInc*Copy1.X*InvLength1+Copy2.X*InvLength2);
+  ToRot1^.Y:=(InvRotVecLength/InvLength1)*(RotInc*Copy1.Y*InvLength1+Copy2.Y*InvLength2);
+  ToRot1^.Z:=(InvRotVecLength/InvLength1)*(RotInc*Copy1.Z*InvLength1+Copy2.Z*InvLength2);
 
-  ToRot2^.X:=(Length2/RotVecLength)*(-Copy1.X/Length1+RotInc*Copy2.X/Length2);
-  ToRot2^.Y:=(Length2/RotVecLength)*(-Copy1.Y/Length1+RotInc*Copy2.Y/Length2);
-  ToRot2^.Z:=(Length2/RotVecLength)*(-Copy1.Z/Length1+RotInc*Copy2.Z/Length2)
+  ToRot2^.X:=(InvRotVecLength/InvLength2)*(-Copy1.X*InvLength1+RotInc*Copy2.X*InvLength2);
+  ToRot2^.Y:=(InvRotVecLength/InvLength2)*(-Copy1.Y*InvLength1+RotInc*Copy2.Y*InvLength2);
+  ToRot2^.Z:=(InvRotVecLength/InvLength2)*(-Copy1.Z*InvLength1+RotInc*Copy2.Z*InvLength2)
 END;
 
 procedure outstring;

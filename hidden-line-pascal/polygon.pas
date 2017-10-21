@@ -207,18 +207,15 @@ end;
 constructor poly.newpoly;
 var
   c:vector3d;
-  divisor: float;
+  faktor: float;
 begin
 
   if ((drawmode =7) or (drawmode = 9)) then
   begin
     c :=   aOriginalTriangle^.o[1]^.o.sub3d(aOriginalTriangle^.o[2]^.o)
     .kreuz(aOriginalTriangle^.o[3]^.o.sub3d(aOriginalTriangle^.o[2]^.o));
-    divisor := (BlickR.betrag3d*c.betrag3d);
-    if (abs(divisor) < epsilon1) then
-      aOriginalTriangle^.cols := 15
-    else
-      aOriginalTriangle^.cols := calcColor(abs(BlickR.skalar(c)/divisor));
+    faktor := (BlickR.invBetrag3d*c.invBetrag3d);
+    aOriginalTriangle^.cols := calcColor(abs(BlickR.skalar(c)*faktor));
   end;
 
   initpoly(aOriginalTriangle^.p[1],aOriginalTriangle^.p[2],aOriginalTriangle^.p[3],aOriginalTriangle^.gl,aOriginalTriangle);

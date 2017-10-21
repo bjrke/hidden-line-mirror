@@ -14,11 +14,11 @@ procedure neukamera;
 begin
   cls;
   iv := BlickR.kreuz(jv);
-  if iv.betrag3d=0 then outstring('i=0');
-  iv := iv.mul3d(0.4*BlickR.betrag3d/(bmx*iv.betrag3d));
+//  if iv.betrag3d=0 then outstring('i=0');
+  iv := iv.mul3d(0.4*iv.invBetrag3d/(bmx*BlickR.invBetrag3d));
   jv := iv.kreuz(BlickR);
-  if jv.betrag3d=0 then outstring('j=0');
-  jv := jv.mul3d(0.4*BlickR.betrag3d/(bmx*jv.betrag3d));
+//  if jv.betrag3d=0 then outstring('j=0');
+  jv := jv.mul3d(0.4*jv.invBetrag3d/(bmx*BlickR.invBetrag3d));
 end;
 
 procedure perspektive(p:ppunkt3d);
@@ -35,7 +35,7 @@ begin
     p^.b^.b.y:=K.det3d/kd;
 
     if ( drawmode = 5 ) then begin
-      tiefePerspektive.update( p^.o.sub3d( Auge ).betrag3d );
+      tiefePerspektive.update( 1.0 / p^.o.sub3d( Auge ).invBetrag3d );
     end;
   end;
 end;
