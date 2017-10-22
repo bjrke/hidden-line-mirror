@@ -222,7 +222,7 @@ var
     inc(zaehl.pp);
     h.x:=(pu1^.b.x+pu2^.b.x+pu3^.b.x)/3;
     h.y:=(pu1^.b.y+pu2^.b.y+pu3^.b.y)/3;
-    if (p1^.punkttest(h, 'addppl1', ausgabeInsert)=20)and not colinear(pu1^,pu2^,pu3^) then begin
+    if (p1^.punkttest(h, 'addppl1', ausgabeInsert)=20)and not colinear(@pu1^.b,@pu2^.b,@pu3^.b) then begin
       ls:=[];
       if pu2^.gz*pu3^.gz<>[] then      ls:=ls+[1];
       if pu3^.gz*pu1^.gz<>[] then      ls:=ls+[2];
@@ -389,6 +389,11 @@ begin
 {  schnitttest:=true;}
   if p^.flaechentest then begin
     inc(zaehl.count);
+    if (zaehl.count > 12000) then
+    begin
+      drawmode := 6;
+      ausgabeInsert := true;
+    end;
     if drawmode=6 then begin
       p^.draw2(15);
       outint('zähler',zaehl.count);

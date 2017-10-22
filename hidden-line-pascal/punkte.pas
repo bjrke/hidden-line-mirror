@@ -39,7 +39,7 @@ type
       constructor init;
   end;
 
-function colinear(p1,p2,p3:punkt):boolean;
+function colinear(p1,p2,p3:pvector2d):boolean;
 function gleicheseite(s,p2,p3,p4:punkt):int;
 
 
@@ -88,7 +88,7 @@ end;
 
 function colinear;
 begin
-  colinear:=abs((p1.b.y-p2.b.y)*(p3.b.x-p2.b.x)-(p1.b.x-p2.b.x)*(p3.b.y-p2.b.y))<epsilon1
+  colinear:=abs((p1^.y-p2^.y)*(p3^.x-p2^.x)-(p1^.x-p2^.x)*(p3^.y-p2^.y))<epsilon0
 end;
 
 function gleicheseite;

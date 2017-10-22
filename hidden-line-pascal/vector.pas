@@ -2,11 +2,11 @@ unit vector;
 interface
 uses ptcgraph,crt;
 const
-  epsilon0=0.001;
+  epsilon0=0.0001;
   epsilon1=epsilon0*epsilon0;
   epsilon2=epsilon1*epsilon1;
 type
-  float=Single;
+  float=Double;
   int=longint;
   pvector3d=^vector3d;
   vector3d=object
@@ -31,6 +31,7 @@ type
     function det3d: float;
     function toString: String;
   end;
+  pvector2d=^vector2d;
   vector2d=object
     x, y: float;
     constructor init(x,y: float);
@@ -235,26 +236,27 @@ BEGIN
 
   ToRot2^.X:=(InvRotVecLength/InvLength2)*(-Copy1.X*InvLength1+RotInc*Copy2.X*InvLength2);
   ToRot2^.Y:=(InvRotVecLength/InvLength2)*(-Copy1.Y*InvLength1+RotInc*Copy2.Y*InvLength2);
-  ToRot2^.Z:=(InvRotVecLength/InvLength2)*(-Copy1.Z*InvLength1+RotInc*Copy2.Z*InvLength2)
+  ToRot2^.Z:=(InvRotVecLength/InvLength2)*(-Copy1.Z*InvLength1+RotInc*Copy2.Z*InvLength2);
 END;
 
 procedure outstring;
 begin
   if tausgabe then begin
-    setcolor(white);
+    WriteLn(s);
+{    setcolor(white);
     outtextxy(tx,th,s);
     inc(th,10);
     while th>2*bmy-20 do begin
       th:=th-round(2*bmy-20);
       tx:=tx+240;
-    end
+    end}
   end;
 end;
 
 function floatToString;
 var s: String;
 begin
-  Str(f:20:15,s);
+  Str(f:15:10,s);
   floatToString := s;
 end;
 

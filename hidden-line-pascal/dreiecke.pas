@@ -179,10 +179,7 @@ end;
 
 function dreiecktyp.flaechentest;
 begin
-  //TODO stattdessen collinarität?
-  flaechentest:=(p[1]^.b.sub2d(p[3]^.b).sqrbetrag2d > epsilon1) AND
-                (p[1]^.b.sub2d(p[2]^.b).sqrbetrag2d > epsilon1) AND
-                (p[2]^.b.sub2d(p[3]^.b).sqrbetrag2d > epsilon1)
+  flaechentest := not colinear(@p[1]^.b, @p[2]^.b, @p[3]^.b);
 end;
 
 function dreieck.tiefe;
