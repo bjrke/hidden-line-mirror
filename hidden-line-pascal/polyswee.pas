@@ -1,10 +1,10 @@
 unit polyswee;
 interface
-uses crt,ptcgraph,polygon,vector,punkte,linien,dreiecke,zeit;
+uses crt,ptcgraph,polygon,vector,punkte,linien,dreiecke,zeit,sysutils;
 var
   zumalen:set of byte;
   mtf:longint;
-
+  ausgabeInsert: Boolean;
 procedure sweep;
 
 implementation
@@ -200,6 +200,7 @@ var
     inc(plpos);
     new(h, init(p.b,ls));
     pl[plpos]:=h;
+    if (ausgabeInsert) then outstring('addpl(' + IntToStr(plpos) + '):'+ h^.b.toString);
   end;
 
   procedure addll(i,j:integer);
@@ -221,7 +222,7 @@ var
     inc(zaehl.pp);
     h.x:=(pu1^.b.x+pu2^.b.x+pu3^.b.x)/3;
     h.y:=(pu1^.b.y+pu2^.b.y+pu3^.b.y)/3;
-    if (p1^.punkttest(h)=20)and not colinear(pu1^,pu2^,pu3^) then begin
+    if (p1^.punkttest(h, 'addppl1', ausgabeInsert)=20)and not colinear(pu1^,pu2^,pu3^) then begin
       ls:=[];
       if pu2^.gz*pu3^.gz<>[] then      ls:=ls+[1];
       if pu3^.gz*pu1^.gz<>[] then      ls:=ls+[2];
@@ -229,7 +230,7 @@ var
       new(ph, initpoly(pu1,pu2,pu3,ls,p2^.originalTriangle));
       h.x:=(p1^.p[1]^.b.x+p1^.p[2]^.b.x+p1^.p[3]^.b.x)/3;
       h.y:=(p1^.p[1]^.b.y+p1^.p[2]^.b.y+p1^.p[3]^.b.y)/3;
-      if (ph^.punkttest(h)=20) and ((ph^.gl<>[]) or (ph^.flaechentest)) then begin
+      if ((ph^.punkttest(h, 'addppl2', ausgabeInsert)=20) and ph^.flaechentest) then begin
         if ph^.p[1]^.b.x>=xscan then begin
           ph^.cols:=2; {15}
           push(ph,1,zaehl.count)
@@ -257,7 +258,8 @@ begin
         addpl(h,p2^.gl*[i]);
       end;
   for i:=1 to 3 do begin
-    pip:=p2^.punkttest(p1^.p[i]^.b);
+    pip:=p2^.punkttest(p1^.p[i]^.b, 'polypoly1', ausgabeInsert);
+    if (ausgabeInsert) then outint('pip1 ',pip);
     case pip of
       0:addpl(p1^.p[i]^,[]); {eckpunkte des oberen, die nur im(nicht auf)unteren sind}
       1..3:begin
@@ -273,10 +275,11 @@ begin
              h4:=gleicheseite(p1^.p[i]^,p1^.p[((i+1) mod 3)+1]^,p2^.p[(pip mod 3)+1]^,p1^.p[(i mod 3)+1]^);
              if (h1=-1)or(h2=-1)or(h3=-1)or(h4=-1) then addpl(p1^.p[i]^,p2^.gl*([1,2,3]-[pip-10]));
       end;
-    end;  {3 drau�en brauchen wir nich}
+    end;  {3 draußen brauchen wir nich}
   end;
   for i:=1 to 3 do begin
-    pip:=p1^.punkttest(p2^.p[i]^.b);
+    pip:=p1^.punkttest(p2^.p[i]^.b, 'polypoly2', ausgabeInsert);
+    if (ausgabeInsert) then outint('pip2 ',pip);
     case pip of{eckpunkt unteres dreieck}
       1..3:begin
          h1:=gleicheseite(p2^.p[i]^,p1^.l[pip].a^,p1^.p[pip]^,p2^.p[(i mod 3)+1]^);
@@ -291,7 +294,7 @@ begin
       for j:=1 to i-1 do
         if j<>i then begin
           li.init(pl[i],pl[j]);
-          if not p1^.linientest(li) then begin
+          if not p1^.linientest(li, ausgabeInsert) then begin
             w:=false;
             for k:=1 to llpos do
               w:=w or (linien.intersect(li,ll[k],l,m) in [1,2,3]);
@@ -389,37 +392,38 @@ begin
     if drawmode=6 then begin
       p^.draw2(15);
       outint('zähler',zaehl.count);
+      outstring(format('insert %p', [p]));
     end;
     tf:=0;
     a:=nil;
     ak:=@swurzel;
     while ak^<>nil do begin
-      case polytest(ak^,p,schnitttest,false) of
+      case polytest(ak^,p,schnitttest,ausgabeInsert) of
         1:begin
             a:=ak^;
             ak:=@ak^^.so;
             typ:=so;
             inc(tf);
-{            outstring('f1so');}
+            if (ausgabeInsert) then outstring('f1so');
           end;
         2:begin
             a:=ak^;
             ak:=@ak^^.su;
             typ:=su;
             inc(tf);
-{            outstring('f2su');}
+            if (ausgabeInsert) then outstring('f2su');
           end;
         3:begin
             if p<>nil then begin
               polypoly(ak^^.originalTriangle,p);
               dispose(p, done('insert fall3'));
-{              outstring('f3u');}
+              if (ausgabeInsert) then outstring('f3u');
             end else
               outstring('p is nil (fall3)');
             goto ende
           end;
         4:begin
-{            outstring('f4o');}
+            if (ausgabeInsert) then outstring('f4o');
             h:=loesche(ak^);
             if h<>nil then begin
               polypoly(p^.originalTriangle,h);
@@ -542,6 +546,6 @@ begin
   end;
 end;
 
-
-
+begin
+  ausgabeInsert := false;
 end.

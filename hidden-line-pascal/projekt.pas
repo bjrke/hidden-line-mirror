@@ -28,7 +28,7 @@ var
 begin
   K.init(iv, jv, Auge.sub3d(p^.o));
   kd:=K.det3d;
-  if abs(kd)>epsilon3 then begin
+  if abs(kd)>epsilon2 then begin
     K.x:=BlickR.neg3d;
     p^.b^.b.x:=K.det3d/kd;
     K.y:=K.x; K.x:=iv;

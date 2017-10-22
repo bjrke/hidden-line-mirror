@@ -10,8 +10,8 @@ type
     procedure draw1(c:color);
     procedure draw2(c:color);
     procedure draw3(c:color);
-    function linientest(li:linie):boolean;
-    function punkttest(t:vector2d):int;
+    function linientest(li:linie; ausgabe: Boolean):boolean;
+    function punkttest(t:vector2d; caller: String; ausgabe: boolean):int;
     function flaechentest:boolean;
   end;
   pdreieck=^dreieck;
@@ -105,14 +105,15 @@ function dreiecktyp.punkttest;
 var
   K:matrix3d;
   h,b1:vector3d;
-  kd,la:float;
+  kd:float;
+  la1,la2,la3: float;
   l1,l2,l3:int;
 
   function testl(l:float):int;
   begin
-    if abs(l)<epsilon1 then begin  {=0}
+    if abs(l)<epsilon0 then begin  {=0}
       testl:=0
-    end else if abs(l-1)<epsilon1 then begin {=1}
+    end else if abs(l-1)<epsilon0 then begin {=1}
       testl:=1
     end else if l<0 then begin {<0}
       testl:=2
@@ -130,9 +131,10 @@ begin
   b1.x:=t.x;    b1.y:=t.y;        b1.z:=1;
   kd:=K.det3d;
   if abs(kd)>epsilon1 then begin
-    h:=K.x;    K.x:=b1;    la:=K.det3d/kd;  K.x:=h;        l1:=testl(la);
-    h:=K.y;    K.y:=b1;    la:=K.det3d/kd;  K.y:=h;        l2:=testl(la);
-    h:=K.z;    K.z:=b1;    la:=K.det3d/kd;  K.z:=h;        l3:=testl(la);
+    h:=K.x;    K.x:=b1;    la1:=K.det3d/kd;  K.x:=h;        l1:=testl(la1);
+    h:=K.y;    K.y:=b1;    la2:=K.det3d/kd;  K.y:=h;        l2:=testl(la2);
+    h:=K.z;    K.z:=b1;    la3:=K.det3d/kd;  K.z:=h;        l3:=testl(la3);
+    if (ausgabe) then outstring('punkttest ' + caller + ' ' + floatToString(la1) + ' ' + floatToString(la2) + ' ' + floatToString(la3));
     case l1*25+l2*5+l3 of
       124:punkttest:=0;          {drin}
 
@@ -159,14 +161,14 @@ var
   la,m:float;
   li1,li2,li3:int;
 begin
-  pa:=punkttest(li.a^.b);
-  pe:=punkttest(li.e^.b);
+  pa:=punkttest(li.a^.b, 'linientest1', ausgabe);
+  pe:=punkttest(li.e^.b, 'linientest2', ausgabe);
   if (pa=0)or(pe=0)then
     linientest:=true
   else if (pa<20)and(pe<20)then begin
     h.x:=(li.a^.b.x+li.e^.b.x)/2;
     h.y:=(li.a^.b.y+li.e^.b.y)/2;
-    linientest:=(punkttest(h)=0);
+    linientest:=(punkttest(h, 'linientest3', ausgabe)=0);
   end else begin
     li1:=linien.intersect(li,l[1],la,m);
     li2:=linien.intersect(li,l[2],la,m);
@@ -177,6 +179,7 @@ end;
 
 function dreiecktyp.flaechentest;
 begin
+  //TODO stattdessen collinarität?
   flaechentest:=(p[1]^.b.sub2d(p[3]^.b).sqrbetrag2d > epsilon1) AND
                 (p[1]^.b.sub2d(p[2]^.b).sqrbetrag2d > epsilon1) AND
                 (p[2]^.b.sub2d(p[3]^.b).sqrbetrag2d > epsilon1)
@@ -190,7 +193,7 @@ begin
   bv := blickr.add3d(iv.mul3d(k.x))
               .add3d(jv.mul3d(k.y));
   t := planeNorm.skalar(bv);
-  if abs(t)>epsilon3 then
+  if abs(t)>epsilon2 then
     tiefe := ( planeDist - planeNorm.skalar(auge) ) / ( t * bv.invBetrag3d )
   else
     tiefe := 100000000;

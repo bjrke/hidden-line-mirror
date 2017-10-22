@@ -1,6 +1,6 @@
 unit polygon;
 interface
-uses crt,vector,punkte,linien,dreiecke,ptcgraph,zeit;
+uses crt,vector,punkte,linien,dreiecke,ptcgraph,zeit,sysutils;
 type
   punr=1..3;
   richtung=(li,re,so,su,po,pu,pr,ne);
@@ -86,7 +86,7 @@ begin
         for wy:=ym1 to ym2 do begin
           h.x:=wx;
           h.y:=wy;
-          if punkttest(h)=0 then begin
+          if punkttest(h, 'draw' ,false)=0 then begin
             my1:= 1 + 7 * ((bmy + yscan) / bmy);
             if my1>15 then
               putpixel(wx+bx,by-wy,15)
@@ -120,7 +120,7 @@ begin
         for wy:=ym1 to ym2 do begin
           h.x:=wx;
           h.y:=wy;
-          if punkttest(h)=0 then begin
+          if punkttest(h, 'draw2', false)=0 then begin
             putpixel(bx+wx,by-wy, calcColor(tiefePerspektive.relative( originalTriangle^.tiefe(h,false) )));
           end;
         end;
@@ -392,18 +392,20 @@ var
   var
     d1,d2:float;
   begin
-    if (p1^.punkttest(h)=0)and(p2^.punkttest(h)=0)then begin
+    if (p1^.punkttest(h, 'polytest.test1', ausgabe)=0)and(p2^.punkttest(h, 'polytest.test2', ausgabe)=0)then begin
       d1:=p1^.originalTriangle^.tiefe(p,ausgabe);
       d2:=p2^.originalTriangle^.tiefe(p,ausgabe);
-      schnitt:=d1<>d2;
+      schnitt:=abs(d1 - d2) > epsilon1;
       if p1^.originalTriangle=p2^.originalTriangle then begin
         v2:=true;
       end else
         v1:=d1<d2;
       if ausgabe then begin
+        outstring('v1:'+BoolToStr(v1) + 'v2:'+BoolToStr(v2) + ' schnitt:'+BoolToStr(schnitt));
         outvector2d('p',p);
         outfloat('d1',d1);
         outfloat('d2',d2);
+        outfloat('d1-d2', d1-d2);
       end;
     end
   end;
@@ -423,6 +425,7 @@ begin
   else begin
     schnitt:=false;
     v2:=false;
+    v1:=false;
     if schnitttest and (p1^.originalTriangle<>p2^.originalTriangle) then begin
       k:=0;
       h.init(0,0);
@@ -431,9 +434,9 @@ begin
       while (k<6)and(j<=3)do begin
         if linien.intersect(p1^.l[j],p2^.l[i],l,m)=1 then begin
           h.x:=h.x+p1^.l[j].a^.b.x+l*(p1^.l[j].e^.b.x-p1^.l[j].a^.b.x)+
-                     p2^.l[i].a^.b.x+m*(p2^.l[i].e^.b.x-p2^.l[i].a^.b.x);
+                   p2^.l[i].a^.b.x+m*(p2^.l[i].e^.b.x-p2^.l[i].a^.b.x);
           h.y:=h.y+p1^.l[j].a^.b.y+l*(p1^.l[j].e^.b.y-p1^.l[j].a^.b.y)+
-                     p2^.l[i].a^.b.y+m*(p2^.l[i].e^.b.y-p2^.l[i].a^.b.y);
+                   p2^.l[i].a^.b.y+m*(p2^.l[i].e^.b.y-p2^.l[i].a^.b.y);
           inc(k)
         end;
         inc(i);
@@ -447,7 +450,8 @@ begin
 
       i:=1;
       while {(k<6)and}(i<=3)do begin
-        pip:=p2^.punkttest(p1^.p[i]^.b);
+        pip:=p2^.punkttest(p1^.p[i]^.b, 'polytest1', ausgabe);
+        if (ausgabe) then outint('pip3 ',pip);
         case pip of
           0:addpl(p1^.p[i]^.b); {eckpunkte des oberen, die nur im(nicht auf)unteren sind}
           1..3:begin
@@ -457,10 +461,10 @@ begin
                   addpl(p1^.p[i]^.b);
               end;
           11..13:begin
-                 h1:=gleicheseite(p1^.p[i]^,p1^.p[(i mod 3)+1]^,p2^.p[((pip-1) mod 3)+1]^,p1^.p[((i+1) mod 3)+1]^);
-                 h2:=gleicheseite(p1^.p[i]^,p1^.p[((i+1) mod 3)+1]^,p2^.p[((pip-1) mod 3)+1]^,p1^.p[(i mod 3)+1]^);
-                 h3:=gleicheseite(p1^.p[i]^,p1^.p[(i mod 3)+1]^,p2^.p[(pip mod 3)+1]^,p1^.p[((i+1) mod 3)+1]^);
-                 h4:=gleicheseite(p1^.p[i]^,p1^.p[((i+1) mod 3)+1]^,p2^.p[(pip mod 3)+1]^,p1^.p[(i mod 3)+1]^);
+                 h1:=gleicheseite(p1^.p[i]^,p1^.p[(i     mod 3)+1]^,p2^.p[((pip-1) mod 3)+1]^,p1^.p[((i+1) mod 3)+1]^);
+                 h2:=gleicheseite(p1^.p[i]^,p1^.p[((i+1) mod 3)+1]^,p2^.p[((pip-1) mod 3)+1]^,p1^.p[(i     mod 3)+1]^);
+                 h3:=gleicheseite(p1^.p[i]^,p1^.p[(i     mod 3)+1]^,p2^.p[(pip     mod 3)+1]^,p1^.p[((i+1) mod 3)+1]^);
+                 h4:=gleicheseite(p1^.p[i]^,p1^.p[((i+1) mod 3)+1]^,p2^.p[(pip     mod 3)+1]^,p1^.p[(i     mod 3)+1]^);
                  if (h1=-1)or(h2=-1)or(h3=-1)or(h4=-1) then
                    addpl(p1^.p[i]^.b);
           end;
@@ -469,7 +473,8 @@ begin
       end;
       i:=1;
       while {(k<6)and}(i<=3)do begin
-        pip:=p1^.punkttest(p2^.p[i]^.b);
+        pip:=p1^.punkttest(p2^.p[i]^.b, 'polytest2', ausgabe);
+        if (ausgabe) then outint('pip4 ',pip);
         case pip of
           0:addpl(p2^.p[i]^.b); {eckpunkte des oberen, die nur im(nicht auf)unteren sind}
           1..3:begin
@@ -525,9 +530,11 @@ begin
       test(h);
     end;
 
-    if v2 then
-      polytest:=5
-    else if not schnitt then begin
+    if v2 then begin
+      polytest:=5;
+      if ausgabe then
+        outstring('v25');
+    end else if not schnitt then begin
       l:=xscan;
       if p1^.p[1]^.b.x<p2^.p[1]^.b.x then
         xscan:=p2^.p[1]^.b.x
@@ -542,27 +549,40 @@ begin
         marke(round( bmx+xscan),round( bmy-p1^.yscan),yellow,'p1^.yscan');
         marke(round( bmx+xscan),round( bmy-p2^.yscan),lightmagenta,'p2^.yscan');
       end;
-      if p1^.yscan>p2^.yscan then
-        polytest:=1
-      else
+      if p1^.yscan>p2^.yscan then begin
+        polytest:=1;
+        if ausgabe then
+          outstring('notschnitt1');
+      end else begin
         polytest:=2;
+        if ausgabe then
+          outstring('notschnitt2');
+      end;
       xscan:=l;
     end else begin
-      if v1 then
-        polytest:=3
-      else
-        polytest:=4
+      if v1 then begin
+        polytest:=3;
+        if ausgabe then
+          outstring('v13');
+      end else begin
+        polytest:=4;
+        if ausgabe then
+          outstring('v14');
+      end;
     end;
     if ausgabe then begin
       outvector2d('p1^.p[1]^.b',p1^.p[1]^.b);
       outvector2d('p1^.p[2]^.b',p1^.p[2]^.b);
       outvector2d('p1^.p[3]^.b',p1^.p[3]^.b);
+      outvector2d('p1^.originalTriangle^.p[1]^.b',p1^.originalTriangle^.p[1]^.b);
+      outvector2d('p1^.originalTriangle^.p[2]^.b',p1^.originalTriangle^.p[2]^.b);
+      outvector2d('p1^.originalTriangle^.p[3]^.b',p1^.originalTriangle^.p[3]^.b);
       outvector2d('p2^.p[1]^.b',p2^.p[1]^.b);
       outvector2d('p2^.p[2]^.b',p2^.p[2]^.b);
       outvector2d('p2^.p[3]^.b',p2^.p[3]^.b);
-      outvector2d('originalTriangle^.p[1]^.b',p2^.originalTriangle^.p[1]^.b);
-      outvector2d('originalTriangle^.p[2]^.b',p2^.originalTriangle^.p[2]^.b);
-      outvector2d('originalTriangle^.p[3]^.b',p2^.originalTriangle^.p[3]^.b);
+      outvector2d('p2^.originalTriangle^.p[1]^.b',p2^.originalTriangle^.p[1]^.b);
+      outvector2d('p2^.originalTriangle^.p[2]^.b',p2^.originalTriangle^.p[2]^.b);
+      outvector2d('p2^.originalTriangle^.p[3]^.b',p2^.originalTriangle^.p[3]^.b);
       p1^.draw3(1);
       p2^.draw3(2);
 

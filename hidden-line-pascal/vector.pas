@@ -2,11 +2,11 @@ unit vector;
 interface
 uses ptcgraph,crt;
 const
-  epsilon1=0.000001;
+  epsilon0=0.001;
+  epsilon1=epsilon0*epsilon0;
   epsilon2=epsilon1*epsilon1;
-  epsilon3=epsilon1*epsilon1*epsilon1;
 type
-  float=Double;
+  float=Single;
   int=longint;
   pvector3d=^vector3d;
   vector3d=object
@@ -254,7 +254,7 @@ end;
 function floatToString;
 var s: String;
 begin
-  Str(f:6:2,s);
+  Str(f:20:15,s);
   floatToString := s;
 end;
 

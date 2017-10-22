@@ -93,8 +93,8 @@ end;
 
 function gleicheseite;
 begin
-  gleicheseite:=sgn(((p3.b.y-s.b.y)*(p2.b.x-s.b.x)-(p3.b.x-s.b.x)*(p2.b.y-s.b.y))
-                   *((p4.b.y-s.b.y)*(p2.b.x-s.b.x)-(p4.b.x-s.b.x)*(p2.b.y-s.b.y)))
+  gleicheseite := sgn(((p3.b.y-s.b.y)*(p2.b.x-s.b.x)-(p3.b.x-s.b.x)*(p2.b.y-s.b.y))
+                    *((p4.b.y-s.b.y)*(p2.b.x-s.b.x)-(p4.b.x-s.b.x)*(p2.b.y-s.b.y)));
 end;
 
 

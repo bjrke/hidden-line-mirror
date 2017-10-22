@@ -42,7 +42,7 @@ begin
 //  setallpalette(bpal);
   backface:=true;
 
-  drawmode:=1;
+  drawmode := 1;
 
 { tetraeder(0,0,0, -1,0,-2, 1,1,-2 ,1,-1,-2);
 
