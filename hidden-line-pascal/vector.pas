@@ -74,6 +74,17 @@ const
 var
   th,tx: integer;
 
+function invsqrt(number: Double): Double;
+var y: Double;
+var i: int64;
+begin
+  i := $5fe6eb50c7b537a9 - (( int64(number)) div 2);
+  y := Double(i);
+  y := y * (1.5 - (number * 0.5 * y * y));   // 1st iteration
+//  y := y * (1.5 - (number * 0.5 * y * y));   // 2nd iteration, this can be removed
+  invsqrt := y;
+end;
+
 constructor vector3d.init;
 begin
   self.x:=x;
@@ -123,7 +134,7 @@ end;
 
 function vector3d.invBetrag3d;
 begin
-  invBetrag3d := 1.0/sqrt(sqr(x)+sqr(y)+sqr(z));
+  invBetrag3d := invsqrt(sqr(x)+sqr(y)+sqr(z));
 end;
 
 function vector3d.move3d;
@@ -167,10 +178,9 @@ begin
   sqrbetrag2d:= sqr(x)+sqr(y);
 end;
 
-
 function vector2d.betrag2d;
 begin
-  betrag2d:= sqrt(self.sqrbetrag2d);
+  betrag2d:= 1.0/invsqrt(self.sqrbetrag2d);
 end;
 
 function vector2d.toString;
@@ -219,7 +229,7 @@ VAR
 
 BEGIN
   RotInc:=cos(t*Pi/180)/sin(t*pi/180);
-  InvRotVecLength:=1.0 / sqrt(sqr(RotInc)+1);
+  InvRotVecLength:= invsqrt(sqr(RotInc)+1);
 
   Copy1:=ToRot1^;
   Copy2:=ToRot2^;
