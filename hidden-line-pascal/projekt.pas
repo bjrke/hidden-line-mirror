@@ -77,7 +77,7 @@ var
   tr,md: Integer;
 begin
   tr:=D8bit;
-  md:=m1280x1024;
+  md:=m1024x768;
   initgraph(tr,md,'');
 end;
 
