@@ -12,7 +12,7 @@ type
 
   ctyp=object
     q:array[1..3]of dtyp;
-    s,p,p2,p3:dtyp;
+    suchbaum,polygons,points2d,points3d:dtyp;
     ptest,count,pp:longint;
     constructor init;
     procedure ausgabe;
@@ -89,9 +89,9 @@ begin
   q[1].init;
   q[2].init;
   q[3].init;
-  s.init;
-  p.init;
-  p2.init;
+  suchbaum.init;
+  polygons.init;
+  points2d.init;
   count:=0;
   ptest:=0;
   pp:=0;
@@ -105,10 +105,10 @@ begin
   q[1].ausgabe('Warteschlange 1');
   q[2].ausgabe('Warteschlange 2');
   q[3].ausgabe('Warteschlange 3');
-  s.ausgabe('Suchbaum');
-  p.ausgabe('Polygone insgesamt');
-  p2.ausgabe('Punkte in Bildeben');
-  p3.ausgabe('Punkte im Raum');
+  suchbaum.ausgabe('Suchbaum');
+  polygons.ausgabe('Polygone insgesamt');
+  points2d.ausgabe('Punkte in Bildeben');
+  points3d.ausgabe('Punkte im Raum');
 end;
 
 constructor minmax.init;
@@ -207,5 +207,5 @@ begin
 end;
 
 begin
-  zaehl.p3.init;
+  zaehl.points3d.init;
 end.

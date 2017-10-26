@@ -125,7 +125,7 @@ function sdelete(p:ppoly):ppoly;
 var
   h:ppoly;
 begin
-  zaehl.s.del;
+  zaehl.suchbaum.del;
   sdelete:=p;
   if p<>nil then begin
     h:=nil;
@@ -470,7 +470,7 @@ begin
       p^.ss:=@swurzel;
       push(swurzel,3,p^.count);
     end;
-    zaehl.s.ins;
+    zaehl.suchbaum.ins;
   ende:
     if tf>mtf then begin
       abflachen;
@@ -501,7 +501,7 @@ var
 begin
   mtf:=0;
   swurzel:=polygon.pop(1);
-  zaehl.s.ins;
+  zaehl.suchbaum.ins;
   if swurzel<>nil then begin
     swurzel^.ss:=@swurzel;
     swurzel^.so:=nil;

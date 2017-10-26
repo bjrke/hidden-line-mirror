@@ -50,19 +50,19 @@ implementation
 
 constructor punkt.init;
 begin
-  zaehl.p2.ins;
+  self.init0;
   b:=bv;
   gz:=ls;
 end;
 
 constructor punkt.init0;
 begin
-  zaehl.p2.ins;
+  zaehl.points2d.ins;
 end;
 
 constructor punkt3d.init;
 begin
-  zaehl.p3.ins;
+  zaehl.points3d.ins;
   o.init(ax,ay,az);
   next:=nil;
   new(b, init0);
@@ -70,7 +70,7 @@ end;
 
 destructor punkt.done;
 begin
-  zaehl.p2.del;
+  zaehl.points2d.del;
 end;
 
 function punkt.copy;

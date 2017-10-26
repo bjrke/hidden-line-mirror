@@ -50,7 +50,7 @@ begin
       dispose(p[i], done)
     else
       outstring('p[i]=nil');
-  zaehl.p.del;
+  zaehl.polygons.del;
 end;
 
 procedure poly.drawpoly;
@@ -144,7 +144,7 @@ var
   lsneu:lset;
 
 begin
-  zaehl.p.ins;
+  zaehl.polygons.ins;
 
   if p1=nil then outstring('p1=nil');
   if p2=nil then outstring('p2=nil');
