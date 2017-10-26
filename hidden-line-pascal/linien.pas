@@ -6,9 +6,8 @@ type
     a,e:ppunkt;
     constructor init(p1,p2: ppunkt);
     procedure draw(c:color);
-    procedure draw1(c:color);
-    procedure draw2(l1,l2:float;c:color);
   end;
+
 function intersect(l1,l2:linie;var lambda,mue:float):int;
 
 implementation
@@ -23,13 +22,6 @@ begin
   end;
 end;
 
-procedure linie.draw1;
-begin
-  setcolor(c);
-  if a^.gz*e^.gz<>[] then
-    line(round(bmx+a^.b.x),round(bmy-a^.b.y),round(bmx+e^.b.x),round(bmy-e^.b.y));
-end;
-
 procedure linie.draw;
 begin
   setcolor(c);
@@ -40,17 +32,6 @@ begin
   else begin
     line(round(bmx+a^.b.x),round(bmy-a^.b.y),round(bmx+e^.b.x),round(bmy-e^.b.y));
   end;
-end;
-
-procedure linie.draw2;
-var
-  dx,dy:float;
-
-begin
-  setcolor(c);
-  dx:=e^.b.x-a^.b.x;
-  dy:=e^.b.y-a^.b.y;
-  line(round(bmx+a^.b.x+l1*dx),round(bmy-a^.b.y-l1*dy),round(bmx+a^.b.x+l2*dx),round(bmy-a^.b.y-l2*dy));
 end;
 
 function intersect;
