@@ -58,27 +58,27 @@ var
   k:matrix2d;
   h:vector2d;
   dk:float;
-  i:int;
 begin
-  i:=0;
-  k.x.x:=l1.e^.b.x-l1.a^.b.x;  k.x.y:=l1.e^.b.y-l1.a^.b.y;
-  k.y.x:=l2.a^.b.x-l2.e^.b.x;  k.y.y:=l2.a^.b.y-l2.e^.b.y;
+  k.init(l1.e^.b.sub2d(l1.a^.b), l2.a^.b.sub2d(l2.e^.b));
+
   dk:=k.det2d;
-  if abs(dk)>epsilon1 then begin
-    h:=k.x;
-    k.x.x:=l2.a^.b.x-l1.a^.b.x;    k.x.y:=l2.a^.b.y-l1.a^.b.y;
-    lambda:=k.det2d/dk;
-    k.y:=k.x;
-    k.x:=h;
-    mue:=k.det2d/dk;
-    if (lambda>epsilon1)and(lambda<1-epsilon1)and(mue>epsilon1)and(mue<1-epsilon1) then i:=1 else {schneiden sich ordentlich}
-    if (lambda>epsilon1)and(lambda<1-epsilon1)and((abs(mue-1)<=epsilon1) or (abs(mue)<=epsilon1))then i:=2 else
-       {min 1 endpunkt2 auf linie 1}
-    if ((abs(lambda-1)<=epsilon1) or (abs(lambda)<=epsilon1))and(mue>epsilon1)and(mue<1-epsilon1)then i:=3 else
-       {min 1 endpunkt1 auf linie 2}
-    if ((abs(lambda-1)<=epsilon1) or (abs(lambda)<=epsilon1))and((abs(mue-1)<=epsilon1) or (abs(mue)<=epsilon1)) then i:=4;
-       {1 gemeinsamer endpunkt}
+  if (abs(dk) <= epsilon1) then
+    intersect := 0 // schneiden sich nicht
+  else begin
+    h := l2.a^.b.sub2d(l1.a^.b);
+    lambda:=k.withX(h).det2d/dk;
+    mue:=k.withY(h).det2d/dk;
+    if (lambda>epsilon1) and (lambda<1-epsilon1) and (mue>epsilon1) and (mue<1-epsilon1) then
+      intersect := 1 // schneiden sich ordentlich
+    else if (lambda>epsilon1) and (lambda<1-epsilon1) and ((abs(mue-1)<=epsilon1) or (abs(mue)<=epsilon1)) then
+      intersect := 2 // min 1 endpunkt2 auf linie 1
+    else if ((abs(lambda-1)<=epsilon1) or (abs(lambda)<=epsilon1)) and (mue>epsilon1) and (mue<1-epsilon1) then
+      intersect := 3 // min 1 endpunkt1 auf linie 2
+    else if ((abs(lambda-1)<=epsilon1) or (abs(lambda)<=epsilon1)) and ((abs(mue-1)<=epsilon1) or (abs(mue)<=epsilon1)) then
+      intersect := 4 // 1 gemeinsamer endpunkt
+    else
+      intersect := 0 // schneiden sich nicht
   end;
-  intersect:=i;
 end;
+
 end.

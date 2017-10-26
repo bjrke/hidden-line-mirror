@@ -47,6 +47,10 @@ type
   matrix2d=object
     x, y: vector2d;
     constructor init(x,y: vector2d);
+
+    function withX(v: vector2d): matrix2d;
+    function withY(v: vector2d): matrix2d;
+
     function det2d:float;
     function toString: String;
   end;
@@ -210,6 +214,16 @@ constructor matrix2d.init;
 begin
   self.x := x;
   self.y := y;
+end;
+
+function matrix2d.withX;
+begin
+  withX.init(v, y);
+end;
+
+function matrix2d.withY;
+begin
+  withY.init(x, v);
 end;
 
 function matrix2d.det2d;
