@@ -1,6 +1,6 @@
 unit polyswee;
 interface
-uses crt,ptcgraph,polygon,vector,punkte,linien,dreiecke,zeit,sysutils;
+uses ptccrt,ptcgraph,polygon,vector,punkte,linien,dreiecke,zeit,sysutils;
 var
   zumalen:set of byte;
   mtf:longint;

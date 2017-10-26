@@ -1,6 +1,6 @@
 unit vector;
 interface
-uses ptcgraph,crt;
+uses ptcgraph,ptccrt;
 const
   epsilon0=0.0001;
   epsilon1=epsilon0*epsilon0;

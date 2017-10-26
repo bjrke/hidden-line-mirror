@@ -1,6 +1,6 @@
 unit projekt;
 interface
-uses crt,ptcgraph,vector,polygon,dreiecke,punkte,linien,zeit;
+uses ptccrt,ptcgraph,vector,polygon,dreiecke,punkte,linien,zeit;
 
 procedure neukamera;
 procedure rechnung;

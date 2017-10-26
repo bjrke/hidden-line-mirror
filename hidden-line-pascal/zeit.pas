@@ -1,6 +1,6 @@
 unit zeit;
 interface
-uses crt, dos, vector;
+uses ptccrt, dos, vector;
 type
   dtyp=object
     insert,delete,maximum,minimum,aktuell:longint;
