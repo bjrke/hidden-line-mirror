@@ -4,4 +4,7 @@
 fp.cfg
 fp.dsk
 fp.ini
-3dplot
+dreidplot
+dreidplot.lpi
+dreidplot.lps
+lib/
