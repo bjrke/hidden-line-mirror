@@ -329,16 +329,16 @@ end;
 
 function pop;
 begin
-  pop := del(First[pnr], pnr);
+  exit(del(First[pnr], pnr));
 end;
 
 function del;
 var
   h: ppoly;
 begin
-  del := p;
-  if p <> nil then
-  begin
+  if p = nil then begin
+    exit(nil);
+    end;
     zaehl.q[pnr].del;
     if p = First[pnr] then
       First[pnr] := First[pnr]^.ne;
@@ -408,7 +408,8 @@ begin
     p^.re := nil;
     p^.ne := nil;
     p^.pr := nil;
-  end;
+
+    exit(p);
 end;
 
 function poly.yscan;
@@ -458,7 +459,7 @@ begin
   begin
     h := miny + maxy;
   end;
-  yscan := h / 2;
+  exit( h / 2 );
 end;
 
 function polytest;
@@ -621,10 +622,6 @@ begin
         h := h.div2d(k);
 
         test(h);
-
-      end
-      else
-      begin
 
       end;
     end;
