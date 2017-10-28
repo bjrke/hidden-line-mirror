@@ -506,6 +506,31 @@ var
     Inc(k);
   end;
 
+  function outputPolyTest(Result: byte): byte;
+  begin
+    if ausgabe then
+    begin
+      outint('polytest: ', Result);
+      outvector2d('p1^.p[1]^.b', p1^.p[1]^.b);
+      outvector2d('p1^.p[2]^.b', p1^.p[2]^.b);
+      outvector2d('p1^.p[3]^.b', p1^.p[3]^.b);
+      outvector2d('p1^.originalTriangle^.p[1]^.b', p1^.originalTriangle^.p[1]^.b);
+      outvector2d('p1^.originalTriangle^.p[2]^.b', p1^.originalTriangle^.p[2]^.b);
+      outvector2d('p1^.originalTriangle^.p[3]^.b', p1^.originalTriangle^.p[3]^.b);
+      outvector2d('p2^.p[1]^.b', p2^.p[1]^.b);
+      outvector2d('p2^.p[2]^.b', p2^.p[2]^.b);
+      outvector2d('p2^.p[3]^.b', p2^.p[3]^.b);
+      outvector2d('p2^.originalTriangle^.p[1]^.b', p2^.originalTriangle^.p[1]^.b);
+      outvector2d('p2^.originalTriangle^.p[2]^.b', p2^.originalTriangle^.p[2]^.b);
+      outvector2d('p2^.originalTriangle^.p[3]^.b', p2^.originalTriangle^.p[3]^.b);
+      p1^.draw3(1);
+      p2^.draw3(2);
+
+      readkey;
+    end;
+    exit(Result);
+  end;
+
 begin
   Inc(zaehl.ptest);
   if p1^.ymin - 1 > p2^.ymax then
@@ -654,76 +679,44 @@ begin
   end;
 
   if v2 then
-  begin
-    polytest := 5;
-    if ausgabe then
-      outstring('v25');
-  end
-  else if not schnitt then
-  begin
-    l := xscan;
-    if p1^.p[1]^.b.x < p2^.p[1]^.b.x then
-      xscan := p2^.p[1]^.b.x
-    else
-      xscan := p1^.p[1]^.b.x;
-    if p1^.p[3]^.b.x > p2^.p[3]^.b.x then
-      xscan := (xscan + p2^.p[3]^.b.x) / 2
-    else
-      xscan := (xscan + p1^.p[3]^.b.x) / 2;
+    exit(outputPolyTest(5));
 
-    if drawmode = 6 then
-    begin
-      marke(round(bmx + xscan), round(bmy - p1^.yscan), yellow, 'p1^.yscan');
-      marke(round(bmx + xscan), round(bmy - p2^.yscan), lightmagenta, 'p2^.yscan');
-    end;
-    if p1^.yscan > p2^.yscan then
-    begin
-      polytest := 1;
-      if ausgabe then
-        outstring('notschnitt1');
-    end
+  if schnitt then
+  begin
+    if v1 then
+      exit(outputPolyTest(3))
     else
-    begin
-      polytest := 2;
-      if ausgabe then
-        outstring('notschnitt2');
-    end;
+      exit(outputPolyTest(4));
+  end;
+
+  l := xscan;
+  if p1^.p[1]^.b.x < p2^.p[1]^.b.x then
+    xscan := p2^.p[1]^.b.x
+  else
+    xscan := p1^.p[1]^.b.x;
+
+  if p1^.p[3]^.b.x > p2^.p[3]^.b.x then
+    xscan := (xscan + p2^.p[3]^.b.x) / 2
+  else
+    xscan := (xscan + p1^.p[3]^.b.x) / 2;
+
+  if drawmode = 6 then
+  begin
+    marke(round(bmx + xscan), round(bmy - p1^.yscan), yellow, 'p1^.yscan');
+    marke(round(bmx + xscan), round(bmy - p2^.yscan), lightmagenta, 'p2^.yscan');
+  end;
+
+  if p1^.yscan > p2^.yscan then
+  begin
     xscan := l;
+    exit(outputPolyTest(1));
   end
   else
   begin
-    if v1 then
-    begin
-      polytest := 3;
-      if ausgabe then
-        outstring('v13');
-    end
-    else
-    begin
-      polytest := 4;
-      if ausgabe then
-        outstring('v14');
-    end;
+    xscan := l;
+    exit(outputPolyTest(2));
   end;
-  if ausgabe then
-  begin
-    outvector2d('p1^.p[1]^.b', p1^.p[1]^.b);
-    outvector2d('p1^.p[2]^.b', p1^.p[2]^.b);
-    outvector2d('p1^.p[3]^.b', p1^.p[3]^.b);
-    outvector2d('p1^.originalTriangle^.p[1]^.b', p1^.originalTriangle^.p[1]^.b);
-    outvector2d('p1^.originalTriangle^.p[2]^.b', p1^.originalTriangle^.p[2]^.b);
-    outvector2d('p1^.originalTriangle^.p[3]^.b', p1^.originalTriangle^.p[3]^.b);
-    outvector2d('p2^.p[1]^.b', p2^.p[1]^.b);
-    outvector2d('p2^.p[2]^.b', p2^.p[2]^.b);
-    outvector2d('p2^.p[3]^.b', p2^.p[3]^.b);
-    outvector2d('p2^.originalTriangle^.p[1]^.b', p2^.originalTriangle^.p[1]^.b);
-    outvector2d('p2^.originalTriangle^.p[2]^.b', p2^.originalTriangle^.p[2]^.b);
-    outvector2d('p2^.originalTriangle^.p[3]^.b', p2^.originalTriangle^.p[3]^.b);
-    p1^.draw3(1);
-    p2^.draw3(2);
 
-    readkey;
-  end;
 end;
 
 procedure verbinde;
