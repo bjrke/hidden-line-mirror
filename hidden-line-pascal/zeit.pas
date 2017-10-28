@@ -167,7 +167,7 @@ var
   h, m, s, s100: word;
 begin
   gettime(h, m, s, s100);
-  gettime2 := 360000 * h + 6000 * m + s * 100 + s100;
+  exit(360000 * h + 6000 * m + s * 100 + s100);
 end;
 
 procedure outtime;
