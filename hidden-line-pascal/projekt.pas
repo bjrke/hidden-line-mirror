@@ -1,6 +1,6 @@
 unit projekt;
 interface
-uses ptccrt,ptcgraph,vector,polygon,dreiecke,punkte,linien,zeit;
+uses ptcgraph,vector,polygon,dreiecke,punkte,zeit;
 
 procedure neukamera;
 procedure rechnung;
@@ -65,7 +65,7 @@ begin
         if h^.flaechentest then
           polygon.push(h,1,-2)
         else
-          dispose(h,done('flächentest'));
+          dispose(h,done);
        end;
     j:=dreiecks.next
   end;

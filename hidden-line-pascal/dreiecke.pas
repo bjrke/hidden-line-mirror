@@ -20,7 +20,7 @@ type
       origPoints:array[1..3] of ppunkt3d;
       planeNorm: vector3d;
       planeDist: float;
-      function tiefe(k:vector2d;ausgabe:boolean):float;
+      function tiefe(k:vector2d):float;
       constructor init(p1,p2,p3:ppunkt3d;ls:lset);
     private
       next:pdreieck;

@@ -22,11 +22,11 @@ var {a,b,c:int;}
   end;
 
 const
-  xs=4;      ys=4;      zs=4;
-  xo=3;      yo=3;      zo=3;
+//  xs=4;      ys=4;      zs=4;
+//  xo=3;      yo=3;      zo=3;
   sw=0.5;
   ad=13;
-  w34=0.43301270189221932338186158537647;
+//  w34=0.43301270189221932338186158537647;
 
 {var
   r1,r2,r3:float;}
@@ -142,19 +142,19 @@ begin
   while first[1]<>nil do begin
     p:=pop(1);
     p^.drawpoly;
-    dispose(p, done('a'));
+    dispose(p, done);
     outstring('f1');
   end;
   while first[2]<>nil do begin
     p:=pop(2);
     p^.drawpoly;
-    dispose(p, done('a'));
+    dispose(p, done);
     outstring('f2');
   end;
   while first[3]<>nil do begin
     p:=pop(3);
     p^.drawpoly;
-    dispose(p, done('a'));
+    dispose(p, done);
     outstring('f3');
   end;
 end;

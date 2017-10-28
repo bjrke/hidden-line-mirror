@@ -8,7 +8,7 @@ type
     procedure draw(c:color);
   end;
 
-function intersect(l1,l2:linie;var lambda,mue:float):int;
+function intersect(l1,l2:linie;var lambda,mue:float):byte;
 
 implementation
 constructor linie.init;

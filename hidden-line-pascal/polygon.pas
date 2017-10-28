@@ -19,7 +19,7 @@ type
     constructor initpoly( p1,p2,p3:ppunkt; ls:lset; aOriginalTriangle:pdreieck);
     constructor newpoly( aOriginalTriangle:pdreieck );
 
-    destructor done(aufr: string);
+    destructor done;
 
     function yscan:float;
     procedure drawpoly;
@@ -121,7 +121,7 @@ begin
           h.x:=wx;
           h.y:=wy;
           if punkttest(h, 'draw2', false)=0 then begin
-            putpixel(bx+wx,by-wy, calcColor(tiefePerspektive.relative( originalTriangle^.tiefe(h,false) )));
+            putpixel(bx+wx,by-wy, calcColor(tiefePerspektive.relative( originalTriangle^.tiefe(h) )));
           end;
         end;
     end;
@@ -393,8 +393,8 @@ var
     d1,d2:float;
   begin
     if (p1^.punkttest(h, 'polytest.test1', ausgabe)=0)and(p2^.punkttest(h, 'polytest.test2', ausgabe)=0)then begin
-      d1:=p1^.originalTriangle^.tiefe(p,ausgabe);
-      d2:=p2^.originalTriangle^.tiefe(p,ausgabe);
+      d1:=p1^.originalTriangle^.tiefe(p);
+      d2:=p2^.originalTriangle^.tiefe(p);
       schnitt:=abs(d1 - d2) > epsilon1;
       if p1^.originalTriangle=p2^.originalTriangle then begin
         v2:=true;

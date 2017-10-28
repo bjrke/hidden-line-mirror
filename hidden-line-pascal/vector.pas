@@ -1,6 +1,6 @@
 unit vector;
 interface
-uses ptcgraph,ptccrt;
+uses ptcgraph;
 const
   epsilon0=0.0001;
   epsilon1=epsilon0*epsilon0;
@@ -75,8 +75,8 @@ var
 implementation
 const
   MoveSpeed:float=1;
-var
-  th,tx: integer;
+//var
+//  th,tx: integer;
 
 function invsqrt(number: Double): Double;
 var y: Double;
@@ -313,9 +313,9 @@ end;
 procedure cls;
 begin
   cleardevice;
-  if tausgabe then putimage(0,0,palleiste^,normalput);
-  th:=10;
-  tx:=20;
+//  if tausgabe then putimage(0,0,palleiste^,normalput);
+//  th:=10;
+//  tx:=20;
 end;
 function sgn;
 begin
@@ -333,7 +333,7 @@ begin
   line(x-4,y+4,x+4,y-4);
   outtextxy(x+5,y-4,s);
 end;
-Begin
-  tx:=20;
-  th:=10;
+//Begin
+//  tx:=20;
+//  th:=10;
 end.

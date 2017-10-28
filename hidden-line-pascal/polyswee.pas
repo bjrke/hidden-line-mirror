@@ -1,6 +1,6 @@
 unit polyswee;
 interface
-uses ptccrt,ptcgraph,polygon,vector,punkte,linien,dreiecke,zeit,sysutils;
+uses ptcgraph,polygon,vector,punkte,linien,dreiecke,zeit,sysutils;
 var
   zumalen:set of byte;
   mtf:longint;
@@ -239,7 +239,7 @@ var
           push(ph,2,zaehl.count)
         end
       end else
-        dispose(ph, done('addppl 2'));
+        dispose(ph, done);
     end;
   end;
 
@@ -342,7 +342,7 @@ begin
           del(h,3);
           if h<>nil then begin
             polypoly(u^.originalTriangle,h);
-            dispose(h,done('lofall3'))
+            dispose(h,done)
           end else
             outstring('h is nil (falls3)');
         end;
@@ -353,7 +353,7 @@ begin
           del(h,3);
           if h<>nil then begin
             polypoly(o^.originalTriangle,h);
-            dispose(h, done('lofall4'))
+            dispose(h, done)
           end else
             outstring('h is nil (falls4)');
         end;
@@ -363,13 +363,13 @@ begin
           sdelete(h);
           del(h,3);
           outint('l5 ozähler ',h^.count);
-          dispose(h, done('l5'));
+          dispose(h, done);
 
           h:=u;
           u:=u^.pu;
           sdelete(h);
           del(h,3);
-          dispose(h, done('l52'));
+          dispose(h, done);
           outint('l5 uzähler',h^.count);
         end;
       end;
@@ -421,7 +421,7 @@ begin
         3:begin
             if p<>nil then begin
               polypoly(ak^^.originalTriangle,p);
-              dispose(p, done('insert fall3'));
+              dispose(p, done);
               if (ausgabeInsert) then outstring('f3u');
             end else
               outstring('p is nil (fall3)');
@@ -432,16 +432,16 @@ begin
             h:=loesche(ak^);
             if h<>nil then begin
               polypoly(p^.originalTriangle,h);
-              dispose(h, done('insert fall4'))
+              dispose(h, done)
             end else
               outstring('h is nil (fall4)');
           end;
         5:begin
           outint('i5 pzähler',p^.count);
-          dispose(p, done('i5'));
+          dispose(p, done);
           p:=loesche(ak^);
           outint('i5 akzähler',p^.count);
-          dispose(p, done('i52'));
+          dispose(p, done);
           goto ende;
         end;
       end
@@ -481,7 +481,7 @@ begin
         ch:=readkey2([#32, #27, '1'..'9','a']);
         if ch in ['1'..'9'] then begin
           cls;
-          if (ord(ch)-ord('0'))in zumalen then
+          if (ord(ch)-ord('0')) in zumalen then
             zumalen:=zumalen-[(ord(ch)-ord('0'))]
           else
             zumalen:=zumalen+[(ord(ch)-ord('0'))]
@@ -520,7 +520,7 @@ begin
         p:=loesche(first[3]);
         p^.cols:=15; {5}
         p^.drawpoly;
-        dispose(p, done('sweep ende'));
+        dispose(p, done);
       end;
     end else begin
       p:=polygon.pop(1);
@@ -538,7 +538,7 @@ begin
         p:=loesche(first[3]);
         p^.cols:=15; {6}
         p^.drawpoly;
-        dispose(p, done('insert pop3'));
+        dispose(p, done);
       end;
     end;
     if not ende then begin
