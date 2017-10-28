@@ -149,12 +149,12 @@ end;
 
 function minmax.toString;
 begin
-  toString := 'min: ' + floatToString(MinValue) + ' max: ' + floatToString(MaxValue);
+  exit( 'min: ' + floatToString(MinValue) + ' max: ' + floatToString(MaxValue) );
 end;
 
 function minmax.relative;
 begin
-  relative := (f - MinValue) / (MaxValue - MinValue);
+  exit( (f - MinValue) / (MaxValue - MinValue));
 end;
 
 procedure starttime;

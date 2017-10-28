@@ -43,7 +43,7 @@ var
       h2 := nil;
     verbinde(h, h1, so);
     verbinde(h, h2, su);
-    newtree := h;
+    exit(h);
   end;
 
 begin
@@ -138,81 +138,84 @@ function sdelete(p: ppoly): ppoly;
 var
   h: ppoly;
 begin
-  zaehl.suchbaum.del;
-  sdelete := p;
-  if p <> nil then
+  if (p = nil) then
   begin
-    h := nil;
-    if p^.so = nil then
-      h := p^.su
-    else if p^.su = nil then
-      h := p^.so
-    else
+    outstring('sdelete(nil)');
+    exit(nil);
+  end;
+
+  zaehl.suchbaum.del;
+
+  h := nil;
+  if p^.so = nil then
+    h := p^.su
+  else if p^.su = nil then
+    h := p^.so
+  else
+  begin
+    if p^.po = nil then
     begin
-      if p^.po = nil then
+      drawtree;
+      outstring('p^.po=nil');
+    end;
+    if p^.pu = nil then
+    begin
+      drawtree;
+      outstring('p^.pu=nil');
+    end;
+    rand := not rand;
+    if rand then
+    begin
+      h := p^.pu;
+      if h^.so <> nil then
+        outstring('h^.so<>nil');
+      if h = p^.su then
       begin
-        drawtree;
-        outstring('p^.po=nil');
-      end;
-      if p^.pu = nil then
-      begin
-        drawtree;
-        outstring('p^.pu=nil');
-      end;
-      rand := not rand;
-      if rand then
-      begin
-        h := p^.pu;
-        if h^.so <> nil then
-          outstring('h^.so<>nil');
-        if h = p^.su then
-        begin
-          verbinde(h, p^.so, so);
-        end
-        else
-        begin
-          h^.ss^ := h^.su;
-          if h^.su <> nil then
-          begin
-            h^.su^.ss := h^.ss;
-          end;
-          verbinde(h, p^.so, so);
-          verbinde(h, p^.su, su);
-        end;
+        verbinde(h, p^.so, so);
       end
       else
       begin
-        h := p^.po;
+        h^.ss^ := h^.su;
         if h^.su <> nil then
-          outstring('h^.su<>nil');
-        if h = p^.so then
         begin
-          verbinde(h, p^.su, su);
-        end
-        else
-        begin
-          h^.ss^ := h^.so;
-          if h^.so <> nil then
-          begin
-            h^.so^.ss := h^.ss;
-          end;
-          verbinde(h, p^.so, so);
-          verbinde(h, p^.su, su);
+          h^.su^.ss := h^.ss;
         end;
+        verbinde(h, p^.so, so);
+        verbinde(h, p^.su, su);
+      end;
+    end
+    else
+    begin
+      h := p^.po;
+      if h^.su <> nil then
+        outstring('h^.su<>nil');
+      if h = p^.so then
+      begin
+        verbinde(h, p^.su, su);
+      end
+      else
+      begin
+        h^.ss^ := h^.so;
+        if h^.so <> nil then
+        begin
+          h^.so^.ss := h^.ss;
+        end;
+        verbinde(h, p^.so, so);
+        verbinde(h, p^.su, su);
       end;
     end;
-    p^.ss^ := h;
-    if h <> nil then
-      h^.ss := p^.ss;
-    verbinde(p^.po, p^.pu, pu);
-    p^.ss := nil;
-    p^.po := nil;
-    p^.pu := nil;
-    p^.so := nil;
-    p^.su := nil;
-  end
-  else
-    outstring('sdelete(nil)');
+  end;
+  p^.ss^ := h;
+  if h <> nil then
+    h^.ss := p^.ss;
+  verbinde(p^.po, p^.pu, pu);
+  p^.ss := nil;
+  p^.po := nil;
+  p^.pu := nil;
+  p^.so := nil;
+  p^.su := nil;
+
+  exit(p);
 end;
 
 procedure polypoly(p1: pdreieck; p2: ppoly);
@@ -379,78 +382,76 @@ end;
 function loesche(p: ppoly): ppoly;
 var
   o, u, h: ppoly;
-  fertig: boolean;
 begin
-  loesche := p;
-  if p <> nil then
+  if (p = nil) then
   begin
-    o := p^.po;
-    u := p^.pu;
-    sdelete(p);
-    del(p, 3);
-    fertig := False;
-    while (not fertig) and (o <> nil) and (u <> nil) do
-    begin
-      case polytest(o, u, True, False) of
-        1:
-        begin
-          h := o;
-          o := o^.po;
-          sdelete(h);
-          del(h, 3);
-          push(h, 2, h^.Count);
-          fertig := False;
-        end;
-        2: fertig := True;
-        4:
-        begin
-          h := o;
-          o := o^.po;
-          sdelete(h);
-          del(h, 3);
-          if h <> nil then
-          begin
-            polypoly(u^.originalTriangle, h);
-            dispose(h, done);
-          end
-          else
-            outstring('h is nil (falls3)');
-        end;
-        3:
-        begin
-          h := u;
-          u := u^.pu;
-          sdelete(h);
-          del(h, 3);
-          if h <> nil then
-          begin
-            polypoly(o^.originalTriangle, h);
-            dispose(h, done);
-          end
-          else
-            outstring('h is nil (falls4)');
-        end;
-        5:
-        begin
-          h := o;
-          o := o^.po;
-          sdelete(h);
-          del(h, 3);
-          outint('l5 ozähler ', h^.Count);
-          dispose(h, done);
+    outstring('p ist nil');
+    exit(nil);
+  end;
 
-          h := u;
-          u := u^.pu;
-          sdelete(h);
-          del(h, 3);
+  o := p^.po;
+  u := p^.pu;
+  sdelete(p);
+  del(p, 3);
+  while (o <> nil) and (u <> nil) do
+  begin
+    case polytest(o, u, True, False) of
+      1:
+      begin
+        h := o;
+        o := o^.po;
+        sdelete(h);
+        del(h, 3);
+        push(h, 2, h^.Count);
+      end;
+      2: exit(p);
+      4:
+      begin
+        h := o;
+        o := o^.po;
+        sdelete(h);
+        del(h, 3);
+        if h <> nil then
+        begin
+          polypoly(u^.originalTriangle, h);
           dispose(h, done);
-          outint('l5 uzähler', h^.Count);
-        end;
+        end
+        else
+          outstring('h is nil (falls3)');
+      end;
+      3:
+      begin
+        h := u;
+        u := u^.pu;
+        sdelete(h);
+        del(h, 3);
+        if h <> nil then
+        begin
+          polypoly(o^.originalTriangle, h);
+          dispose(h, done);
+        end
+        else
+          outstring('h is nil (falls4)');
+      end;
+      5:
+      begin
+        h := o;
+        o := o^.po;
+        sdelete(h);
+        del(h, 3);
+        outint('l5 ozähler ', h^.Count);
+        dispose(h, done);
+
+        h := u;
+        u := u^.pu;
+        sdelete(h);
+        del(h, 3);
+        dispose(h, done);
+        outint('l5 uzähler', h^.Count);
       end;
     end;
-  end
-  else
-    outstring('p ist nil');
+  end;
+  exit(p);
 end;
 
 procedure insert(p: ppoly; schnitttest: boolean);
