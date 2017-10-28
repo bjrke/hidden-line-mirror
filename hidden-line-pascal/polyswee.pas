@@ -468,11 +468,6 @@ begin
   if p^.flaechentest then
   begin
     Inc(zaehl.Count);
-    if (zaehl.Count > 12000) then
-    begin
-      drawmode := 6;
-      ausgabeInsert := True;
-    end;
     if drawmode = 6 then
     begin
       p^.draw2(15);
