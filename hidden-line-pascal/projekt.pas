@@ -57,7 +57,7 @@ begin
   ED:=BlickR.skalar(Auge) + epsilon1;
   j:=dreiecks.first;
   while j<>nil do begin
-    if (BlickR.skalar(j^.o[1]^.o)>ED) AND (BlickR.skalar(j^.o[2]^.o)>ED) AND (BlickR.skalar(j^.o[3]^.o)>ED) AND // test if not behind view plane
+    if (BlickR.skalar(j^.origPoints[1]^.o)>ED) AND (BlickR.skalar(j^.origPoints[2]^.o)>ED) AND (BlickR.skalar(j^.origPoints[3]^.o)>ED) AND // test if not behind view plane
        // evtl kann man das mit der Lichtberechnung beim Initialisieren des Polygons kombinieren
        (not backface or ((j^.p[3]^.b.x-j^.p[1]^.b.x)*(j^.p[2]^.b.y-j^.p[1]^.b.y)+epsilon1<
                          (j^.p[3]^.b.y-j^.p[1]^.b.y)*(j^.p[2]^.b.x-j^.p[1]^.b.x))) then begin

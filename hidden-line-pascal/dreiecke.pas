@@ -17,7 +17,7 @@ type
   pdreieck=^dreieck;
   dreieck=object(dreiecktyp)
     public
-      o:array[1..3] of ppunkt3d;
+      origPoints:array[1..3] of ppunkt3d;
       planeNorm: vector3d;
       planeDist: float;
       function tiefe(k:vector2d;ausgabe:boolean):float;
@@ -56,9 +56,9 @@ end;
 
 constructor dreieck.init;
 begin
-  o[1]:=p1;
-  o[2]:=p2;
-  o[3]:=p3;
+  origPoints[1]:=p1;
+  origPoints[2]:=p2;
+  origPoints[3]:=p3;
   p[1]:=p1^.b;
   p[2]:=p2^.b;
   p[3]:=p3^.b;
@@ -67,10 +67,10 @@ begin
   l[2].init(p[3],p[1]);
   l[3].init(p[1],p[2]);
   next:=nil;
-  planeNorm := o[2]^.o.sub3d(o[1]^.o)
-        .kreuz(o[3]^.o.sub3d(o[1]^.o));
+  planeNorm := origPoints[2]^.o.sub3d(origPoints[1]^.o)
+        .kreuz(origPoints[3]^.o.sub3d(origPoints[1]^.o));
   planeNorm := planeNorm.mul3d(planeNorm.invBetrag3d);
-  planeDist := planeNorm.skalar(o[1]^.o);
+  planeDist := planeNorm.skalar(origPoints[1]^.o);
 end;
 
 procedure dreiecktyp.draw1;

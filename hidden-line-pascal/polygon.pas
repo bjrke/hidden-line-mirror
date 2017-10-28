@@ -212,8 +212,8 @@ begin
 
   if ((drawmode =7) or (drawmode = 9)) then
   begin
-    c :=   aOriginalTriangle^.o[1]^.o.sub3d(aOriginalTriangle^.o[2]^.o)
-    .kreuz(aOriginalTriangle^.o[3]^.o.sub3d(aOriginalTriangle^.o[2]^.o));
+    c :=   aOriginalTriangle^.origPoints[1]^.o.sub3d(aOriginalTriangle^.origPoints[2]^.o)
+    .kreuz(aOriginalTriangle^.origPoints[3]^.o.sub3d(aOriginalTriangle^.origPoints[2]^.o));
     faktor := (BlickR.invBetrag3d*c.invBetrag3d);
     aOriginalTriangle^.cols := calcColor(abs(BlickR.skalar(c)*faktor));
   end;
