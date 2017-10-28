@@ -1,63 +1,71 @@
 unit polyswee;
+
 interface
-uses ptcgraph,polygon,vector,punkte,linien,dreiecke,zeit,sysutils;
+
+uses ptcgraph, polygon, vector, punkte, linien, dreiecke, zeit, SysUtils;
+
 var
-  zumalen:set of byte;
-  mtf:longint;
-  ausgabeInsert: Boolean;
+  zumalen: set of byte;
+  mtf: longint;
+  ausgabeInsert: boolean;
+
 procedure sweep;
 
 implementation
 
 procedure abflachen;
 type
-  fettesfeld=array[0..16382]of ppoly;
+  fettesfeld = array[0..16382] of ppoly;
 var
-  pa:^fettesfeld;
-  c:int;
-  p,q:ppoly;
-  maxtiefe: Integer;
+  pa: ^fettesfeld;
+  c: int;
+  p, q: ppoly;
+  maxtiefe: integer;
 
-  function newtree(a,e: int; tiefe: Integer):ppoly;
+  function newtree(a, e: int; tiefe: integer): ppoly;
   var
-    h,h1,h2:ppoly;
-    x:int;
+    h, h1, h2: ppoly;
+    x: int;
   begin
-    if ( tiefe > maxtiefe ) then maxtiefe := tiefe;
-    x:=a+((e-a)div 2);
-    h:=pa^[x];
-    h^.so:=nil;
-    h^.su:=nil;
-    if a<=(x-1) then
-      h1:=newtree(a,x-1, tiefe+1)
+    if (tiefe > maxtiefe) then
+      maxtiefe := tiefe;
+    x := a + ((e - a) div 2);
+    h := pa^[x];
+    h^.so := nil;
+    h^.su := nil;
+    if a <= (x - 1) then
+      h1 := newtree(a, x - 1, tiefe + 1)
     else
-      h1:=nil;
-    if (x+1)<=e then
-      h2:=newtree(x+1,e, tiefe+1)
+      h1 := nil;
+    if (x + 1) <= e then
+      h2 := newtree(x + 1, e, tiefe + 1)
     else
-      h2:=nil;
-    verbinde(h,h1,so);
-    verbinde(h,h2,su);
-    newtree:=h;
+      h2 := nil;
+    verbinde(h, h1, so);
+    verbinde(h, h2, su);
+    newtree := h;
   end;
 
 begin
   maxtiefe := 0;
-  if swurzel<>nil then begin
+  if swurzel <> nil then
+  begin
     new(pa);
-    p:=swurzel;
-    while p<>nil do begin
-      q:=p;
-      p:=p^.so;
+    p := swurzel;
+    while p <> nil do
+    begin
+      q := p;
+      p := p^.so;
     end;
-    c:=0;
-    while q<>nil do begin
-      pa^[c]:=q;
-      inc(c);
-      q:=q^.pu;
+    c := 0;
+    while q <> nil do
+    begin
+      pa^[c] := q;
+      Inc(c);
+      q := q^.pu;
     end;
-    swurzel:=newtree(0,c-1, 1);
-    swurzel^.ss:=@swurzel;
+    swurzel := newtree(0, c - 1, 1);
+    swurzel^.ss := @swurzel;
     dispose(pa);
   end;
   mtf := 2 * maxtiefe + 5;
@@ -65,39 +73,44 @@ end;
 
 procedure drawtree;
 var
-  f:color;
-  procedure dp(p:ppoly;dx,dy:integer);
+  f: color;
+
+  procedure dp(p: ppoly; dx, dy: integer);
   begin
-    if (dy<bmy*2) and (p<>nil) then begin
-      inc(f);
-      p^.cols:=f;
-      p^.drx:=dx;
-      p^.dry:=dy;
-      dp(p^.so,dx+bmx shr (dy div 10),dy+10);
-      dp(p^.su,dx-bmx shr (dy div 10),dy+10);
-      dec(f);
+    if (dy < bmy * 2) and (p <> nil) then
+    begin
+      Inc(f);
+      p^.cols := f;
+      p^.drx := dx;
+      p^.dry := dy;
+      dp(p^.so, dx + bmx shr (dy div 10), dy + 10);
+      dp(p^.su, dx - bmx shr (dy div 10), dy + 10);
+      Dec(f);
     end;
   end;
 
-  procedure verbindung(s,z:ppoly;c:color);
+  procedure verbindung(s, z: ppoly; c: color);
   begin
-    if (z<>nil)and(z^.dry<bmy*2) then begin
+    if (z <> nil) and (z^.dry < bmy * 2) then
+    begin
       setcolor(c);
-      line(s^.drx,s^.dry,z^.drx,z^.dry);
-      line(bmx-4*s^.dry+round(xscan),bmy-round(s^.yscan),bmx-4*z^.dry+round(xscan),bmy-round(z^.yscan));
+      line(s^.drx, s^.dry, z^.drx, z^.dry);
+      line(bmx - 4 * s^.dry + round(xscan), bmy - round(s^.yscan), bmx - 4 * z^.dry +
+        round(xscan), bmy - round(z^.yscan));
     end;
   end;
 
-  procedure zeichne(p:ppoly);
+  procedure zeichne(p: ppoly);
   var
-    s:string;
-    ys:int;
+    s: string;
+    ys: int;
   begin
-    if p<>nil then begin
+    if p <> nil then
+    begin
       setcolor(p^.cols);
-      circle(p^.drx,p^.dry,3);
-      verbindung(p,p^.so,1);
-      verbindung(p,p^.su,2);
+      circle(p^.drx, p^.dry, 3);
+      verbindung(p, p^.so, 1);
+      verbindung(p, p^.su, 2);
   {    verbindung(p,p^.pu,4);
       verbindung(p,p^.po,4);}
       zeichne(p^.so);
@@ -106,451 +119,552 @@ var
         p^.draw3(p^.cols)
       else
         setcolor(p^.cols);
-      ys:=round(p^.yscan);
-      str(ys,s);
-      outtextxy(bmx-4*p^.dry+round(xscan)-4*length(s),bmy-ys,s);
-      outtextxy(p^.drx-12,p^.dry,s)
+      ys := round(p^.yscan);
+      str(ys, s);
+      outtextxy(bmx - 4 * p^.dry + round(xscan) - 4 * length(s), bmy - ys, s);
+      outtextxy(p^.drx - 12, p^.dry, s);
     end;
   end;
 
 begin
   setcolor(white);
-  line(round(xscan+bmx),0,round(xscan+bmx),2*bmy-1);
-  f:=0;
-  dp(swurzel,bmx,10);
+  line(round(xscan + bmx), 0, round(xscan + bmx), 2 * bmy - 1);
+  f := 0;
+  dp(swurzel, bmx, 10);
   zeichne(swurzel);
 end;
 
-function sdelete(p:ppoly):ppoly;
+function sdelete(p: ppoly): ppoly;
 var
-  h:ppoly;
+  h: ppoly;
 begin
   zaehl.suchbaum.del;
-  sdelete:=p;
-  if p<>nil then begin
-    h:=nil;
-    if p^.so=nil then
-      h:=p^.su
-    else if p^.su=nil then
-      h:=p^.so
-    else begin
-      if p^.po=nil then begin
+  sdelete := p;
+  if p <> nil then
+  begin
+    h := nil;
+    if p^.so = nil then
+      h := p^.su
+    else if p^.su = nil then
+      h := p^.so
+    else
+    begin
+      if p^.po = nil then
+      begin
         drawtree;
         outstring('p^.po=nil');
       end;
-      if p^.pu=nil then begin
+      if p^.pu = nil then
+      begin
         drawtree;
         outstring('p^.pu=nil');
       end;
-      rand:=not rand;
-      if rand then begin
-        h:=p^.pu;
-        if h^.so<>nil then outstring('h^.so<>nil');
-        if h=p^.su then begin
-          verbinde(h,p^.so,so);
-        end else begin
-          h^.ss^:=h^.su;
-          if h^.su<>nil then begin
-            h^.su^.ss:=h^.ss;
-          end;
-          verbinde(h,p^.so,so);
-          verbinde(h,p^.su,su)
+      rand := not rand;
+      if rand then
+      begin
+        h := p^.pu;
+        if h^.so <> nil then
+          outstring('h^.so<>nil');
+        if h = p^.su then
+        begin
+          verbinde(h, p^.so, so);
         end
-      end else begin
-        h:=p^.po;
-        if h^.su<>nil then outstring('h^.su<>nil');
-        if h=p^.so then begin
-          verbinde(h,p^.su,su);
-        end else begin
-          h^.ss^:=h^.so;
-          if h^.so<>nil then begin
-            h^.so^.ss:=h^.ss;
+        else
+        begin
+          h^.ss^ := h^.su;
+          if h^.su <> nil then
+          begin
+            h^.su^.ss := h^.ss;
           end;
-          verbinde(h,p^.so,so);
-          verbinde(h,p^.su,su)
+          verbinde(h, p^.so, so);
+          verbinde(h, p^.su, su);
+        end;
+      end
+      else
+      begin
+        h := p^.po;
+        if h^.su <> nil then
+          outstring('h^.su<>nil');
+        if h = p^.so then
+        begin
+          verbinde(h, p^.su, su);
         end
+        else
+        begin
+          h^.ss^ := h^.so;
+          if h^.so <> nil then
+          begin
+            h^.so^.ss := h^.ss;
+          end;
+          verbinde(h, p^.so, so);
+          verbinde(h, p^.su, su);
+        end;
       end;
     end;
-    p^.ss^:=h;
-    if h<>nil then
-      h^.ss:=p^.ss;
-    verbinde(p^.po,p^.pu,pu);
-    p^.ss:=nil;
-    p^.po:=nil;
-    p^.pu:=nil;
-    p^.so:=nil;
-    p^.su:=nil;
-  end else outstring('sdelete(nil)');
+    p^.ss^ := h;
+    if h <> nil then
+      h^.ss := p^.ss;
+    verbinde(p^.po, p^.pu, pu);
+    p^.ss := nil;
+    p^.po := nil;
+    p^.pu := nil;
+    p^.so := nil;
+    p^.su := nil;
+  end
+  else
+    outstring('sdelete(nil)');
 end;
 
-procedure polypoly(p1:pdreieck;p2:ppoly);
+procedure polypoly(p1: pdreieck; p2: ppoly);
 var
-  pl:array[1..20]of ppunkt;
-  ll:array[1..20]of linie;
-  am:array[1..20,1..20]of boolean;
-  h1,h2,h3,h4,plpos,llpos,i,j,k,pip:int;
-  l,m:float;
-  h:punkt;
-  li:linie;
-  w:boolean;
+  pl: array[1..20] of ppunkt;
+  ll: array[1..20] of linie;
+  am: array[1..20, 1..20] of boolean;
+  h1, h2, h3, h4, plpos, llpos, i, j, k, pip: int;
+  l, m: float;
+  h: punkt;
+  li: linie;
+  w: boolean;
 
-  procedure addpl(p:punkt;ls:lset);
-  var h:ppunkt;
-  begin
-    inc(plpos);
-    new(h, init(p.b,ls));
-    pl[plpos]:=h;
-    if (ausgabeInsert) then outstring('addpl(' + IntToStr(plpos) + '):'+ h^.b.toString);
-  end;
-
-  procedure addll(i,j:integer);
-  begin
-    inc(llpos);
-    ll[llpos].a:=pl[i];
-    ll[llpos].e:=pl[j];
-    am[i,j]:=true;
-    am[j,i]:=true;
-  end;
-
-  procedure addppl(pu1,pu2,pu3:ppunkt);
+  procedure addpl(p: punkt; ls: lset);
   var
-    h:vector2d;
-    ls:lset;
-    ph:ppoly;
+    h: ppunkt;
+  begin
+    Inc(plpos);
+    new(h, init(p.b, ls));
+    pl[plpos] := h;
+    if (ausgabeInsert) then
+      outstring('addpl(' + IntToStr(plpos) + '):' + h^.b.toString);
+  end;
+
+  procedure addll(i, j: integer);
+  begin
+    Inc(llpos);
+    ll[llpos].a := pl[i];
+    ll[llpos].e := pl[j];
+    am[i, j] := True;
+    am[j, i] := True;
+  end;
+
+  procedure addppl(pu1, pu2, pu3: ppunkt);
+  var
+    h: vector2d;
+    ls: lset;
+    ph: ppoly;
 
   begin
-    inc(zaehl.pp);
-    h.x:=(pu1^.b.x+pu2^.b.x+pu3^.b.x)/3;
-    h.y:=(pu1^.b.y+pu2^.b.y+pu3^.b.y)/3;
-    if (p1^.punkttest(h, 'addppl1', ausgabeInsert)=20)and not colinear(@pu1^.b,@pu2^.b,@pu3^.b) then begin
-      ls:=[];
-      if pu2^.gz*pu3^.gz<>[] then      ls:=ls+[1];
-      if pu3^.gz*pu1^.gz<>[] then      ls:=ls+[2];
-      if pu1^.gz*pu2^.gz<>[] then      ls:=ls+[3];
-      new(ph, initpoly(pu1,pu2,pu3,ls,p2^.originalTriangle));
-      h.x:=(p1^.p[1]^.b.x+p1^.p[2]^.b.x+p1^.p[3]^.b.x)/3;
-      h.y:=(p1^.p[1]^.b.y+p1^.p[2]^.b.y+p1^.p[3]^.b.y)/3;
-      if ((ph^.punkttest(h, 'addppl2', ausgabeInsert)=20) and ph^.flaechentest) then begin
-        if ph^.p[1]^.b.x>=xscan then begin
-          ph^.cols:=2; {15}
-          push(ph,1,zaehl.count)
-        end else begin
-          ph^.cols:=3;  {4}
-          push(ph,2,zaehl.count)
+    Inc(zaehl.pp);
+    h.x := (pu1^.b.x + pu2^.b.x + pu3^.b.x) / 3;
+    h.y := (pu1^.b.y + pu2^.b.y + pu3^.b.y) / 3;
+    if (p1^.punkttest(h, 'addppl1', ausgabeInsert) = 20) and not
+      colinear(@pu1^.b, @pu2^.b, @pu3^.b) then
+    begin
+      ls := [];
+      if pu2^.gz * pu3^.gz <> [] then
+        ls := ls + [1];
+      if pu3^.gz * pu1^.gz <> [] then
+        ls := ls + [2];
+      if pu1^.gz * pu2^.gz <> [] then
+        ls := ls + [3];
+      new(ph, initpoly(pu1, pu2, pu3, ls, p2^.originalTriangle));
+      h.x := (p1^.p[1]^.b.x + p1^.p[2]^.b.x + p1^.p[3]^.b.x) / 3;
+      h.y := (p1^.p[1]^.b.y + p1^.p[2]^.b.y + p1^.p[3]^.b.y) / 3;
+      if ((ph^.punkttest(h, 'addppl2', ausgabeInsert) = 20) and ph^.flaechentest) then
+      begin
+        if ph^.p[1]^.b.x >= xscan then
+        begin
+          ph^.cols := 2; {15}
+          push(ph, 1, zaehl.Count);
         end
-      end else
+        else
+        begin
+          ph^.cols := 3;  {4}
+          push(ph, 2, zaehl.Count);
+        end;
+      end
+      else
         dispose(ph, done);
     end;
   end;
 
 begin
-  plpos:=0;  llpos:=0;
-  for i:=1 to 20 do
-    for j:=1 to 20 do
-      am[i,j]:=false;
-  for i:=1 to 3 do
-    for j:=1 to 3 do
-      if linien.intersect(p1^.l[j],p2^.l[i],l,m)=1 then begin
-        h.b.x:=(p1^.l[j].a^.b.x+l*(p1^.l[j].e^.b.x-p1^.l[j].a^.b.x)+
-                p2^.l[i].a^.b.x+m*(p2^.l[i].e^.b.x-p2^.l[i].a^.b.x))/2;
-        h.b.y:=(p1^.l[j].a^.b.y+l*(p1^.l[j].e^.b.y-p1^.l[j].a^.b.y)+
-                p2^.l[i].a^.b.y+m*(p2^.l[i].e^.b.y-p2^.l[i].a^.b.y))/2;
-        addpl(h,p2^.gl*[i]);
+  plpos := 0;
+  llpos := 0;
+  for i := 1 to 20 do
+    for j := 1 to 20 do
+      am[i, j] := False;
+  for i := 1 to 3 do
+    for j := 1 to 3 do
+      if linien.intersect(p1^.l[j], p2^.l[i], l, m) = 1 then
+      begin
+        h.b.x := (p1^.l[j].a^.b.x + l * (p1^.l[j].e^.b.x - p1^.l[j].a^.b.x) +
+          p2^.l[i].a^.b.x + m * (p2^.l[i].e^.b.x - p2^.l[i].a^.b.x)) / 2;
+        h.b.y := (p1^.l[j].a^.b.y + l * (p1^.l[j].e^.b.y - p1^.l[j].a^.b.y) +
+          p2^.l[i].a^.b.y + m * (p2^.l[i].e^.b.y - p2^.l[i].a^.b.y)) / 2;
+        addpl(h, p2^.gl * [i]);
       end;
-  for i:=1 to 3 do begin
-    pip:=p2^.punkttest(p1^.p[i]^.b, 'polypoly1', ausgabeInsert);
-    if (ausgabeInsert) then outint('pip1 ',pip);
+  for i := 1 to 3 do
+  begin
+    pip := p2^.punkttest(p1^.p[i]^.b, 'polypoly1', ausgabeInsert);
+    if (ausgabeInsert) then
+      outint('pip1 ', pip);
     case pip of
-      0:addpl(p1^.p[i]^,[]); {eckpunkte des oberen, die nur im(nicht auf)unteren sind}
-      1..3:begin
-            h1:=gleicheseite(p1^.p[i]^,p2^.l[pip].a^,p2^.p[pip]^,p1^.p[(i mod 3)+1]^);
-            h2:=gleicheseite(p1^.p[i]^,p2^.l[pip].a^,p2^.p[pip]^,p1^.p[((i+1) mod 3)+1]^);
-            if (h1=1) or (h2=1) then
-              addpl(p1^.p[i]^,p2^.gl*[pip]);
-          end;
-      11..13:begin
-             h1:=gleicheseite(p1^.p[i]^,p1^.p[(i mod 3)+1]^,p2^.p[((pip-1) mod 3)+1]^,p1^.p[((i+1) mod 3)+1]^);
-             h2:=gleicheseite(p1^.p[i]^,p1^.p[((i+1) mod 3)+1]^,p2^.p[((pip-1) mod 3)+1]^,p1^.p[(i mod 3)+1]^);
-             h3:=gleicheseite(p1^.p[i]^,p1^.p[(i mod 3)+1]^,p2^.p[(pip mod 3)+1]^,p1^.p[((i+1) mod 3)+1]^);
-             h4:=gleicheseite(p1^.p[i]^,p1^.p[((i+1) mod 3)+1]^,p2^.p[(pip mod 3)+1]^,p1^.p[(i mod 3)+1]^);
-             if (h1=-1)or(h2=-1)or(h3=-1)or(h4=-1) then addpl(p1^.p[i]^,p2^.gl*([1,2,3]-[pip-10]));
+      0: addpl(p1^.p[i]^, []); {eckpunkte des oberen, die nur im(nicht auf)unteren sind}
+      1..3:
+      begin
+        h1 := gleicheseite(p1^.p[i]^, p2^.l[pip].a^, p2^.p[pip]^, p1^.p[(i mod 3) + 1]^);
+        h2 := gleicheseite(p1^.p[i]^, p2^.l[pip].a^, p2^.p[pip]^,
+          p1^.p[((i + 1) mod 3) + 1]^);
+        if (h1 = 1) or (h2 = 1) then
+          addpl(p1^.p[i]^, p2^.gl * [pip]);
+      end;
+      11..13:
+      begin
+        h1 := gleicheseite(p1^.p[i]^, p1^.p[(i mod 3) + 1]^, p2^.p[
+          ((pip - 1) mod 3) + 1]^, p1^.p[((i + 1) mod 3) + 1]^);
+        h2 := gleicheseite(p1^.p[i]^, p1^.p[((i + 1) mod 3) + 1]^, p2^.p[
+          ((pip - 1) mod 3) + 1]^, p1^.p[(i mod 3) + 1]^);
+        h3 := gleicheseite(p1^.p[i]^, p1^.p[(i mod 3) + 1]^, p2^.p[
+          (pip mod 3) + 1]^, p1^.p[((i + 1) mod 3) + 1]^);
+        h4 := gleicheseite(p1^.p[i]^, p1^.p[((i + 1) mod 3) + 1]^, p2^.p[
+          (pip mod 3) + 1]^, p1^.p[(i mod 3) + 1]^);
+        if (h1 = -1) or (h2 = -1) or (h3 = -1) or (h4 = -1) then
+          addpl(p1^.p[i]^, p2^.gl * ([1, 2, 3] - [pip - 10]));
       end;
     end;  {3 draußen brauchen wir nich}
   end;
-  for i:=1 to 3 do begin
-    pip:=p1^.punkttest(p2^.p[i]^.b, 'polypoly2', ausgabeInsert);
-    if (ausgabeInsert) then outint('pip2 ',pip);
+  for i := 1 to 3 do
+  begin
+    pip := p1^.punkttest(p2^.p[i]^.b, 'polypoly2', ausgabeInsert);
+    if (ausgabeInsert) then
+      outint('pip2 ', pip);
     case pip of{eckpunkt unteres dreieck}
-      1..3:begin
-         h1:=gleicheseite(p2^.p[i]^,p1^.l[pip].a^,p1^.p[pip]^,p2^.p[(i mod 3)+1]^);
-         h2:=gleicheseite(p2^.p[i]^,p1^.l[pip].a^,p1^.p[pip]^,p2^.p[((i+1) mod 3)+1]^);
-         if (h1=-1)or(h2=-1) then addpl(p2^.p[i]^,p2^.gl*([1,2,3]-[i]));
+      1..3:
+      begin
+        h1 := gleicheseite(p2^.p[i]^, p1^.l[pip].a^, p1^.p[pip]^, p2^.p[(i mod 3) + 1]^);
+        h2 := gleicheseite(p2^.p[i]^, p1^.l[pip].a^, p1^.p[pip]^, p2^.p[((i + 1) mod 3) + 1]^);
+        if (h1 = -1) or (h2 = -1) then
+          addpl(p2^.p[i]^, p2^.gl * ([1, 2, 3] - [i]));
       end;
-      20:addpl(p2^.p[i]^,p2^.gl*([1,2,3]-[i])); {eckpunkte des unteren, die alle draußen sind}
+      20: addpl(p2^.p[i]^, p2^.gl * ([1, 2, 3] - [i]));
+      {eckpunkte des unteren, die alle draußen sind}
     end;
   end;
   begin
-    for i:=1 to plpos do
-      for j:=1 to i-1 do
-        if j<>i then begin
-          li.init(pl[i],pl[j]);
-          if not p1^.linientest(li, ausgabeInsert) then begin
-            w:=false;
-            for k:=1 to llpos do
-              w:=w or (linien.intersect(li,ll[k],l,m) in [1,2,3]);
+    for i := 1 to plpos do
+      for j := 1 to i - 1 do
+        if j <> i then
+        begin
+          li.init(pl[i], pl[j]);
+          if not p1^.linientest(li, ausgabeInsert) then
+          begin
+            w := False;
+            for k := 1 to llpos do
+              w := w or (linien.intersect(li, ll[k], l, m) in [1, 2, 3]);
             if not w then
-              addll(i,j);
-          end
+              addll(i, j);
+          end;
         end;
-    for i:=1 to plpos do
-      for j:=i+1 to plpos do
-        for k:=j+1 to plpos do
-          if am[i,j] and am[j,k] and am[k,i] then
-            addppl(pl[i],pl[j],pl[k]);
+    for i := 1 to plpos do
+      for j := i + 1 to plpos do
+        for k := j + 1 to plpos do
+          if am[i, j] and am[j, k] and am[k, i] then
+            addppl(pl[i], pl[j], pl[k]);
   end;
-  for i:=1 to plpos do
+  for i := 1 to plpos do
     Dispose(pl[i], done);
 end;
 
-function loesche(p:ppoly):ppoly;
+function loesche(p: ppoly): ppoly;
 var
-  o,u,h:ppoly;
-  fertig:boolean;
+  o, u, h: ppoly;
+  fertig: boolean;
 begin
-  loesche:=p;
-  if p<>nil then begin
-    o:=p^.po;
-    u:=p^.pu;
+  loesche := p;
+  if p <> nil then
+  begin
+    o := p^.po;
+    u := p^.pu;
     sdelete(p);
-    del(p,3);
-    fertig:=false;
-    while (not fertig) and (o<>nil)and(u<>nil) do begin
-      case polytest(o,u,true,false) of
-        1:begin
-          h:=o;
-          o:=o^.po;
+    del(p, 3);
+    fertig := False;
+    while (not fertig) and (o <> nil) and (u <> nil) do
+    begin
+      case polytest(o, u, True, False) of
+        1:
+        begin
+          h := o;
+          o := o^.po;
           sdelete(h);
-          del(h,3);
-          push(h,2,h^.count);
-          fertig:=false;
+          del(h, 3);
+          push(h, 2, h^.Count);
+          fertig := False;
         end;
-        2:fertig:=true;
-        4:begin
-          h:=o;
-          o:=o^.po;
+        2: fertig := True;
+        4:
+        begin
+          h := o;
+          o := o^.po;
           sdelete(h);
-          del(h,3);
-          if h<>nil then begin
-            polypoly(u^.originalTriangle,h);
-            dispose(h,done)
-          end else
+          del(h, 3);
+          if h <> nil then
+          begin
+            polypoly(u^.originalTriangle, h);
+            dispose(h, done);
+          end
+          else
             outstring('h is nil (falls3)');
         end;
-        3:begin
-          h:=u;
-          u:=u^.pu;
+        3:
+        begin
+          h := u;
+          u := u^.pu;
           sdelete(h);
-          del(h,3);
-          if h<>nil then begin
-            polypoly(o^.originalTriangle,h);
-            dispose(h, done)
-          end else
+          del(h, 3);
+          if h <> nil then
+          begin
+            polypoly(o^.originalTriangle, h);
+            dispose(h, done);
+          end
+          else
             outstring('h is nil (falls4)');
         end;
-        5:begin
-          h:=o;
-          o:=o^.po;
+        5:
+        begin
+          h := o;
+          o := o^.po;
           sdelete(h);
-          del(h,3);
-          outint('l5 ozähler ',h^.count);
+          del(h, 3);
+          outint('l5 ozähler ', h^.Count);
           dispose(h, done);
 
-          h:=u;
-          u:=u^.pu;
+          h := u;
+          u := u^.pu;
           sdelete(h);
-          del(h,3);
+          del(h, 3);
           dispose(h, done);
-          outint('l5 uzähler',h^.count);
+          outint('l5 uzähler', h^.Count);
         end;
       end;
     end;
-  end else outstring('p ist nil');
+  end
+  else
+    outstring('p ist nil');
 end;
 
-procedure insert(p:ppoly;schnitttest:boolean);
+procedure insert(p: ppoly; schnitttest: boolean);
 var
-  h,o,u,a:ppoly;
-  ak:pppoly;
-  typ:richtung;
-  ch:char;
-  tf:int;
-label ende;
+  h, o, u, a: ppoly;
+  ak: pppoly;
+  typ: richtung;
+  ch: char;
+  tf: int;
+label
+  ende;
 begin
-{  schnitttest:=true;}
-  if p^.flaechentest then begin
-    inc(zaehl.count);
-    if (zaehl.count > 12000) then
+  {  schnitttest:=true;}
+  if p^.flaechentest then
+  begin
+    Inc(zaehl.Count);
+    if (zaehl.Count > 12000) then
     begin
       drawmode := 6;
-      ausgabeInsert := true;
+      ausgabeInsert := True;
     end;
-    if drawmode=6 then begin
+    if drawmode = 6 then
+    begin
       p^.draw2(15);
-      outint('zähler',zaehl.count);
+      outint('zähler', zaehl.Count);
       outstring(format('insert %p', [p]));
     end;
-    tf:=0;
-    a:=nil;
-    ak:=@swurzel;
-    while ak^<>nil do begin
-      case polytest(ak^,p,schnitttest,ausgabeInsert) of
-        1:begin
-            a:=ak^;
-            ak:=@ak^^.so;
-            typ:=so;
-            inc(tf);
-            if (ausgabeInsert) then outstring('f1so');
-          end;
-        2:begin
-            a:=ak^;
-            ak:=@ak^^.su;
-            typ:=su;
-            inc(tf);
-            if (ausgabeInsert) then outstring('f2su');
-          end;
-        3:begin
-            if p<>nil then begin
-              polypoly(ak^^.originalTriangle,p);
-              dispose(p, done);
-              if (ausgabeInsert) then outstring('f3u');
-            end else
-              outstring('p is nil (fall3)');
-            goto ende
-          end;
-        4:begin
-            if (ausgabeInsert) then outstring('f4o');
-            h:=loesche(ak^);
-            if h<>nil then begin
-              polypoly(p^.originalTriangle,h);
-              dispose(h, done)
-            end else
-              outstring('h is nil (fall4)');
-          end;
-        5:begin
-          outint('i5 pzähler',p^.count);
+    tf := 0;
+    a := nil;
+    ak := @swurzel;
+    while ak^ <> nil do
+    begin
+      case polytest(ak^, p, schnitttest, ausgabeInsert) of
+        1:
+        begin
+          a := ak^;
+          ak := @ak^^.so;
+          typ := so;
+          Inc(tf);
+          if (ausgabeInsert) then
+            outstring('f1so');
+        end;
+        2:
+        begin
+          a := ak^;
+          ak := @ak^^.su;
+          typ := su;
+          Inc(tf);
+          if (ausgabeInsert) then
+            outstring('f2su');
+        end;
+        3:
+        begin
+          if p <> nil then
+          begin
+            polypoly(ak^^.originalTriangle, p);
+            dispose(p, done);
+            if (ausgabeInsert) then
+              outstring('f3u');
+          end
+          else
+            outstring('p is nil (fall3)');
+          goto ende;
+        end;
+        4:
+        begin
+          if (ausgabeInsert) then
+            outstring('f4o');
+          h := loesche(ak^);
+          if h <> nil then
+          begin
+            polypoly(p^.originalTriangle, h);
+            dispose(h, done);
+          end
+          else
+            outstring('h is nil (fall4)');
+        end;
+        5:
+        begin
+          outint('i5 pzähler', p^.Count);
           dispose(p, done);
-          p:=loesche(ak^);
-          outint('i5 akzähler',p^.count);
+          p := loesche(ak^);
+          outint('i5 akzähler', p^.Count);
           dispose(p, done);
           goto ende;
         end;
-      end
-    end;
-    if a<>nil then begin
-      verbinde(a,p,typ);
-      if typ=so then begin
-        o:=a^.po;
-        u:=a
-      end else begin
-        o:=a;
-        u:=a^.pu
       end;
-      verbinde(o,p,pu);
-      verbinde(p,u,pu);
-      p^.so:=nil;
-      p^.su:=nil;
-      push(p,3,p^.count);
-    end else begin
-      swurzel:=p;
-      p^.po:=nil;
-      p^.pu:=nil;
-      p^.so:=nil;
-      p^.su:=nil;
-      p^.pr:=nil;
-      p^.ss:=@swurzel;
-      push(swurzel,3,p^.count);
+    end;
+    if a <> nil then
+    begin
+      verbinde(a, p, typ);
+      if typ = so then
+      begin
+        o := a^.po;
+        u := a;
+      end
+      else
+      begin
+        o := a;
+        u := a^.pu;
+      end;
+      verbinde(o, p, pu);
+      verbinde(p, u, pu);
+      p^.so := nil;
+      p^.su := nil;
+      push(p, 3, p^.Count);
+    end
+    else
+    begin
+      swurzel := p;
+      p^.po := nil;
+      p^.pu := nil;
+      p^.so := nil;
+      p^.su := nil;
+      p^.pr := nil;
+      p^.ss := @swurzel;
+      push(swurzel, 3, p^.Count);
     end;
     zaehl.suchbaum.ins;
-  ende:
-    if tf>mtf then begin
-      abflachen;
-    end;
-    if drawmode=6 then begin
+    ende:
+      if tf > mtf then
+      begin
+        abflachen;
+      end;
+    if drawmode = 6 then
+    begin
       repeat
         drawtree;
-        ch:=readkey2([#32, #27, '1'..'9','a']);
-        if ch in ['1'..'9'] then begin
+        ch := readkey2([#32, #27, '1'..'9', 'a']);
+        if ch in ['1'..'9'] then
+        begin
           cls;
-          if (ord(ch)-ord('0')) in zumalen then
-            zumalen:=zumalen-[(ord(ch)-ord('0'))]
+          if (Ord(ch) - Ord('0')) in zumalen then
+            zumalen := zumalen - [(Ord(ch) - Ord('0'))]
           else
-            zumalen:=zumalen+[(ord(ch)-ord('0'))]
+            zumalen := zumalen + [(Ord(ch) - Ord('0'))];
         end;
-        if ch='a' then abflachen;
-        if ch=#27 then drawmode:=1;
+        if ch = 'a' then
+          abflachen;
+        if ch = #27 then
+          drawmode := 1;
       until ch in [#32, #27];
-      cls
+      cls;
     end;
   end;
 end;
 
 procedure sweep;
 var
-  p:ppoly;
-  ende:boolean;
+  p: ppoly;
+  ende: boolean;
 begin
-  mtf:=0;
-  swurzel:=polygon.pop(1);
+  mtf := 0;
+  swurzel := polygon.pop(1);
   zaehl.suchbaum.ins;
-  if swurzel<>nil then begin
-    swurzel^.ss:=@swurzel;
-    swurzel^.so:=nil;
-    swurzel^.su:=nil;
-    swurzel^.po:=nil;
-    swurzel^.pu:=nil;
-    push(swurzel,3,swurzel^.count);
-    xscan:=swurzel^.p[1]^.b.x
+  if swurzel <> nil then
+  begin
+    swurzel^.ss := @swurzel;
+    swurzel^.so := nil;
+    swurzel^.su := nil;
+    swurzel^.po := nil;
+    swurzel^.pu := nil;
+    push(swurzel, 3, swurzel^.Count);
+    xscan := swurzel^.p[1]^.b.x;
   end;
-  ende:=false;
-  while not ende do begin
-    if first[1]=nil then begin
-      if first[3]=nil then
-        ende:=true
-      else begin
-        p:=loesche(first[3]);
-        p^.cols:=15; {5}
+  ende := False;
+  while not ende do
+  begin
+    if First[1] = nil then
+    begin
+      if First[3] = nil then
+        ende := True
+      else
+      begin
+        p := loesche(First[3]);
+        p^.cols := 15; {5}
         p^.drawpoly;
         dispose(p, done);
       end;
-    end else begin
-      p:=polygon.pop(1);
-      xscan:=p^.p[1]^.b.x;
-      insert(p,true);
+    end
+    else
+    begin
+      p := polygon.pop(1);
+      xscan := p^.p[1]^.b.x;
+      insert(p, True);
 
-      if first[1]<>nil then xscan:=first[1]^.p[1]^.b.x;
+      if First[1] <> nil then
+        xscan := First[1]^.p[1]^.b.x;
 
-      while(first[3]<>nil)and(first[3]^.p[3]^.b.x<=xscan+epsilon1)do begin
+      while (First[3] <> nil) and (First[3]^.p[3]^.b.x <= xscan + epsilon1) do
+      begin
 
-        while first[2]<>nil do begin
-          p:=polygon.pop(2);
-          insert(p,false);
+        while First[2] <> nil do
+        begin
+          p := polygon.pop(2);
+          insert(p, False);
         end;
-        p:=loesche(first[3]);
-        p^.cols:=15; {6}
+        p := loesche(First[3]);
+        p^.cols := 15; {6}
         p^.drawpoly;
         dispose(p, done);
       end;
     end;
-    if not ende then begin
-      p:=polygon.pop(2);
-      while p<>nil do begin
-        insert(p,false);
-        p:=polygon.pop(2);
+    if not ende then
+    begin
+      p := polygon.pop(2);
+      while p <> nil do
+      begin
+        insert(p, False);
+        p := polygon.pop(2);
       end;
     end;
   end;
 end;
 
 begin
-  ausgabeInsert := false;
+  ausgabeInsert := False;
 end.

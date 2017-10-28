@@ -1,85 +1,107 @@
 unit zeit;
+
 interface
+
 uses ptccrt, dos, vector;
+
 type
-  dtyp=object
-    insert,delete,maximum,minimum,aktuell:longint;
+  dtyp = object
+    insert, Delete, maximum, minimum, aktuell: longint;
     constructor init;
     procedure ins;
     procedure del;
-    procedure ausgabe(name:string);
+    procedure ausgabe(Name: string);
   end;
 
-  ctyp=object
-    q:array[1..3]of dtyp;
-    suchbaum,polygons,points2d,points3d:dtyp;
-    ptest,count,pp:longint;
+  ctyp = object
+    q: array[1..3] of dtyp;
+    suchbaum, polygons, points2d, points3d: dtyp;
+    ptest, Count, pp: longint;
     constructor init;
     procedure ausgabe;
   end;
 
-  minmax=object
-    minValue, maxValue: float;
+  minmax = object
+    MinValue, MaxValue: float;
     constructor init;
     procedure update(f: float);
-    function toString: String;
+    function toString: string;
     function relative(f: float): float;
   end;
 
   cset = set of char;
 
-function gettime2: LongInt;
+function gettime2: longint;
 procedure starttime;
 procedure outtime;
-function readkey2( include: cset): char;
+function readkey2(include: cset): char;
 
 var
-  zaehl:ctyp;
+  zaehl: ctyp;
+
 implementation
-var time:longint;
+
+var
+  time: longint;
 
 constructor dtyp.init;
 begin
-  insert:=0;
-  delete:=0;
-  maximum:=0;
-  minimum:=0;
-  aktuell:=0;
+  insert := 0;
+  Delete := 0;
+  maximum := 0;
+  minimum := 0;
+  aktuell := 0;
 end;
 
 procedure dtyp.ins;
 begin
-  inc(insert);
-  inc(aktuell);
-  if aktuell>maximum then maximum:=aktuell;
+  Inc(insert);
+  Inc(aktuell);
+  if aktuell > maximum then
+    maximum := aktuell;
 end;
 
 procedure dtyp.del;
 begin
-  inc(delete);
-  dec(aktuell);
-  if aktuell<minimum then minimum:=aktuell;
+  Inc(Delete);
+  Dec(aktuell);
+  if aktuell < minimum then
+    minimum := aktuell;
 end;
 
 procedure dtyp.ausgabe;
 begin
-  outstring(name);
-  if (insert=delete)and(insert<>0)then
-    outint('  Einfügungen = Löschungen:',insert)
-  else begin
-    if insert<>0 then outint('  Einfügungen:',insert);
-    if delete<>0 then outint('  Löschungen:',delete);
+  outstring(Name);
+  if (insert = Delete) and (insert <> 0) then
+    outint('  Einfügungen = Löschungen:', insert)
+  else
+  begin
+    if insert <> 0 then
+      outint('  Einfügungen:', insert);
+    if Delete <> 0 then
+      outint('  Löschungen:', Delete);
   end;
-  if (maximum<>0) and (maximum<>aktuell) then outint('  Höchststand:',maximum);
-  if (minimum<>0) and (minimum<>aktuell) then outint('  Tiefststand:',minimum);
-  if (aktuell<>insert)then begin
-    if (aktuell<>0) and (minimum<>aktuell) and (maximum<>aktuell) then outint('  aktueller Stand:',aktuell);
-    if (aktuell=maximum)and (aktuell<>0)then outint('  aktuell(Höchst)Stand:',aktuell);
-    if (aktuell=minimum)and (aktuell<>0)then outint('  aktuell(Tiefst)Stand:',aktuell);
-  end else begin
-    if (aktuell<>0) and (minimum<>aktuell) and (maximum<>aktuell) then outint('  aktueller Stand = Einfügungen:',aktuell);
-    if (aktuell=maximum)and (aktuell<>0)then outint('  aktuell(Höchst)Stand = Einfügungen:',aktuell);
-    if (aktuell=minimum)and (aktuell<>0)then outint('  aktuell(Tiefst)Stand = Einfügungen:',aktuell);
+  if (maximum <> 0) and (maximum <> aktuell) then
+    outint('  Höchststand:', maximum);
+  if (minimum <> 0) and (minimum <> aktuell) then
+    outint('  Tiefststand:', minimum);
+  if (aktuell <> insert) then
+  begin
+    if (aktuell <> 0) and (minimum <> aktuell) and (maximum <> aktuell) then
+      outint('  aktueller Stand:', aktuell);
+    if (aktuell = maximum) and (aktuell <> 0) then
+      outint('  aktuell(Höchst)Stand:', aktuell);
+    if (aktuell = minimum) and (aktuell <> 0) then
+      outint('  aktuell(Tiefst)Stand:', aktuell);
+  end
+  else
+  begin
+    if (aktuell <> 0) and (minimum <> aktuell) and (maximum <> aktuell) then
+      outint('  aktueller Stand = Einfügungen:', aktuell);
+    if (aktuell = maximum) and (aktuell <> 0) then
+      outint('  aktuell(Höchst)Stand = Einfügungen:', aktuell);
+    if (aktuell = minimum) and (aktuell <> 0) then
+      outint('  aktuell(Tiefst)Stand = Einfügungen:', aktuell);
   end;
   outstring('--------------------------');
 end;
@@ -92,16 +114,16 @@ begin
   suchbaum.init;
   polygons.init;
   points2d.init;
-  count:=0;
-  ptest:=0;
-  pp:=0;
+  Count := 0;
+  ptest := 0;
+  pp := 0;
 end;
 
 procedure ctyp.ausgabe;
 begin
-  outint('# insert aufrufe : ',count);
-  outint('# Polytests: ',ptest);
-  outint('# Triangulationen: ',pp);
+  outint('# insert aufrufe : ', Count);
+  outint('# Polytests: ', ptest);
+  outint('# Triangulationen: ', pp);
   q[1].ausgabe('Warteschlange 1');
   q[2].ausgabe('Warteschlange 2');
   q[3].ausgabe('Warteschlange 3');
@@ -113,26 +135,26 @@ end;
 
 constructor minmax.init;
 begin
-  minValue := 1e20;
-  maxValue := -1e20;
+  MinValue := 1e20;
+  MaxValue := -1e20;
 end;
 
 procedure minmax.update;
 begin
-  if ( f < minValue ) then
-    minValue := f;
-  if ( f > maxValue ) then
-    maxValue := f;
+  if (f < MinValue) then
+    MinValue := f;
+  if (f > MaxValue) then
+    MaxValue := f;
 end;
 
 function minmax.toString;
 begin
-  toString := 'min: ' + floatToString( minValue ) + ' max: ' + floatToString( maxValue );
+  toString := 'min: ' + floatToString(MinValue) + ' max: ' + floatToString(MaxValue);
 end;
 
 function minmax.relative;
 begin
-  relative := (f - minValue) / (maxValue - minValue);
+  relative := (f - MinValue) / (MaxValue - MinValue);
 end;
 
 procedure starttime;
@@ -142,65 +164,71 @@ end;
 
 function gettime2;
 var
-  h,m,s,s100:word;
+  h, m, s, s100: word;
 begin
-  gettime(h,m,s,s100);
-  gettime2:=360000*h+6000*m+s*100+s100;
+  gettime(h, m, s, s100);
+  gettime2 := 360000 * h + 6000 * m + s * 100 + s100;
 end;
 
 procedure outtime;
 var
-  t:longint;
-  h,m:word;
-  s:float;
-  s1,s2:string;
+  t: longint;
+  h, m: word;
+  s: float;
+  s1, s2: string;
 begin
-  s1:='';
-  t:=time;
+  s1 := '';
+  t := time;
   starttime;
-  t:=time-t;
-  h:=t div 360000;
-  m:=(t-h*360000) div 6000;
-  s:=(t-h*360000-m*6000)/100;
-  if h>0 then begin
-    str(h,s1);
-    s1:=s1+'h';
+  t := time - t;
+  h := t div 360000;
+  m := (t - h * 360000) div 6000;
+  s := (t - h * 360000 - m * 6000) / 100;
+  if h > 0 then
+  begin
+    str(h, s1);
+    s1 := s1 + 'h';
   end;
-  if (h>0) or (m>0) then begin
-    str(m,s2);
-    if m=0 then s1:=s1+'0';
-    if m<10 then s1:=s1+'0';
-    s1:=s1+s2+'m';
-    if s=0 then s1:=s1+'0';
-    if s<10 then s1:=s1+'0';
+  if (h > 0) or (m > 0) then
+  begin
+    str(m, s2);
+    if m = 0 then
+      s1 := s1 + '0';
+    if m < 10 then
+      s1 := s1 + '0';
+    s1 := s1 + s2 + 'm';
+    if s = 0 then
+      s1 := s1 + '0';
+    if s < 10 then
+      s1 := s1 + '0';
   end;
-  str(s:0:2,s2);
-  s1:=s1+s2+'s';
-  outstring('Zeit: '+s1);
+  str(s: 0: 2, s2);
+  s1 := s1 + s2 + 's';
+  outstring('Zeit: ' + s1);
 end;
 
 function readkey2;
 var
-  start: LongInt;
-  ch, res: Char;
+  start: longint;
+  ch, res: char;
 begin
   repeat
     res := ReadKey;
-    if ( res = #0 ) then
+    if (res = #0) then
       ReadKey
-  until ( Upcase(res) in include);
+  until (Upcase(res) in include);
 
   if KeyPressed then
   begin
     start := gettime2;
     repeat
       ch := ReadKey;
-      if ( ch = #0 ) then
+      if (ch = #0) then
         ReadKey
-    until ((not KeyPressed) or (ch <> res) or ((gettime2 - start) > 500))
+    until ((not KeyPressed) or (ch <> res) or ((gettime2 - start) > 500));
   end;
 
-  if ( Upcase(ch) in include ) then
+  if (Upcase(ch) in include) then
     exit(ch)
   else
     exit(res);
