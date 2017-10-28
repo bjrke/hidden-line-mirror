@@ -157,24 +157,30 @@ end;
 function dreiecktyp.linientest;
 var
   pa,pe:int;
-  h:vector2d;
   la,m:float;
   li1,li2,li3:int;
 begin
   pa:=punkttest(li.a^.b, 'linientest1', ausgabe);
+  if (pa = 0) then
+    exit(true);
+
   pe:=punkttest(li.e^.b, 'linientest2', ausgabe);
-  if (pa=0)or(pe=0)then
-    linientest:=true
-  else if (pa<20)and(pe<20)then begin
-    h.x:=(li.a^.b.x+li.e^.b.x)/2;
-    h.y:=(li.a^.b.y+li.e^.b.y)/2;
-    linientest:=(punkttest(h, 'linientest3', ausgabe)=0);
-  end else begin
-    li1:=linien.intersect(li,l[1],la,m);
-    li2:=linien.intersect(li,l[2],la,m);
-    li3:=linien.intersect(li,l[3],la,m);
-    linientest:=(li1=1)or(li2=1)or(li3=1)or((li1=2)and(li2=2))or((li2=2)and(li3=2))or((li3=2)and(li1=2));
-  end
+  if (pe=0) then
+    exit(true);
+
+  if (pa<20) and (pe<20) then
+    exit(punkttest((li.a^.b).add2d(li.e^.b).div2d(2), 'linientest3', ausgabe) = 0);
+
+  li1:=linien.intersect(li,l[1],la,m);
+  if ( li1 = 1 ) then
+    exit(true);
+
+  li2:=linien.intersect(li,l[2],la,m);
+  if ( (li2 = 1) or ((li1=2) and (li2=2)) ) then
+    exit(true);
+
+  li3:=linien.intersect(li,l[3],la,m);
+  linientest:=(li3=1) or ((li3=2) and ((li2=2) or (li1=2)));
 end;
 
 function dreiecktyp.flaechentest;
