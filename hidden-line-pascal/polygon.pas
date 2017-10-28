@@ -336,80 +336,81 @@ function del;
 var
   h: ppoly;
 begin
-  if p = nil then begin
+  if p = nil then
+  begin
     exit(nil);
-    end;
-    zaehl.q[pnr].del;
-    if p = First[pnr] then
-      First[pnr] := First[pnr]^.ne;
-    h := nil;
-    if p^.re = nil then
-      h := p^.li
-    else if p^.li = nil then
-      h := p^.re
-    else
+  end;
+  zaehl.q[pnr].del;
+  if p = First[pnr] then
+    First[pnr] := First[pnr]^.ne;
+  h := nil;
+  if p^.re = nil then
+    h := p^.li
+  else if p^.li = nil then
+    h := p^.re
+  else
+  begin
+    if p^.ne = nil then
     begin
-      if p^.ne = nil then
+      outstring('p^.ne=nil');
+    end;
+    if p^.pr = nil then
+    begin
+      outstring('p^.pr=nil');
+    end;
+    rand := not rand;
+    if rand then
+    begin
+      h := p^.pr;
+      if h^.re <> nil then
+        outstring('h^.re<>nil');
+      if h = p^.li then
       begin
-        outstring('p^.ne=nil');
-      end;
-      if p^.pr = nil then
-      begin
-        outstring('p^.pr=nil');
-      end;
-      rand := not rand;
-      if rand then
-      begin
-        h := p^.pr;
-        if h^.re <> nil then
-          outstring('h^.re<>nil');
-        if h = p^.li then
-        begin
-          verbinde(h, p^.re, re);
-        end
-        else
-        begin
-          h^.ps^ := h^.li;
-          if h^.li <> nil then
-          begin
-            h^.li^.ps := h^.ps;
-          end;
-          verbinde(h, p^.re, re);
-          verbinde(h, p^.li, li);
-        end;
+        verbinde(h, p^.re, re);
       end
       else
       begin
-        h := p^.ne;
+        h^.ps^ := h^.li;
         if h^.li <> nil then
-          outstring('h^.li<>nil');
-        if h = p^.re then
         begin
-          verbinde(h, p^.li, li);
-        end
-        else
-        begin
-          h^.ps^ := h^.re;
-          if h^.re <> nil then
-          begin
-            h^.re^.ps := h^.ps;
-          end;
-          verbinde(h, p^.re, re);
-          verbinde(h, p^.li, li);
+          h^.li^.ps := h^.ps;
         end;
+        verbinde(h, p^.re, re);
+        verbinde(h, p^.li, li);
+      end;
+    end
+    else
+    begin
+      h := p^.ne;
+      if h^.li <> nil then
+        outstring('h^.li<>nil');
+      if h = p^.re then
+      begin
+        verbinde(h, p^.li, li);
+      end
+      else
+      begin
+        h^.ps^ := h^.re;
+        if h^.re <> nil then
+        begin
+          h^.re^.ps := h^.ps;
+        end;
+        verbinde(h, p^.re, re);
+        verbinde(h, p^.li, li);
       end;
     end;
-    p^.ps^ := h;
-    if h <> nil then
-      h^.ps := p^.ps;
-    verbinde(p^.ne, p^.pr, pr);
-    p^.ps := nil;
-    p^.li := nil;
-    p^.re := nil;
-    p^.ne := nil;
-    p^.pr := nil;
+  end;
+  p^.ps^ := h;
+  if h <> nil then
+    h^.ps := p^.ps;
+  verbinde(p^.ne, p^.pr, pr);
+  p^.ps := nil;
+  p^.li := nil;
+  p^.re := nil;
+  p^.ne := nil;
+  p^.pr := nil;
 
-    exit(p);
+  exit(p);
 end;
 
 function poly.yscan;
@@ -459,7 +460,7 @@ begin
   begin
     h := miny + maxy;
   end;
-  exit( h / 2 );
+  exit(h / 2);
 end;
 
 function polytest;
@@ -507,219 +508,218 @@ var
 begin
   Inc(zaehl.ptest);
   if p1^.ymin - 1 > p2^.ymax then
-    polytest := 1
-  else if p2^.ymin - 1 > p1^.ymax then
-    polytest := 2
-  else
+    exit(1);
+
+  if p2^.ymin - 1 > p1^.ymax then
+    exit(2);
+
+  schnitt := False;
+  v2 := False;
+  v1 := False;
+  if schnitttest and (p1^.originalTriangle <> p2^.originalTriangle) then
   begin
-    schnitt := False;
-    v2 := False;
-    v1 := False;
-    if schnitttest and (p1^.originalTriangle <> p2^.originalTriangle) then
+    k := 0;
+    h.init(0, 0);
+    i := 1;
+    j := 1;
+    while (k < 6) and (j <= 3) do
     begin
-      k := 0;
-      h.init(0, 0);
-      i := 1;
-      j := 1;
-      while (k < 6) and (j <= 3) do
+      if linien.intersect(p1^.l[j], p2^.l[i], l, m) = 1 then
       begin
-        if linien.intersect(p1^.l[j], p2^.l[i], l, m) = 1 then
+        h.x := h.x + p1^.l[j].a^.b.x + l * (p1^.l[j].e^.b.x - p1^.l[j].a^.b.x) +
+          p2^.l[i].a^.b.x + m * (p2^.l[i].e^.b.x - p2^.l[i].a^.b.x);
+        h.y := h.y + p1^.l[j].a^.b.y + l * (p1^.l[j].e^.b.y - p1^.l[j].a^.b.y) +
+          p2^.l[i].a^.b.y + m * (p2^.l[i].e^.b.y - p2^.l[i].a^.b.y);
+        Inc(k);
+      end;
+      Inc(i);
+      if i = 4 then
+      begin
+        Inc(j);
+        i := 1;
+      end;
+    end;
+
+    h := h.div2d(2);
+
+    i := 1;
+    while {(k<6)and}(i <= 3) do
+    begin
+      pip := p2^.punkttest(p1^.p[i]^.b, 'polytest1', ausgabe);
+      if (ausgabe) then
+        outint('pip3 ', pip);
+      case pip of
+        0: addpl(p1^.p[i]^.b);
+        {eckpunkte des oberen, die nur im(nicht auf)unteren sind}
+        1..3:
         begin
-          h.x := h.x + p1^.l[j].a^.b.x + l * (p1^.l[j].e^.b.x - p1^.l[j].a^.b.x) +
-            p2^.l[i].a^.b.x + m * (p2^.l[i].e^.b.x - p2^.l[i].a^.b.x);
-          h.y := h.y + p1^.l[j].a^.b.y + l * (p1^.l[j].e^.b.y - p1^.l[j].a^.b.y) +
-            p2^.l[i].a^.b.y + m * (p2^.l[i].e^.b.y - p2^.l[i].a^.b.y);
-          Inc(k);
+          h1 := gleicheseite(p1^.p[i]^, p2^.l[pip].a^, p2^.p[pip]^,
+            p1^.p[(i mod 3) + 1]^);
+          h2 := gleicheseite(p1^.p[i]^, p2^.l[pip].a^, p2^.p[pip]^,
+            p1^.p[((i + 1) mod 3) + 1]^);
+          if (h1 = 1) or (h2 = 1) then
+            addpl(p1^.p[i]^.b);
         end;
-        Inc(i);
-        if i = 4 then
+        11..13:
         begin
-          Inc(j);
-          i := 1;
+          h1 := gleicheseite(p1^.p[i]^, p1^.p[(i mod 3) + 1]^,
+            p2^.p[((pip - 1) mod 3) + 1]^, p1^.p[((i + 1) mod 3) + 1]^);
+          h2 := gleicheseite(p1^.p[i]^, p1^.p[((i + 1) mod 3) + 1]^,
+            p2^.p[((pip - 1) mod 3) + 1]^, p1^.p[(i mod 3) + 1]^);
+          h3 := gleicheseite(p1^.p[i]^, p1^.p[(i mod 3) + 1]^,
+            p2^.p[(pip mod 3) + 1]^, p1^.p[((i + 1) mod 3) + 1]^);
+          h4 := gleicheseite(p1^.p[i]^, p1^.p[((i + 1) mod 3) + 1]^,
+            p2^.p[(pip mod 3) + 1]^, p1^.p[(i mod 3) + 1]^);
+          if (h1 = -1) or (h2 = -1) or (h3 = -1) or (h4 = -1) then
+            addpl(p1^.p[i]^.b);
         end;
       end;
-
-      h := h.div2d(2);
-
-      i := 1;
-      while {(k<6)and}(i <= 3) do
-      begin
-        pip := p2^.punkttest(p1^.p[i]^.b, 'polytest1', ausgabe);
-        if (ausgabe) then
-          outint('pip3 ', pip);
-        case pip of
-          0: addpl(p1^.p[i]^.b);
-          {eckpunkte des oberen, die nur im(nicht auf)unteren sind}
-          1..3:
-          begin
-            h1 := gleicheseite(p1^.p[i]^, p2^.l[pip].a^, p2^.p[pip]^,
-              p1^.p[(i mod 3) + 1]^);
-            h2 := gleicheseite(p1^.p[i]^, p2^.l[pip].a^, p2^.p[pip]^,
-              p1^.p[((i + 1) mod 3) + 1]^);
-            if (h1 = 1) or (h2 = 1) then
-              addpl(p1^.p[i]^.b);
-          end;
-          11..13:
-          begin
-            h1 := gleicheseite(p1^.p[i]^, p1^.p[(i mod 3) + 1]^,
-              p2^.p[((pip - 1) mod 3) + 1]^, p1^.p[((i + 1) mod 3) + 1]^);
-            h2 := gleicheseite(p1^.p[i]^, p1^.p[((i + 1) mod 3) + 1]^,
-              p2^.p[((pip - 1) mod 3) + 1]^, p1^.p[(i mod 3) + 1]^);
-            h3 := gleicheseite(p1^.p[i]^, p1^.p[(i mod 3) + 1]^,
-              p2^.p[(pip mod 3) + 1]^, p1^.p[((i + 1) mod 3) + 1]^);
-            h4 := gleicheseite(p1^.p[i]^, p1^.p[((i + 1) mod 3) + 1]^,
-              p2^.p[(pip mod 3) + 1]^, p1^.p[(i mod 3) + 1]^);
-            if (h1 = -1) or (h2 = -1) or (h3 = -1) or (h4 = -1) then
-              addpl(p1^.p[i]^.b);
-          end;
-        end;
-        Inc(i);
-      end;
-      i := 1;
-      while {(k<6)and}(i <= 3) do
-      begin
-        pip := p1^.punkttest(p2^.p[i]^.b, 'polytest2', ausgabe);
-        if (ausgabe) then
-          outint('pip4 ', pip);
-        case pip of
-          0: addpl(p2^.p[i]^.b);
-          {eckpunkte des oberen, die nur im(nicht auf)unteren sind}
-          1..3:
-          begin
-            h1 := gleicheseite(p2^.p[i]^, p1^.l[pip].a^, p1^.p[pip]^,
-              p2^.p[(i mod 3) + 1]^);
-            h2 := gleicheseite(p2^.p[i]^, p1^.l[pip].a^, p1^.p[pip]^,
-              p2^.p[((i + 1) mod 3) + 1]^);
-            if (h1 = 1) or (h2 = 1) then
-              addpl(p2^.p[i]^.b);
-          end;
-          11..13:
-          begin
-            h1 := gleicheseite(p2^.p[i]^, p2^.p[(i mod 3) + 1]^,
-              p1^.p[((pip - 1) mod 3) + 1]^, p2^.p[((i + 1) mod 3) + 1]^);
-            h2 := gleicheseite(p2^.p[i]^, p2^.p[((i + 1) mod 3) + 1]^,
-              p1^.p[((pip - 1) mod 3) + 1]^, p2^.p[(i mod 3) + 1]^);
-            h3 := gleicheseite(p2^.p[i]^, p2^.p[(i mod 3) + 1]^,
-              p1^.p[(pip mod 3) + 1]^, p2^.p[((i + 1) mod 3) + 1]^);
-            h4 := gleicheseite(p2^.p[i]^, p2^.p[((i + 1) mod 3) + 1]^,
-              p1^.p[(pip mod 3) + 1]^, p2^.p[(i mod 3) + 1]^);
-            if (h1 = -1) or (h2 = -1) or (h3 = -1) or (h4 = -1) then
-              addpl(p2^.p[i]^.b);
-          end;
-        end;
-        Inc(i);
-      end;
-  {    while (k<6)and(i<=3)do begin
-        if p1^.punkttest(p2^.p[i]^.b)=0 then begin
-          inc(k,2);
-          h[x]:=h[x]+p2^.p[i]^.b[x];
-          h[y]:=h[y]+p2^.p[i]^.b[y];
-        end;
-        inc(i);
-      end;}
-      if k > 0 then
-      begin
-        h := h.div2d(k);
-
-        test(h);
-
-      end;
+      Inc(i);
     end;
-
-    if not schnitt then
+    i := 1;
+    while {(k<6)and}(i <= 3) do
     begin
-      h.x := (p1^.p[1]^.b.x + p1^.p[2]^.b.x + p1^.p[3]^.b.x) / 3;
-      h.y := (p1^.p[1]^.b.y + p1^.p[2]^.b.y + p1^.p[3]^.b.y) / 3;
+      pip := p1^.punkttest(p2^.p[i]^.b, 'polytest2', ausgabe);
+      if (ausgabe) then
+        outint('pip4 ', pip);
+      case pip of
+        0: addpl(p2^.p[i]^.b);
+        {eckpunkte des oberen, die nur im(nicht auf)unteren sind}
+        1..3:
+        begin
+          h1 := gleicheseite(p2^.p[i]^, p1^.l[pip].a^, p1^.p[pip]^,
+            p2^.p[(i mod 3) + 1]^);
+          h2 := gleicheseite(p2^.p[i]^, p1^.l[pip].a^, p1^.p[pip]^,
+            p2^.p[((i + 1) mod 3) + 1]^);
+          if (h1 = 1) or (h2 = 1) then
+            addpl(p2^.p[i]^.b);
+        end;
+        11..13:
+        begin
+          h1 := gleicheseite(p2^.p[i]^, p2^.p[(i mod 3) + 1]^,
+            p1^.p[((pip - 1) mod 3) + 1]^, p2^.p[((i + 1) mod 3) + 1]^);
+          h2 := gleicheseite(p2^.p[i]^, p2^.p[((i + 1) mod 3) + 1]^,
+            p1^.p[((pip - 1) mod 3) + 1]^, p2^.p[(i mod 3) + 1]^);
+          h3 := gleicheseite(p2^.p[i]^, p2^.p[(i mod 3) + 1]^,
+            p1^.p[(pip mod 3) + 1]^, p2^.p[((i + 1) mod 3) + 1]^);
+          h4 := gleicheseite(p2^.p[i]^, p2^.p[((i + 1) mod 3) + 1]^,
+            p1^.p[(pip mod 3) + 1]^, p2^.p[(i mod 3) + 1]^);
+          if (h1 = -1) or (h2 = -1) or (h3 = -1) or (h4 = -1) then
+            addpl(p2^.p[i]^.b);
+        end;
+      end;
+      Inc(i);
+    end;
+{    while (k<6)and(i<=3)do begin
+      if p1^.punkttest(p2^.p[i]^.b)=0 then begin
+        inc(k,2);
+        h[x]:=h[x]+p2^.p[i]^.b[x];
+        h[y]:=h[y]+p2^.p[i]^.b[y];
+      end;
+      inc(i);
+    end;}
+    if k > 0 then
+    begin
+      h := h.div2d(k);
+
       test(h);
-    end;
 
-    if not schnitt then
-    begin
-      h.x := (p2^.p[1]^.b.x + p2^.p[2]^.b.x + p2^.p[3]^.b.x) / 3;
-      h.y := (p2^.p[1]^.b.y + p2^.p[2]^.b.y + p2^.p[3]^.b.y) / 3;
-      test(h);
     end;
+  end;
 
-    if not schnitt then
+  if not schnitt then
+  begin
+    h.x := (p1^.p[1]^.b.x + p1^.p[2]^.b.x + p1^.p[3]^.b.x) / 3;
+    h.y := (p1^.p[1]^.b.y + p1^.p[2]^.b.y + p1^.p[3]^.b.y) / 3;
+    test(h);
+  end;
+
+  if not schnitt then
+  begin
+    h.x := (p2^.p[1]^.b.x + p2^.p[2]^.b.x + p2^.p[3]^.b.x) / 3;
+    h.y := (p2^.p[1]^.b.y + p2^.p[2]^.b.y + p2^.p[3]^.b.y) / 3;
+    test(h);
+  end;
+
+  if not schnitt then
+  begin
+    h.x := (p1^.p[1]^.b.x + p1^.p[2]^.b.x + p1^.p[3]^.b.x + p2^.p[1]^.b.x +
+      p2^.p[2]^.b.x + p2^.p[3]^.b.x) / 6;
+    h.y := (p1^.p[1]^.b.y + p1^.p[2]^.b.y + p1^.p[3]^.b.y + p2^.p[1]^.b.y +
+      p2^.p[2]^.b.y + p2^.p[3]^.b.y) / 6;
+    test(h);
+  end;
+
+  if v2 then
+  begin
+    polytest := 5;
+    if ausgabe then
+      outstring('v25');
+  end
+  else if not schnitt then
+  begin
+    l := xscan;
+    if p1^.p[1]^.b.x < p2^.p[1]^.b.x then
+      xscan := p2^.p[1]^.b.x
+    else
+      xscan := p1^.p[1]^.b.x;
+    if p1^.p[3]^.b.x > p2^.p[3]^.b.x then
+      xscan := (xscan + p2^.p[3]^.b.x) / 2
+    else
+      xscan := (xscan + p1^.p[3]^.b.x) / 2;
+
+    if drawmode = 6 then
     begin
-      h.x := (p1^.p[1]^.b.x + p1^.p[2]^.b.x + p1^.p[3]^.b.x +
-        p2^.p[1]^.b.x + p2^.p[2]^.b.x + p2^.p[3]^.b.x) / 6;
-      h.y := (p1^.p[1]^.b.y + p1^.p[2]^.b.y + p1^.p[3]^.b.y +
-        p2^.p[1]^.b.y + p2^.p[2]^.b.y + p2^.p[3]^.b.y) / 6;
-      test(h);
+      marke(round(bmx + xscan), round(bmy - p1^.yscan), yellow, 'p1^.yscan');
+      marke(round(bmx + xscan), round(bmy - p2^.yscan), lightmagenta, 'p2^.yscan');
     end;
-
-    if v2 then
+    if p1^.yscan > p2^.yscan then
     begin
-      polytest := 5;
+      polytest := 1;
       if ausgabe then
-        outstring('v25');
-    end
-    else if not schnitt then
-    begin
-      l := xscan;
-      if p1^.p[1]^.b.x < p2^.p[1]^.b.x then
-        xscan := p2^.p[1]^.b.x
-      else
-        xscan := p1^.p[1]^.b.x;
-      if p1^.p[3]^.b.x > p2^.p[3]^.b.x then
-        xscan := (xscan + p2^.p[3]^.b.x) / 2
-      else
-        xscan := (xscan + p1^.p[3]^.b.x) / 2;
-
-      if drawmode = 6 then
-      begin
-        marke(round(bmx + xscan), round(bmy - p1^.yscan), yellow, 'p1^.yscan');
-        marke(round(bmx + xscan), round(bmy - p2^.yscan), lightmagenta, 'p2^.yscan');
-      end;
-      if p1^.yscan > p2^.yscan then
-      begin
-        polytest := 1;
-        if ausgabe then
-          outstring('notschnitt1');
-      end
-      else
-      begin
-        polytest := 2;
-        if ausgabe then
-          outstring('notschnitt2');
-      end;
-      xscan := l;
+        outstring('notschnitt1');
     end
     else
     begin
-      if v1 then
-      begin
-        polytest := 3;
-        if ausgabe then
-          outstring('v13');
-      end
-      else
-      begin
-        polytest := 4;
-        if ausgabe then
-          outstring('v14');
-      end;
+      polytest := 2;
+      if ausgabe then
+        outstring('notschnitt2');
     end;
-    if ausgabe then
+    xscan := l;
+  end
+  else
+  begin
+    if v1 then
     begin
-      outvector2d('p1^.p[1]^.b', p1^.p[1]^.b);
-      outvector2d('p1^.p[2]^.b', p1^.p[2]^.b);
-      outvector2d('p1^.p[3]^.b', p1^.p[3]^.b);
-      outvector2d('p1^.originalTriangle^.p[1]^.b', p1^.originalTriangle^.p[1]^.b);
-      outvector2d('p1^.originalTriangle^.p[2]^.b', p1^.originalTriangle^.p[2]^.b);
-      outvector2d('p1^.originalTriangle^.p[3]^.b', p1^.originalTriangle^.p[3]^.b);
-      outvector2d('p2^.p[1]^.b', p2^.p[1]^.b);
-      outvector2d('p2^.p[2]^.b', p2^.p[2]^.b);
-      outvector2d('p2^.p[3]^.b', p2^.p[3]^.b);
-      outvector2d('p2^.originalTriangle^.p[1]^.b', p2^.originalTriangle^.p[1]^.b);
-      outvector2d('p2^.originalTriangle^.p[2]^.b', p2^.originalTriangle^.p[2]^.b);
-      outvector2d('p2^.originalTriangle^.p[3]^.b', p2^.originalTriangle^.p[3]^.b);
-      p1^.draw3(1);
-      p2^.draw3(2);
-
-      readkey;
+      polytest := 3;
+      if ausgabe then
+        outstring('v13');
+    end
+    else
+    begin
+      polytest := 4;
+      if ausgabe then
+        outstring('v14');
     end;
+  end;
+  if ausgabe then
+  begin
+    outvector2d('p1^.p[1]^.b', p1^.p[1]^.b);
+    outvector2d('p1^.p[2]^.b', p1^.p[2]^.b);
+    outvector2d('p1^.p[3]^.b', p1^.p[3]^.b);
+    outvector2d('p1^.originalTriangle^.p[1]^.b', p1^.originalTriangle^.p[1]^.b);
+    outvector2d('p1^.originalTriangle^.p[2]^.b', p1^.originalTriangle^.p[2]^.b);
+    outvector2d('p1^.originalTriangle^.p[3]^.b', p1^.originalTriangle^.p[3]^.b);
+    outvector2d('p2^.p[1]^.b', p2^.p[1]^.b);
+    outvector2d('p2^.p[2]^.b', p2^.p[2]^.b);
+    outvector2d('p2^.p[3]^.b', p2^.p[3]^.b);
+    outvector2d('p2^.originalTriangle^.p[1]^.b', p2^.originalTriangle^.p[1]^.b);
+    outvector2d('p2^.originalTriangle^.p[2]^.b', p2^.originalTriangle^.p[2]^.b);
+    outvector2d('p2^.originalTriangle^.p[3]^.b', p2^.originalTriangle^.p[3]^.b);
+    p1^.draw3(1);
+    p2^.draw3(2);
+
+    readkey;
   end;
 end;
 
