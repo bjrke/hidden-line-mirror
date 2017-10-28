@@ -17,7 +17,7 @@ type
     originalTriangle: pdreieck;
     drx, dry: integer;
     farbe: color;
-    count: int;
+    Count: int;
     ymin, ymax: float;
 
     constructor initpoly(p1, p2, p3: ppunkt; ls: lset; aOriginalTriangle: pdreieck);
@@ -31,7 +31,7 @@ type
 
 var
   swurzel: ppoly;
-  wurzel, first: array [punr] of ppoly;
+  wurzel, First: array [punr] of ppoly;
   xscan: float;
   colmode: boolean;
   drawmode: integer;
@@ -153,7 +153,8 @@ begin
     9:
     begin
       draw1(originalTriangle^.cols);
-    end;
+    end
+    else
   end;
 end;
 
@@ -572,7 +573,8 @@ begin
             p2^.p[(pip mod 3) + 1]^, p1^.p[(i mod 3) + 1]^);
           if (h1 = -1) or (h2 = -1) or (h3 = -1) or (h4 = -1) then
             addpl(p1^.p[i]^.b);
-        end;
+        end
+        else
       end;
       Inc(i);
     end;
@@ -606,7 +608,8 @@ begin
             p1^.p[(pip mod 3) + 1]^, p2^.p[(i mod 3) + 1]^);
           if (h1 = -1) or (h2 = -1) or (h3 = -1) or (h4 = -1) then
             addpl(p2^.p[i]^.b);
-        end;
+        end
+        else
       end;
       Inc(i);
     end;
