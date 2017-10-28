@@ -95,8 +95,8 @@ var
     begin
       setcolor(c);
       line(s^.drx, s^.dry, z^.drx, z^.dry);
-      line(bmx - 4 * s^.dry + round(xscan), bmy - round(s^.yscan), bmx - 4 * z^.dry +
-        round(xscan), bmy - round(z^.yscan));
+      line(bmx - 4 * s^.dry + round(xscan), bmy - round(s^.yscan),
+        bmx - 4 * z^.dry + round(xscan), bmy - round(z^.yscan));
     end;
   end;
 
@@ -320,14 +320,14 @@ begin
       end;
       11..13:
       begin
-        h1 := gleicheseite(p1^.p[i]^, p1^.p[(i mod 3) + 1]^, p2^.p[
-          ((pip - 1) mod 3) + 1]^, p1^.p[((i + 1) mod 3) + 1]^);
-        h2 := gleicheseite(p1^.p[i]^, p1^.p[((i + 1) mod 3) + 1]^, p2^.p[
-          ((pip - 1) mod 3) + 1]^, p1^.p[(i mod 3) + 1]^);
-        h3 := gleicheseite(p1^.p[i]^, p1^.p[(i mod 3) + 1]^, p2^.p[
-          (pip mod 3) + 1]^, p1^.p[((i + 1) mod 3) + 1]^);
-        h4 := gleicheseite(p1^.p[i]^, p1^.p[((i + 1) mod 3) + 1]^, p2^.p[
-          (pip mod 3) + 1]^, p1^.p[(i mod 3) + 1]^);
+        h1 := gleicheseite(p1^.p[i]^, p1^.p[(i mod 3) + 1]^,
+          p2^.p[((pip - 1) mod 3) + 1]^, p1^.p[((i + 1) mod 3) + 1]^);
+        h2 := gleicheseite(p1^.p[i]^, p1^.p[((i + 1) mod 3) + 1]^,
+          p2^.p[((pip - 1) mod 3) + 1]^, p1^.p[(i mod 3) + 1]^);
+        h3 := gleicheseite(p1^.p[i]^, p1^.p[(i mod 3) + 1]^,
+          p2^.p[(pip mod 3) + 1]^, p1^.p[((i + 1) mod 3) + 1]^);
+        h4 := gleicheseite(p1^.p[i]^, p1^.p[((i + 1) mod 3) + 1]^,
+          p2^.p[(pip mod 3) + 1]^, p1^.p[(i mod 3) + 1]^);
         if (h1 = -1) or (h2 = -1) or (h3 = -1) or (h4 = -1) then
           addpl(p1^.p[i]^, p2^.gl * ([1, 2, 3] - [pip - 10]));
       end;
@@ -342,7 +342,8 @@ begin
       1..3:
       begin
         h1 := gleicheseite(p2^.p[i]^, p1^.l[pip].a^, p1^.p[pip]^, p2^.p[(i mod 3) + 1]^);
-        h2 := gleicheseite(p2^.p[i]^, p1^.l[pip].a^, p1^.p[pip]^, p2^.p[((i + 1) mod 3) + 1]^);
+        h2 := gleicheseite(p2^.p[i]^, p1^.l[pip].a^, p1^.p[pip]^,
+          p2^.p[((i + 1) mod 3) + 1]^);
         if (h1 = -1) or (h2 = -1) then
           addpl(p2^.p[i]^, p2^.gl * ([1, 2, 3] - [i]));
       end;

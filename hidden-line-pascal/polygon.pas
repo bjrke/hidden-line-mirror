@@ -547,7 +547,8 @@ begin
         if (ausgabe) then
           outint('pip3 ', pip);
         case pip of
-          0: addpl(p1^.p[i]^.b); {eckpunkte des oberen, die nur im(nicht auf)unteren sind}
+          0: addpl(p1^.p[i]^.b);
+          {eckpunkte des oberen, die nur im(nicht auf)unteren sind}
           1..3:
           begin
             h1 := gleicheseite(p1^.p[i]^, p2^.l[pip].a^, p2^.p[pip]^,
@@ -580,7 +581,8 @@ begin
         if (ausgabe) then
           outint('pip4 ', pip);
         case pip of
-          0: addpl(p2^.p[i]^.b); {eckpunkte des oberen, die nur im(nicht auf)unteren sind}
+          0: addpl(p2^.p[i]^.b);
+          {eckpunkte des oberen, die nur im(nicht auf)unteren sind}
           1..3:
           begin
             h1 := gleicheseite(p2^.p[i]^, p1^.l[pip].a^, p1^.p[pip]^,
@@ -592,12 +594,12 @@ begin
           end;
           11..13:
           begin
-            h1 := gleicheseite(p2^.p[i]^, p2^.p[(i mod 3) + 1]^, p1^.p[
-              ((pip - 1) mod 3) + 1]^, p2^.p[((i + 1) mod 3) + 1]^);
+            h1 := gleicheseite(p2^.p[i]^, p2^.p[(i mod 3) + 1]^,
+              p1^.p[((pip - 1) mod 3) + 1]^, p2^.p[((i + 1) mod 3) + 1]^);
             h2 := gleicheseite(p2^.p[i]^, p2^.p[((i + 1) mod 3) + 1]^,
               p1^.p[((pip - 1) mod 3) + 1]^, p2^.p[(i mod 3) + 1]^);
-            h3 := gleicheseite(p2^.p[i]^, p2^.p[(i mod 3) + 1]^, p1^.p[
-              (pip mod 3) + 1]^, p2^.p[((i + 1) mod 3) + 1]^);
+            h3 := gleicheseite(p2^.p[i]^, p2^.p[(i mod 3) + 1]^,
+              p1^.p[(pip mod 3) + 1]^, p2^.p[((i + 1) mod 3) + 1]^);
             h4 := gleicheseite(p2^.p[i]^, p2^.p[((i + 1) mod 3) + 1]^,
               p1^.p[(pip mod 3) + 1]^, p2^.p[(i mod 3) + 1]^);
             if (h1 = -1) or (h2 = -1) or (h3 = -1) or (h4 = -1) then
@@ -643,10 +645,10 @@ begin
 
     if not schnitt then
     begin
-      h.x := (p1^.p[1]^.b.x + p1^.p[2]^.b.x + p1^.p[3]^.b.x + p2^.p[1]^.b.x +
-        p2^.p[2]^.b.x + p2^.p[3]^.b.x) / 6;
-      h.y := (p1^.p[1]^.b.y + p1^.p[2]^.b.y + p1^.p[3]^.b.y + p2^.p[1]^.b.y +
-        p2^.p[2]^.b.y + p2^.p[3]^.b.y) / 6;
+      h.x := (p1^.p[1]^.b.x + p1^.p[2]^.b.x + p1^.p[3]^.b.x +
+        p2^.p[1]^.b.x + p2^.p[2]^.b.x + p2^.p[3]^.b.x) / 6;
+      h.y := (p1^.p[1]^.b.y + p1^.p[2]^.b.y + p1^.p[3]^.b.y +
+        p2^.p[1]^.b.y + p2^.p[2]^.b.y + p2^.p[3]^.b.y) / 6;
       test(h);
     end;
 

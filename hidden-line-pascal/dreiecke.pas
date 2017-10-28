@@ -173,8 +173,8 @@ begin
     K.z := h;
     l3 := testl(la3);
     if (ausgabe) then
-      outstring('punkttest ' + caller + ' ' + floatToString(la1) + ' ' +
-        floatToString(la2) + ' ' + floatToString(la3));
+      outstring('punkttest ' + caller + ' ' + floatToString(la1) +
+        ' ' + floatToString(la2) + ' ' + floatToString(la3));
     case l1 * 25 + l2 * 5 + l3 of
       124: punkttest := 0;          {drin}
 

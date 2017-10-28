@@ -98,7 +98,7 @@ begin
   y := double(i);
   y := y * (1.5 - (number * 0.5 * y * y));   // 1st iteration
   //  y := y * (1.5 - (number * 0.5 * y * y));   // 2nd iteration, this can be removed
-  invsqrt := y;
+  exit(y);
 end;
 
 constructor vector3d.init;
@@ -146,24 +146,23 @@ end;
 
 function vector3d.skalar;
 begin
-  skalar := x * v.x + y * v.y + z * v.z;
+  exit(x * v.x + y * v.y + z * v.z);
 end;
 
 function vector3d.invBetrag3d;
 begin
-  invBetrag3d := invsqrt(sqr(x) + sqr(y) + sqr(z));
+  exit(invsqrt(sqr(x) + sqr(y) + sqr(z)));
 end;
 
 function vector3d.move3d;
 begin
-  move3d := add3d(direction.mul3d(polarisation * MoveSpeed).mul3d(
-    direction.invBetrag3d));
+  exit(add3d(direction.mul3d(polarisation * MoveSpeed).mul3d(direction.invBetrag3d)));
 end;
 
 function vector3d.toString;
 begin
-  toString := '(' + floatToString(x) + ',' + floatToString(y) + ',' +
-    floatToString(z) + ')';
+  exit('(' + floatToString(x) + ',' + floatToString(y) + ',' +
+    floatToString(z) + ')');
 end;
 
 constructor vector2d.init;
@@ -194,17 +193,17 @@ end;
 
 function vector2d.sqrbetrag2d;
 begin
-  sqrbetrag2d := sqr(x) + sqr(y);
+  exit(sqr(x) + sqr(y));
 end;
 
 function vector2d.betrag2d;
 begin
-  betrag2d := 1.0 / invsqrt(self.sqrbetrag2d);
+  exit(1.0 / invsqrt(self.sqrbetrag2d));
 end;
 
 function vector2d.toString;
 begin
-  toString := '(' + floatToString(x) + ',' + floatToString(y) + ')';
+  exit('(' + floatToString(x) + ',' + floatToString(y) + ')');
 end;
 
 constructor matrix3d.init;
@@ -216,13 +215,13 @@ end;
 
 function matrix3d.det3d;
 begin
-  det3d := x.x * y.y * z.z + y.x * z.y * x.z + z.x * x.y * y.z - x.x * z.y * y.z -
-    y.x * x.y * z.z - z.x * y.y * x.z;
+  exit(x.x * y.y * z.z + y.x * z.y * x.z + z.x * x.y * y.z - x.x *
+    z.y * y.z - y.x * x.y * z.z - z.x * y.y * x.z);
 end;
 
 function matrix3d.toString;
 begin
-  toString := '(' + x.toString + ',' + y.toString + ',' + z.toString + ')';
+  exit('(' + x.toString + ',' + y.toString + ',' + z.toString + ')');
 end;
 
 constructor matrix2d.init;
@@ -243,12 +242,12 @@ end;
 
 function matrix2d.det2d;
 begin
-  det2d := x.x * y.y - x.y * y.x;
+  exit(x.x * y.y - x.y * y.x);
 end;
 
 function matrix2d.toString;
 begin
-  toString := '(' + x.toString + ',' + y.toString + ')';
+  exit('(' + x.toString + ',' + y.toString + ')');
 end;
 
 procedure RotVec;
@@ -272,9 +271,12 @@ begin
     writeln('InvLength1=0');
   if InvLength2 = 0 then
     writeln('InvLength2=0');
-  ToRot1^.X := (InvRotVecLength / InvLength1) * (RotInc * Copy1.X * InvLength1 + Copy2.X * InvLength2);
-  ToRot1^.Y := (InvRotVecLength / InvLength1) * (RotInc * Copy1.Y * InvLength1 + Copy2.Y * InvLength2);
-  ToRot1^.Z := (InvRotVecLength / InvLength1) * (RotInc * Copy1.Z * InvLength1 + Copy2.Z * InvLength2);
+  ToRot1^.X := (InvRotVecLength / InvLength1) * (RotInc * Copy1.X *
+    InvLength1 + Copy2.X * InvLength2);
+  ToRot1^.Y := (InvRotVecLength / InvLength1) * (RotInc * Copy1.Y *
+    InvLength1 + Copy2.Y * InvLength2);
+  ToRot1^.Z := (InvRotVecLength / InvLength1) * (RotInc * Copy1.Z *
+    InvLength1 + Copy2.Z * InvLength2);
 
   ToRot2^.X := (InvRotVecLength / InvLength2) *
     (-Copy1.X * InvLength1 + RotInc * Copy2.X * InvLength2);
@@ -304,7 +306,7 @@ var
   s: string;
 begin
   Str(f: 15: 10, s);
-  floatToString := s;
+  exit(s);
 end;
 
 procedure outfloat;
@@ -344,11 +346,11 @@ end;
 function sgn;
 begin
   if x < -epsilon1 then
-    sgn := -1
+    exit(-1)
   else if x > epsilon1 then
-    sgn := 1
+    exit(1)
   else
-    sgn := 0;
+    exit(0);
 end;
 
 procedure marke;

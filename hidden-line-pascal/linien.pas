@@ -38,7 +38,8 @@ begin
     outstring('e=nil')
   else
   begin
-    line(round(bmx + a^.b.x), round(bmy - a^.b.y), round(bmx + e^.b.x), round(bmy - e^.b.y));
+    line(round(bmx + a^.b.x), round(bmy - a^.b.y), round(bmx + e^.b.x),
+      round(bmy - e^.b.y));
   end;
 end;
 
