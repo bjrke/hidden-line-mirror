@@ -333,7 +333,8 @@ begin
           p2^.p[(pip mod 3) + 1]^, p1^.p[(i mod 3) + 1]^);
         if (h1 = -1) or (h2 = -1) or (h3 = -1) or (h4 = -1) then
           addpl(p1^.p[i]^, p2^.gl * ([1, 2, 3] - [pip - 10]));
-      end;
+      end
+      else
     end;  {3 draußen brauchen wir nich}
   end;
   for i := 1 to 3 do
@@ -351,7 +352,8 @@ begin
           addpl(p2^.p[i]^, p2^.gl * ([1, 2, 3] - [i]));
       end;
       20: addpl(p2^.p[i]^, p2^.gl * ([1, 2, 3] - [i]));
-      {eckpunkte des unteren, die alle draußen sind}
+        {eckpunkte des unteren, die alle draußen sind}
+      else
     end;
   end;
   begin
@@ -448,7 +450,8 @@ begin
         del(h, 3);
         dispose(h, done);
         outint('l5 uzähler', h^.Count);
-      end;
+      end
+      else
     end;
   end;
   exit(p);
@@ -532,7 +535,8 @@ begin
           outint('i5 akzähler', p^.Count);
           dispose(p, done);
           goto ende;
-        end;
+        end
+        else
       end;
     end;
     if a <> nil then

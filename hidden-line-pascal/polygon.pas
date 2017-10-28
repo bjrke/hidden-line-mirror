@@ -17,7 +17,7 @@ type
     originalTriangle: pdreieck;
     drx, dry: integer;
     farbe: color;
-    Count: int;
+    count: int;
     ymin, ymax: float;
 
     constructor initpoly(p1, p2, p3: ppunkt; ls: lset; aOriginalTriangle: pdreieck);
@@ -31,7 +31,7 @@ type
 
 var
   swurzel: ppoly;
-  wurzel, First: array [punr] of ppoly;
+  wurzel, first: array [punr] of ppoly;
   xscan: float;
   colmode: boolean;
   drawmode: integer;
