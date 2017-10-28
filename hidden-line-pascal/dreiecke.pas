@@ -36,7 +36,6 @@ type
     function First: pdreieck;
     function Next: pdreieck;
     constructor init;
-    destructor done;
   private
     Anker, aktuell, Last: pdreieck;
   end;
@@ -51,11 +50,10 @@ implementation
 function calcColor;
 begin
   if (f < 0) then
-    calcColor := 1
-  else if (f > 1) then
-    calcColor := 15
-  else
-    calcColor := Round(f * 14.0);
+    exit(1);
+  if (f > 1) then
+    exit(15);
+  exit(Round(f * 14.0));
 end;
 
 constructor dreieck.init;
@@ -120,25 +118,14 @@ var
   function testl(l: float): int;
   begin
     if abs(l) < epsilon0 then
-    begin  {=0}
-      testl := 0;
-    end
-    else if abs(l - 1) < epsilon0 then
-    begin {=1}
-      testl := 1;
-    end
-    else if l < 0 then
-    begin {<0}
-      testl := 2;
-    end
-    else if l > 1 then
-    begin {>1}
-      testl := 3;
-    end
-    else
-    begin  {0<l<1}
-      testl := 4;
-    end;
+      exit(0); //=0
+    if abs(l - 1) < epsilon0 then
+      exit(1); //=1
+    if l < 0 then
+      exit(2);
+    if l > 1 then
+      exit(3);
+    exit(4); // 0<l<1
   end;
 
 begin
@@ -155,45 +142,44 @@ begin
   b1.y := t.y;
   b1.z := 1;
   kd := K.det3d;
-  if abs(kd) > epsilon1 then
-  begin
-    h := K.x;
-    K.x := b1;
-    la1 := K.det3d / kd;
-    K.x := h;
-    l1 := testl(la1);
-    h := K.y;
-    K.y := b1;
-    la2 := K.det3d / kd;
-    K.y := h;
-    l2 := testl(la2);
-    h := K.z;
-    K.z := b1;
-    la3 := K.det3d / kd;
-    K.z := h;
-    l3 := testl(la3);
-    if (ausgabe) then
-      outstring('punkttest ' + caller + ' ' + floatToString(la1) +
-        ' ' + floatToString(la2) + ' ' + floatToString(la3));
-    case l1 * 25 + l2 * 5 + l3 of
-      124: punkttest := 0;          {drin}
-
-      24: punkttest := 1;            {kanten}
-      104: punkttest := 2;
-      120: punkttest := 3;
-
-      25: punkttest := 11;          {eckpunkte}
-      5: punkttest := 12;
-      1: punkttest := 13;
-      else
-        punkttest := 20;         {draußen}
-    end;
-  end
-  else
+  if abs(kd) < epsilon1 then
   begin
     outstring('nullerdiv ' + K.toString);
-    punkttest := 0;
+    exit(0);
   end;
+
+  h := K.x;
+  K.x := b1;
+  la1 := K.det3d / kd;
+  K.x := h;
+  l1 := testl(la1);
+  h := K.y;
+  K.y := b1;
+  la2 := K.det3d / kd;
+  K.y := h;
+  l2 := testl(la2);
+  h := K.z;
+  K.z := b1;
+  la3 := K.det3d / kd;
+  K.z := h;
+  l3 := testl(la3);
+  if (ausgabe) then
+    outstring('punkttest ' + caller + ' ' + floatToString(la1) +
+      ' ' + floatToString(la2) + ' ' + floatToString(la3));
+  case l1 * 25 + l2 * 5 + l3 of
+    124: exit(0);          // drin
+
+    24: exit(1);            // kanten
+    104: exit(2);
+    120: exit(3);
+
+    25: exit(11);          // eckpunkte
+    5: exit(12);
+    1: exit(13);
+    else
+      exit(20);         // draußen
+  end;
+
 end;
 
 function dreiecktyp.linientest;
@@ -222,12 +208,12 @@ begin
     exit(True);
 
   li3 := linien.intersect(li, l[3], la, m);
-  linientest := (li3 = 1) or ((li3 = 2) and ((li2 = 2) or (li1 = 2)));
+  exit((li3 = 1) or ((li3 = 2) and ((li2 = 2) or (li1 = 2))));
 end;
 
 function dreiecktyp.flaechentest;
 begin
-  flaechentest := not colinear(@p[1]^.b, @p[2]^.b, @p[3]^.b);
+  exit(not colinear(@p[1]^.b, @p[2]^.b, @p[3]^.b));
 end;
 
 function dreieck.tiefe;
@@ -237,22 +223,15 @@ var
 begin
   bv := blickr.add3d(iv.mul3d(k.x)).add3d(jv.mul3d(k.y));
   t := planeNorm.skalar(bv);
-  if abs(t) > epsilon2 then
-    tiefe := (planeDist - planeNorm.skalar(auge)) / (t * bv.invBetrag3d)
-  else
-    tiefe := 100000000;
-  {  cols:=darkgray;}
+  if abs(t) < epsilon2 then
+    exit(100000000);
+  exit((planeDist - planeNorm.skalar(auge)) / (t * bv.invBetrag3d));
 end;
 
 constructor dliste.init;
 begin
   Anker := nil;
   Last := nil;
-end;
-
-destructor dliste.done;
-begin
-
 end;
 
 function dliste.add;
@@ -269,20 +248,20 @@ begin
     last^.Next := h;
     last := h;
   end;
-  add := h;
+  exit(h);
 end;
 
 function dliste.First;
 begin
   aktuell := anker;
-  First := aktuell;
+  exit(aktuell);
 end;
 
 function dliste.Next;
 begin
   if aktuell <> nil then
     aktuell := aktuell^.Next;
-  Next := aktuell;
+  exit(aktuell);
 end;
 
 begin
