@@ -71,7 +71,7 @@ begin
   mtf := 2 * maxtiefe + 5;
 end;
 
-procedure drawtree;
+procedure drawtree(xscan: float);
 var
   f: color;
 
@@ -95,8 +95,8 @@ var
     begin
       setcolor(c);
       line(s^.drx, s^.dry, z^.drx, z^.dry);
-      line(bmx - 4 * s^.dry + round(xscan), bmy - round(s^.yscan),
-        bmx - 4 * z^.dry + round(xscan), bmy - round(z^.yscan));
+      line(bmx - 4 * s^.dry + round(xscan), bmy - round(s^.yscan(xscan)),
+        bmx - 4 * z^.dry + round(xscan), bmy - round(z^.yscan(xscan)));
     end;
   end;
 
@@ -119,7 +119,7 @@ var
         p^.draw3(p^.cols)
       else
         setcolor(p^.cols);
-      ys := round(p^.yscan);
+      ys := round(p^.yscan(xscan));
       str(ys, s);
       outtextxy(bmx - 4 * p^.dry + round(xscan) - 4 * length(s), bmy - ys, s);
       outtextxy(p^.drx - 12, p^.dry, s);
@@ -134,7 +134,7 @@ begin
   zeichne(swurzel);
 end;
 
-function sdelete(p: ppoly): ppoly;
+function sdelete(xscan: float; p: ppoly): ppoly;
 var
   h: ppoly;
 begin
@@ -155,12 +155,12 @@ begin
   begin
     if p^.po = nil then
     begin
-      drawtree;
+      drawtree(xscan);
       outstring('p^.po=nil');
     end;
     if p^.pu = nil then
     begin
-      drawtree;
+      drawtree(xscan);
       outstring('p^.pu=nil');
     end;
     rand := not rand;
@@ -218,7 +218,7 @@ begin
   exit(p);
 end;
 
-procedure polypoly(p1: pdreieck; p2: ppoly);
+procedure polypoly(xscan: float; p1: pdreieck; p2: ppoly);
 var
   pl: array[1..20] of ppunkt;
   ll: array[1..20] of linie;
@@ -395,7 +395,7 @@ begin
     Dispose(pl[i], done);
 end;
 
-function loesche(p: ppoly): ppoly;
+function loesche(xscan: float; p: ppoly): ppoly;
 var
   o, u, h: ppoly;
 begin
@@ -407,16 +407,16 @@ begin
 
   o := p^.po;
   u := p^.pu;
-  sdelete(p);
+  sdelete(xscan, p);
   del(p, 3);
   while (o <> nil) and (u <> nil) do
   begin
-    case polytest(o, u, True, False) of
+    case polytest(xscan, o, u, True, False) of
       1:
       begin
         h := o;
         o := o^.po;
-        sdelete(h);
+        sdelete(xscan, h);
         del(h, 3);
         push(h, 2, h^.Count);
       end;
@@ -425,11 +425,11 @@ begin
       begin
         h := o;
         o := o^.po;
-        sdelete(h);
+        sdelete(xscan, h);
         del(h, 3);
         if h <> nil then
         begin
-          polypoly(u^.originalTriangle, h);
+          polypoly(xscan, u^.originalTriangle, h);
           dispose(h, done);
         end
         else
@@ -439,11 +439,11 @@ begin
       begin
         h := u;
         u := u^.pu;
-        sdelete(h);
+        sdelete(xscan, h);
         del(h, 3);
         if h <> nil then
         begin
-          polypoly(o^.originalTriangle, h);
+          polypoly(xscan, o^.originalTriangle, h);
           dispose(h, done);
         end
         else
@@ -453,14 +453,14 @@ begin
       begin
         h := o;
         o := o^.po;
-        sdelete(h);
+        sdelete(xscan, h);
         del(h, 3);
         outint('l5 ozähler ', h^.Count);
         dispose(h, done);
 
         h := u;
         u := u^.pu;
-        sdelete(h);
+        sdelete(xscan, h);
         del(h, 3);
         dispose(h, done);
         outint('l5 uzähler', h^.Count);
@@ -471,7 +471,7 @@ begin
   exit(p);
 end;
 
-procedure insert(p: ppoly; schnitttest: boolean);
+procedure insert(xscan: float; p: ppoly; schnitttest: boolean);
 var
   h, o, u, a: ppoly;
   ak: pppoly;
@@ -496,7 +496,7 @@ begin
     ak := @swurzel;
     while ak^ <> nil do
     begin
-      case polytest(ak^, p, schnitttest, ausgabeInsert) of
+      case polytest(xscan, ak^, p, schnitttest, ausgabeInsert) of
         1:
         begin
           a := ak^;
@@ -519,7 +519,7 @@ begin
         begin
           if p <> nil then
           begin
-            polypoly(ak^^.originalTriangle, p);
+            polypoly(xscan, ak^^.originalTriangle, p);
             dispose(p, done);
             if (ausgabeInsert) then
               outstring('f3u');
@@ -532,10 +532,10 @@ begin
         begin
           if (ausgabeInsert) then
             outstring('f4o');
-          h := loesche(ak^);
+          h := loesche(xscan, ak^);
           if h <> nil then
           begin
-            polypoly(p^.originalTriangle, h);
+            polypoly(xscan, p^.originalTriangle, h);
             dispose(h, done);
           end
           else
@@ -545,7 +545,7 @@ begin
         begin
           outint('i5 pzähler', p^.Count);
           dispose(p, done);
-          p := loesche(ak^);
+          p := loesche(xscan, ak^);
           outint('i5 akzähler', p^.Count);
           dispose(p, done);
           goto ende;
@@ -593,7 +593,7 @@ begin
     if drawmode = 6 then
     begin
       repeat
-        drawtree;
+        drawtree(xscan);
         ch := readkey2([#32, #27, '1'..'9', 'a']);
         if ch in ['1'..'9'] then
         begin
@@ -617,6 +617,7 @@ procedure sweep;
 var
   p: ppoly;
   ende: boolean;
+  xscan: float;
 begin
   mtf := 0;
   swurzel := polygon.pop(1);
@@ -640,7 +641,7 @@ begin
         ende := True
       else
       begin
-        p := loesche(First[3]);
+        p := loesche(xscan, First[3]);
         p^.cols := 15; {5}
         p^.drawpoly;
         dispose(p, done);
@@ -650,7 +651,7 @@ begin
     begin
       p := polygon.pop(1);
       xscan := p^.p[1]^.b.x;
-      insert(p, True);
+      insert(xscan, p, True);
 
       if First[1] <> nil then
         xscan := First[1]^.p[1]^.b.x;
@@ -661,9 +662,9 @@ begin
         while First[2] <> nil do
         begin
           p := polygon.pop(2);
-          insert(p, False);
+          insert(xscan, p, False);
         end;
-        p := loesche(First[3]);
+        p := loesche(xscan, First[3]);
         p^.cols := 15; {6}
         p^.drawpoly;
         dispose(p, done);
@@ -674,7 +675,7 @@ begin
       p := polygon.pop(2);
       while p <> nil do
       begin
-        insert(p, False);
+        insert(xscan, p, False);
         p := polygon.pop(2);
       end;
     end;

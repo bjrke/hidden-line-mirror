@@ -25,14 +25,13 @@ type
 
     destructor done;
 
-    function yscan: float;
+    function yscan(xscan: float): float;
     procedure drawpoly;
   end;
 
 var
   swurzel: ppoly;
   wurzel, First: array [punr] of ppoly;
-  xscan: float;
   colmode: boolean;
   drawmode: integer;
   rand: boolean;
@@ -41,7 +40,7 @@ var
 procedure push(p: ppoly; pnr: punr; c: int);
 function pop(pnr: punr): ppoly;
 function del(p: ppoly; pnr: punr): ppoly;
-function polytest(p1, p2: ppoly; schnitttest, ausgabe: boolean): byte;
+function polytest(xscan: float; p1, p2: ppoly; schnitttest, ausgabe: boolean): byte;
 procedure verbindeso(v, s: ppoly);
 procedure verbindesu(v, s: ppoly);
 procedure verbindeli(v, s: ppoly);
@@ -96,17 +95,15 @@ begin
       xm2 := round(p[3]^.b.x);
       bx := round(bmx);
       by := round(bmy);
-      my2 := xscan;
       for wx := xm1 to xm2 do
       begin
-        xscan := wx;
         for wy := ym1 to ym2 do
         begin
           h.x := wx;
           h.y := wy;
           if punkttest(h, 'draw', False) = 0 then
           begin
-            my1 := 1 + 7 * ((bmy + yscan) / bmy);
+            my1 := 1 + 7 * ((bmy + yscan(wx)) / bmy);
             if my1 > 15 then
               putpixel(wx + bx, by - wy, 15)
             else if my1 < 1 then
@@ -116,7 +113,6 @@ begin
           end;
         end;
       end;
-      xscan := my2;
     end;
     5:
     begin
@@ -700,33 +696,28 @@ begin
       exit(outputPolyTest(4));
   end;
 
-  xscanHelp := xscan;
   if p1^.p[1]^.b.x < p2^.p[1]^.b.x then
-    xscan := p2^.p[1]^.b.x
+    xscanHelp := p2^.p[1]^.b.x
   else
-    xscan := p1^.p[1]^.b.x;
+    xscanHelp := p1^.p[1]^.b.x;
 
   if p1^.p[3]^.b.x > p2^.p[3]^.b.x then
-    xscan := (xscan + p2^.p[3]^.b.x) / 2
+    xscanHelp := (xscanHelp + p2^.p[3]^.b.x) / 2
   else
-    xscan := (xscan + p1^.p[3]^.b.x) / 2;
+    xscanHelp := (xscanHelp + p1^.p[3]^.b.x) / 2;
 
   if drawmode = 6 then
   begin
-    marke(round(bmx + xscan), round(bmy - p1^.yscan), yellow, 'p1^.yscan');
-    marke(round(bmx + xscan), round(bmy - p2^.yscan), lightmagenta, 'p2^.yscan');
+    marke(round(bmx + xscanHelp), round(bmy - p1^.yscan(xscanHelp)),
+      yellow, 'p1^.yscan');
+    marke(round(bmx + xscanHelp), round(bmy - p2^.yscan(xscanHelp)),
+      lightmagenta, 'p2^.yscan');
   end;
 
-  if p1^.yscan > p2^.yscan then
-  begin
-    xscan := xscanHelp;
-    exit(outputPolyTest(1));
-  end
+  if p1^.yscan(xscanHelp) > p2^.yscan(xscanHelp) then
+    exit(outputPolyTest(1))
   else
-  begin
-    xscan := xscanHelp;
     exit(outputPolyTest(2));
-  end;
 
 end;
 
