@@ -74,7 +74,7 @@ begin
 end;
 
 function punkt.copy;
-var result: ^punkt;
+var result: ppunkt;
 begin
   new(result, init(b, gz));
   copy := result;

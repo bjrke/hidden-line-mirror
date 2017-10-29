@@ -468,7 +468,8 @@ function polytest;
 var
   i, j, k: integer;
   pip, h1, h2, h3, h4: shortint;
-  l, m: float;
+  interset: intersectresult;
+  xscanHelp: float;
   h: vector2d;
   schnitt, v1, v2: boolean;
 
@@ -550,12 +551,15 @@ begin
     j := 1;
     while (k < 6) and (j <= 3) do
     begin
-      if linien.intersect(p1^.l[j], p2^.l[i], l, m) = 1 then
+      interset := linien.intersect(p1^.l[j], p2^.l[i]);
+      if interset.match = 1 then
       begin
-        h.x := h.x + p1^.l[j].a^.b.x + l * (p1^.l[j].e^.b.x - p1^.l[j].a^.b.x) +
-          p2^.l[i].a^.b.x + m * (p2^.l[i].e^.b.x - p2^.l[i].a^.b.x);
-        h.y := h.y + p1^.l[j].a^.b.y + l * (p1^.l[j].e^.b.y - p1^.l[j].a^.b.y) +
-          p2^.l[i].a^.b.y + m * (p2^.l[i].e^.b.y - p2^.l[i].a^.b.y);
+        h.x := h.x + p1^.l[j].a^.b.x + interset.lambda *
+          (p1^.l[j].e^.b.x - p1^.l[j].a^.b.x) + p2^.l[i].a^.b.x +
+          interset.mue * (p2^.l[i].e^.b.x - p2^.l[i].a^.b.x);
+        h.y := h.y + p1^.l[j].a^.b.y + interset.lambda *
+          (p1^.l[j].e^.b.y - p1^.l[j].a^.b.y) + p2^.l[i].a^.b.y +
+          interset.mue * (p2^.l[i].e^.b.y - p2^.l[i].a^.b.y);
         Inc(k);
       end;
       Inc(i);
@@ -689,7 +693,7 @@ begin
       exit(outputPolyTest(4));
   end;
 
-  l := xscan;
+  xscanHelp := xscan;
   if p1^.p[1]^.b.x < p2^.p[1]^.b.x then
     xscan := p2^.p[1]^.b.x
   else
@@ -708,12 +712,12 @@ begin
 
   if p1^.yscan > p2^.yscan then
   begin
-    xscan := l;
+    xscan := xscanHelp;
     exit(outputPolyTest(1));
   end
   else
   begin
-    xscan := l;
+    xscan := xscanHelp;
     exit(outputPolyTest(2));
   end;
 

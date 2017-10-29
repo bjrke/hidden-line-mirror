@@ -224,7 +224,7 @@ var
   ll: array[1..20] of linie;
   am: array[1..20, 1..20] of boolean;
   h1, h2, h3, h4, plpos, llpos, i, j, k, pip: int;
-  l, m: float;
+  intersect: intersectresult;
   h: punkt;
   li: linie;
   w: boolean;
@@ -298,14 +298,20 @@ begin
       am[i, j] := False;
   for i := 1 to 3 do
     for j := 1 to 3 do
-      if linien.intersect(p1^.l[j], p2^.l[i], l, m) = 1 then
+    begin
+      intersect := linien.intersect(p1^.l[j], p2^.l[i]);
+      if (intersect.match = 1) then
       begin
-        h.b.x := (p1^.l[j].a^.b.x + l * (p1^.l[j].e^.b.x - p1^.l[j].a^.b.x) +
-          p2^.l[i].a^.b.x + m * (p2^.l[i].e^.b.x - p2^.l[i].a^.b.x)) / 2;
-        h.b.y := (p1^.l[j].a^.b.y + l * (p1^.l[j].e^.b.y - p1^.l[j].a^.b.y) +
-          p2^.l[i].a^.b.y + m * (p2^.l[i].e^.b.y - p2^.l[i].a^.b.y)) / 2;
+        h.b.x := (p1^.l[j].a^.b.x + intersect.lambda *
+          (p1^.l[j].e^.b.x - p1^.l[j].a^.b.x) + p2^.l[i].a^.b.x +
+          intersect.mue * (p2^.l[i].e^.b.x - p2^.l[i].a^.b.x)) / 2;
+        h.b.y := (p1^.l[j].a^.b.y + intersect.lambda *
+          (p1^.l[j].e^.b.y - p1^.l[j].a^.b.y) + p2^.l[i].a^.b.y +
+          intersect.mue * (p2^.l[i].e^.b.y - p2^.l[i].a^.b.y)) / 2;
         addpl(h, p2^.gl * [i]);
       end;
+    end;
+
   for i := 1 to 3 do
   begin
     pip := p2^.punkttest(p1^.p[i]^.b, 'polypoly1', ausgabeInsert);
@@ -364,10 +370,18 @@ begin
           li.init(pl[i], pl[j]);
           if not p1^.linientest(li, ausgabeInsert) then
           begin
-            w := False;
-            for k := 1 to llpos do
-              w := w or (linien.intersect(li, ll[k], l, m) in [1, 2, 3]);
-            if not w then
+            w := True;
+            k := 1;
+            while (w and (k <= llpos)) do
+            begin
+              intersect := linien.intersect(li, ll[k]);
+              if (intersect.match in [1, 2, 3]) then
+              begin
+                w := False;
+              end;
+              k := k + 1;
+            end;
+            if (w) then
               addll(i, j);
           end;
         end;

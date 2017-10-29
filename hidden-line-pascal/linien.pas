@@ -11,7 +11,12 @@ type
     procedure draw(c: color);
   end;
 
-function intersect(l1, l2: linie; var lambda, mue: float): byte;
+  intersectresult = object
+    match: byte;
+    lambda, mue: float;
+  end;
+
+function intersect(l1, l2: linie): intersectresult;
 
 implementation
 
@@ -48,31 +53,38 @@ var
   k: matrix2d;
   h: vector2d;
   dk: float;
+  r: intersectresult;
+
+  function prepareResult(m: byte): intersectresult;
+  begin
+    r.match := m;
+    exit(r);
+  end;
+
 begin
   k.init(l1.e^.b.sub2d(l1.a^.b), l2.a^.b.sub2d(l2.e^.b));
 
   dk := k.det2d;
   if (abs(dk) <= epsilon1) then
-    exit(0); // schneiden sich nicht
+    exit(prepareResult(0)); // schneiden sich nicht
 
   h := l2.a^.b.sub2d(l1.a^.b);
-  lambda := k.withX(h).det2d / dk;
-  mue := k.withY(h).det2d / dk;
-  if (lambda > epsilon1) and (lambda < 1 - epsilon1) and (mue > epsilon1) and
-    (mue < 1 - epsilon1) then
-    exit(1) // schneiden sich ordentlich
-  else if (lambda > epsilon1) and (lambda < 1 - epsilon1) and
-    ((abs(mue - 1) <= epsilon1) or (abs(mue) <= epsilon1)) then
-    exit(2) // min 1 endpunkt2 auf linie 1
-  else if ((abs(lambda - 1) <= epsilon1) or (abs(lambda) <= epsilon1)) and
-    (mue > epsilon1) and (mue < 1 - epsilon1) then
-    exit(3) // min 1 endpunkt1 auf linie 2
-  else if ((abs(lambda - 1) <= epsilon1) or (abs(lambda) <= epsilon1)) and
-    ((abs(mue - 1) <= epsilon1) or (abs(mue) <= epsilon1)) then
-    exit(4) // 1 gemeinsamer endpunkt
+  r.lambda := k.withX(h).det2d / dk;
+  r.mue := k.withY(h).det2d / dk;
+  if (r.lambda > epsilon1) and (r.lambda < 1 - epsilon1) and
+    (r.mue > epsilon1) and (r.mue < 1 - epsilon1) then
+    exit(prepareResult(1)) // schneiden sich ordentlich
+  else if (r.lambda > epsilon1) and (r.lambda < 1 - epsilon1) and
+    ((abs(r.mue - 1) <= epsilon1) or (abs(r.mue) <= epsilon1)) then
+    exit(prepareResult(2)) // min 1 endpunkt2 auf linie 1
+  else if ((abs(r.lambda - 1) <= epsilon1) or (abs(r.lambda) <= epsilon1)) and
+    (r.mue > epsilon1) and (r.mue < 1 - epsilon1) then
+    exit(prepareResult(3)) // min 1 endpunkt1 auf linie 2
+  else if ((abs(r.lambda - 1) <= epsilon1) or (abs(r.lambda) <= epsilon1)) and
+    ((abs(r.mue - 1) <= epsilon1) or (abs(r.mue) <= epsilon1)) then
+    exit(prepareResult(4)) // 1 gemeinsamer endpunkt
   else
-    exit(0); // schneiden sich nicht
-
+    exit(prepareResult(0)); // schneiden sich nicht
 end;
 
 end.
