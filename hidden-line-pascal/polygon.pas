@@ -42,7 +42,14 @@ procedure push(p: ppoly; pnr: punr; c: int);
 function pop(pnr: punr): ppoly;
 function del(p: ppoly; pnr: punr): ppoly;
 function polytest(p1, p2: ppoly; schnitttest, ausgabe: boolean): byte;
-procedure verbinde(v, s: ppoly; r: richtung);
+procedure verbindeso(v, s: ppoly);
+procedure verbindesu(v, s: ppoly);
+procedure verbindeli(v, s: ppoly);
+procedure verbindere(v, s: ppoly);
+procedure verbindepo(v, s: ppoly);
+procedure verbindepu(v, s: ppoly);
+procedure verbindepr(v, s: ppoly);
+procedure verbindene(v, s: ppoly);
 
 implementation
 
@@ -298,9 +305,9 @@ begin
         end
         else
         begin
-          verbinde(a, p, li);
-          verbinde(a^.pr, p, ne);
-          verbinde(p, a, ne);
+          verbindeli(a, p);
+          verbindene(a^.pr, p);
+          verbindene(p, a);
           fertig := True;
         end;
       end
@@ -312,9 +319,9 @@ begin
         end
         else
         begin
-          verbinde(a, p, re);
-          verbinde(p, a^.ne, ne);
-          verbinde(a, p, ne);
+          verbindere(a, p);
+          verbindene(p, a^.ne);
+          verbindene(a, p);
           fertig := True;
         end;
       end
@@ -367,7 +374,7 @@ begin
         outstring('h^.re<>nil');
       if h = p^.li then
       begin
-        verbinde(h, p^.re, re);
+        verbindere(h, p^.re);
       end
       else
       begin
@@ -376,8 +383,8 @@ begin
         begin
           h^.li^.ps := h^.ps;
         end;
-        verbinde(h, p^.re, re);
-        verbinde(h, p^.li, li);
+        verbindere(h, p^.re);
+        verbindeli(h, p^.li);
       end;
     end
     else
@@ -387,7 +394,7 @@ begin
         outstring('h^.li<>nil');
       if h = p^.re then
       begin
-        verbinde(h, p^.li, li);
+        verbindeli(h, p^.li);
       end
       else
       begin
@@ -396,15 +403,15 @@ begin
         begin
           h^.re^.ps := h^.ps;
         end;
-        verbinde(h, p^.re, re);
-        verbinde(h, p^.li, li);
+        verbindere(h, p^.re);
+        verbindeli(h, p^.li);
       end;
     end;
   end;
   p^.ps^ := h;
   if h <> nil then
     h^.ps := p^.ps;
-  verbinde(p^.ne, p^.pr, pr);
+  verbindepr(p^.ne, p^.pr);
   p^.ps := nil;
   p^.li := nil;
   p^.re := nil;
@@ -723,89 +730,91 @@ begin
 
 end;
 
-procedure verbinde;
+procedure verbindeso;
 begin
-  case r of
-    so:
-    begin
-      if v <> nil then
-        v^.so := s;
-      if s <> nil then
-      begin
-        if v <> nil then
-          s^.ss := @v^.so
-        else
-          s^.ss := nil;
-      end;
-    end;
-    su:
-    begin
-      if v <> nil then
-        v^.su := s;
-      if s <> nil then
-      begin
-        if v <> nil then
-          s^.ss := @v^.su
-        else
-          s^.ss := nil;
-      end;
-    end;
-    li:
-    begin
-      if v <> nil then
-        v^.li := s;
-      if s <> nil then
-      begin
-        if v <> nil then
-          s^.ps := @v^.li
-        else
-          s^.ps := nil;
-      end;
-    end;
-    re:
-    begin
-      if v <> nil then
-        v^.re := s;
-      if s <> nil then
-      begin
-        if v <> nil then
-          s^.ps := @v^.re
-        else
-          s^.ps := nil;
-      end;
-    end;
-    po:
-    begin
-      if v <> nil then
-        v^.po := s;
-      if s <> nil then
-        s^.pu := v;
-    end;
-    pu:
-    begin
-      if v <> nil then
-        v^.pu := s;
-      if s <> nil then
-        s^.po := v;
-    end;
-    pr:
-    begin
-      if v <> nil then
-        v^.pr := s;
-      if s <> nil then
-        s^.ne := v;
-    end;
-    ne:
-    begin
-      if v <> nil then
-        v^.ne := s;
-      if s <> nil then
-        s^.pr := v;
-    end;
+  if v <> nil then
+    v^.so := s;
+  if s <> nil then
+  begin
+    if v <> nil then
+      s^.ss := @v^.so
     else
-      outstring('gehtnicht');
+      s^.ss := nil;
   end;
 end;
+
+procedure verbindesu;
+begin
+  if v <> nil then
+    v^.su := s;
+  if s <> nil then
+  begin
+    if v <> nil then
+      s^.ss := @v^.su
+    else
+      s^.ss := nil;
+  end;
+end;
+
+procedure verbindeli;
+begin
+  if v <> nil then
+    v^.li := s;
+  if s <> nil then
+  begin
+    if v <> nil then
+      s^.ps := @v^.li
+    else
+      s^.ps := nil;
+  end;
+end;
+
+procedure verbindere;
+begin
+  if v <> nil then
+    v^.re := s;
+  if s <> nil then
+  begin
+    if v <> nil then
+      s^.ps := @v^.re
+    else
+      s^.ps := nil;
+  end;
+end;
+
+procedure verbindepo;
+begin
+  if v <> nil then
+    v^.po := s;
+  if s <> nil then
+    s^.pu := v;
+end;
+
+procedure verbindepu;
+begin
+  if v <> nil then
+    v^.pu := s;
+  if s <> nil then
+    s^.po := v;
+end;
+
+procedure verbindepr;
+begin
+  if v <> nil then
+    v^.pr := s;
+  if s <> nil then
+    s^.ne := v;
+end;
+
+procedure verbindene;
+begin
+  if v <> nil then
+    v^.ne := s;
+  if s <> nil then
+    s^.pr := v;
+end;
+
+
 
 begin
   colmode := False;

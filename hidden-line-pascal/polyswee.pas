@@ -41,8 +41,8 @@ var
       h2 := newtree(x + 1, e, tiefe + 1)
     else
       h2 := nil;
-    verbinde(h, h1, so);
-    verbinde(h, h2, su);
+    verbindeso(h, h1);
+    verbindesu(h, h2);
     exit(h);
   end;
 
@@ -171,7 +171,7 @@ begin
         outstring('h^.so<>nil');
       if h = p^.su then
       begin
-        verbinde(h, p^.so, so);
+        verbindeso(h, p^.so);
       end
       else
       begin
@@ -180,8 +180,8 @@ begin
         begin
           h^.su^.ss := h^.ss;
         end;
-        verbinde(h, p^.so, so);
-        verbinde(h, p^.su, su);
+        verbindeso(h, p^.so);
+        verbindesu(h, p^.su);
       end;
     end
     else
@@ -191,7 +191,7 @@ begin
         outstring('h^.su<>nil');
       if h = p^.so then
       begin
-        verbinde(h, p^.su, su);
+        verbindesu(h, p^.su);
       end
       else
       begin
@@ -200,15 +200,15 @@ begin
         begin
           h^.so^.ss := h^.ss;
         end;
-        verbinde(h, p^.so, so);
-        verbinde(h, p^.su, su);
+        verbindeso(h, p^.so);
+        verbindesu(h, p^.su);
       end;
     end;
   end;
   p^.ss^ := h;
   if h <> nil then
     h^.ss := p^.ss;
-  verbinde(p^.po, p^.pu, pu);
+  verbindepu(p^.po, p^.pu);
   p^.ss := nil;
   p^.po := nil;
   p^.pu := nil;
@@ -555,19 +555,20 @@ begin
     end;
     if a <> nil then
     begin
-      verbinde(a, p, typ);
       if typ = so then
       begin
+        verbindeso(a, p);
         o := a^.po;
         u := a;
       end
       else
       begin
+        verbindesu(a, p);
         o := a;
         u := a^.pu;
       end;
-      verbinde(o, p, pu);
-      verbinde(p, u, pu);
+      verbindepu(o, p);
+      verbindepu(p, u);
       p^.so := nil;
       p^.su := nil;
       push(p, 3, p^.Count);
