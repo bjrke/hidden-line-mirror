@@ -72,20 +72,16 @@ begin
 end;
 
 procedure drawtree(xscan: float);
-var
-  f: color;
 
-  procedure dp(p: ppoly; dx, dy: integer);
+  procedure dp(p: ppoly; dx, dy: integer; f: color);
   begin
     if (dy < bmy * 2) and (p <> nil) then
     begin
-      Inc(f);
-      p^.cols := f;
+      p^.cols := f+1;
       p^.drx := dx;
       p^.dry := dy;
-      dp(p^.so, dx + bmx shr (dy div 10), dy + 10);
-      dp(p^.su, dx - bmx shr (dy div 10), dy + 10);
-      Dec(f);
+      dp(p^.so, dx + bmx shr (dy div 10), dy + 10, f+1);
+      dp(p^.su, dx - bmx shr (dy div 10), dy + 10, f+1);
     end;
   end;
 
@@ -111,8 +107,8 @@ var
       circle(p^.drx, p^.dry, 3);
       verbindung(p, p^.so, 1);
       verbindung(p, p^.su, 2);
-  {    verbindung(p,p^.pu,4);
-      verbindung(p,p^.po,4);}
+      verbindung(p, p^.pu, 4);
+      verbindung(p, p^.po, 4);
       zeichne(p^.so);
       zeichne(p^.su);
       if p^.cols in zumalen then
@@ -129,8 +125,7 @@ var
 begin
   setcolor(white);
   line(round(xscan + bmx), 0, round(xscan + bmx), 2 * bmy - 1);
-  f := 0;
-  dp(swurzel, bmx, 10);
+  dp(swurzel, bmx, 10, 1);
   zeichne(swurzel);
 end;
 
