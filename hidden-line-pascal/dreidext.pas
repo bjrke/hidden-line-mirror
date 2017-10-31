@@ -50,7 +50,7 @@ begin
   help := Points^.addo(ax, ay, az);
   dreiecks.add(Center, Last, help, [1, 2, 3]);
   Last := help;
-  add := Last;
+  exit(Last);
 end;
 
 destructor Trifan.Done;
@@ -82,7 +82,7 @@ begin
   w := not w;
   l1 := l2;
   l2 := help;
-  add := l2;
+  exit(l2);
 end;
 
 constructor QuadStrip.Init;
