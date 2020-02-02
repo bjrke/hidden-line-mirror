@@ -1,0 +1,20 @@
+{
+  "author": "Jan Burkhardt <264754-bjrke@users.noreply.gitlab.com>",
+  "name": "hidden-line-wasm",
+  "version": "0.1.0",
+  "repository": "gitlab:bjrke/hidden-line",
+  "license": "Beerware",
+  "scripts": {
+    "build": "rimraf dist pkg && webpack",
+    "start": "rimraf dist pkg && webpack-dev-server --open -d",
+    "test": "cargo test && wasm-pack test --headless"
+  },
+  "devDependencies": {
+    "@wasm-tool/wasm-pack-plugin": "1.1.0",
+    "copy-webpack-plugin": "5.1.1",
+    "webpack": "4.41.5",
+    "webpack-cli": "3.3.10",
+    "webpack-dev-server": "3.10.2",
+    "rimraf": "3.0.1"
+  }
+}
