@@ -32,6 +32,9 @@ features = [
   "SvgElement",
   "Node",
   "Window",
+  "EventListener",
+  "HtmlParagraphElement",
+  "KeyboardEvent"
 ]
 [target."cfg(debug_assertions)".dependencies]
 console_error_panic_hook = "0.1.6"

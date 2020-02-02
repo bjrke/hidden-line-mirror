@@ -20,17 +20,37 @@ pub fn main_js() -> Result<(), JsValue> {
         .dyn_into::<web_sys::SvgElement>()
         .unwrap();
 
-    let circle = document.create_element_ns(Some("http://www.w3.org/2000/svg"), "circle")?;
-    circle.set_attribute("cx", "0")?;
-    circle.set_attribute("cy", "0")?;
-    circle.set_attribute("r", "128")?;
-    circle.set_attribute("stroke", "black")?;
-    circle.set_attribute("fill", "blue")?;
+    let circle = circle(document);
     svg.append_child(&circle)?;
 
     svg.set_attribute("viewBox", "-128 -128 256 256")?;
 
     body.append_child(&svg)?;
 
+    setup_clicker(&body, circle);
+
     Ok(())
+}
+
+fn circle(document: web_sys::Document) -> web_sys::Element {
+    let circle = document
+        .create_element_ns(Some("http://www.w3.org/2000/svg"), "circle")
+        .unwrap();
+    circle.set_attribute("cx", "0").unwrap();
+    circle.set_attribute("cy", "0").unwrap();
+    circle.set_attribute("r", "100").unwrap();
+    circle.set_attribute("stroke", "black").unwrap();
+    circle.set_attribute("fill", "blue").unwrap();
+    circle
+}
+
+fn setup_clicker(body: &web_sys::HtmlElement, circle: web_sys::Element) {
+    let mut clicks = 0;
+    let a = Closure::wrap(Box::new(move || {
+        clicks += 1;
+        circle.set_attribute("r", &clicks.to_string());
+    }) as Box<dyn FnMut()>);
+    body.set_onclick(Some(a.as_ref().unchecked_ref()));
+
+    a.forget();
 }
