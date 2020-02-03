@@ -1,5 +1,4 @@
 use wasm_bindgen::prelude::*;
-use wasm_bindgen::JsCast;
 
 #[cfg(feature = "wee_alloc")]
 #[global_allocator]
@@ -9,25 +8,6 @@ static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 pub fn main_js() -> Result<(), JsValue> {
     #[cfg(debug_assertions)]
     console_error_panic_hook::set_once();
-
-    let window = web_sys::window().unwrap();
-    let document = window.document().unwrap();
-    let body = document.body().unwrap();
-
-    let svg = document
-        .create_element_ns(Some("http://www.w3.org/2000/svg"), "svg")
-        .unwrap()
-        .dyn_into::<web_sys::SvgElement>()
-        .unwrap();
-
-    let circle = circle(document);
-    svg.append_child(&circle)?;
-
-    svg.set_attribute("viewBox", "-128 -128 256 256")?;
-
-    body.append_child(&svg)?;
-
-    setup_clicker(&body, circle);
 
     Ok(())
 }
@@ -44,13 +24,32 @@ fn circle(document: web_sys::Document) -> web_sys::Element {
     circle
 }
 
-fn setup_clicker(body: &web_sys::HtmlElement, circle: web_sys::Element) {
-    let mut clicks = 0;
-    let a = Closure::wrap(Box::new(move || {
-        clicks += 1;
-        circle.set_attribute("r", &clicks.to_string());
-    }) as Box<dyn FnMut()>);
-    body.set_onclick(Some(a.as_ref().unchecked_ref()));
+#[wasm_bindgen]
+pub fn lets_go(svg: web_sys::SvgElement) -> HiddenLine {
+    let document = svg.owner_document().unwrap();
+    let circle = circle(document);
+    svg.append_child(&circle).unwrap();
 
-    a.forget();
+    svg.set_attribute("viewBox", "-128 -128 256 256").unwrap();
+
+    HiddenLine {
+        radius: 100,
+        circle,
+    }
+}
+
+#[wasm_bindgen]
+pub struct HiddenLine {
+    radius: i32,
+    circle: web_sys::Element,
+}
+
+#[wasm_bindgen]
+impl HiddenLine {
+    pub fn on_click(&mut self) {
+        self.radius += 1;
+        self.circle
+            .set_attribute("r", &self.radius.to_string())
+            .unwrap();
+    }
 }
