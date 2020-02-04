@@ -1,6 +1,12 @@
+mod appcontext;
+mod drawcontext;
 mod float;
+mod line;
 mod mat2;
 mod mat3;
+mod point;
+mod svgcontext;
+mod time;
 mod vec2;
 mod vec3;
 

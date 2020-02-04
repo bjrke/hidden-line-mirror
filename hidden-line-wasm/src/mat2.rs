@@ -2,7 +2,7 @@ use crate::float::*;
 use crate::vec2::Vector2;
 
 #[derive(Clone, Copy)]
-struct Matrix2 {
+pub struct Matrix2 {
     pub x: Vector2,
     pub y: Vector2,
 }

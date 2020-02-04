@@ -43,3 +43,7 @@ impl std::fmt::Display for Vector2 {
     write!(f, "({}, {})", self.x, self.y)
   }
 }
+
+pub fn colinear(p1: &Vector2, p2: &Vector2, p3: &Vector2) -> bool {
+  ((p1.y - p2.y) * (p3.x - p2.x) - (p1.x - p2.x) * (p3.y - p2.y)).abs() < epsilon0
+}
