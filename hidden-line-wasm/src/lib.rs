@@ -1,3 +1,9 @@
+mod float;
+mod mat2;
+mod mat3;
+mod vec2;
+mod vec3;
+
 use wasm_bindgen::prelude::*;
 
 #[cfg(feature = "wee_alloc")]
