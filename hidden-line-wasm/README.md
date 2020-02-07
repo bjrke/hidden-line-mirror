@@ -1,5 +1,14 @@
 ## How to install
 
+install rustup, you probably have to relogin
+https://rustup.rs/
+
+install wasm-pack
+https://rustwasm.github.io/wasm-pack/installer/
+
+install npm
+https://www.npmjs.com/get-npm
+
 ```sh
 npm install
 ```
