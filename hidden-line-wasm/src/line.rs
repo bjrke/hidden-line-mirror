@@ -3,17 +3,17 @@ use crate::float::*;
 use crate::mat2::*;
 use crate::point::*;
 
-pub struct line<'a> {
-    a: &'a point,
-    e: &'a point,
+pub struct Line<'a> {
+    pub a: &'a point,
+    pub e: &'a point,
 }
 
-impl line<'_> {
-    pub fn new<'a>(p1: &'a point, p2: &'a point) -> line<'a> {
+impl Line<'_> {
+    pub fn new<'a>(p1: &'a point, p2: &'a point) -> Line<'a> {
         if p1.b.x < p2.b.x {
-            line { a: p1, e: p2 }
+            Line { a: p1, e: p2 }
         } else {
-            line { a: p2, e: p1 }
+            Line { a: p2, e: p1 }
         }
     }
 
@@ -28,7 +28,7 @@ pub struct intersectresult {
     pub mue: Float,
 }
 
-pub fn intersect(l1: &line, l2: &line) -> intersectresult {
+pub fn intersect(l1: &Line, l2: &Line) -> intersectresult {
     let k = Matrix2::new(l1.e.b.sub2d(&l1.a.b), l2.a.b.sub2d(&l2.e.b));
     let dk = k.det2d();
 

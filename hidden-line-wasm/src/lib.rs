@@ -7,6 +7,7 @@ mod mat3;
 mod point;
 mod svgcontext;
 mod time;
+mod triangle;
 mod vec2;
 mod vec3;
 

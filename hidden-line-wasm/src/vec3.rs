@@ -58,6 +58,10 @@ impl Vector3 {
     pub fn move3d(&self, direction: &Vector3, polarisation: Float) -> Vector3 {
         self.add3d(&direction.mul3d(polarisation * MOVE_SPEED * direction.invBetrag3d()))
     }
+
+    pub fn normalize(&self) -> Vector3 {
+        self.mul3d(self.invBetrag3d())
+    }
 }
 
 impl std::fmt::Display for Vector3 {
