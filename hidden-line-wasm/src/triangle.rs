@@ -1,3 +1,4 @@
+use crate::appcontext::*;
 use crate::drawcontext::*;
 use crate::float::*;
 use crate::line::*;
@@ -177,24 +178,20 @@ impl dreieck<'_> {
             planeNorm,
             planeDist: planeNorm.skalar(&p1.o),
         }
-        //   origPoints[1] := p1;
-        //   origPoints[2] := p2;
-        //   origPoints[3] := p3;
-        //   p[1] := p1^.b;
-        //   p[2] := p2^.b;
-        //   p[3] := p3^.b;
-        //   gl := ls;
-        //   l[1].init(p[2], p[3]);
-        //   l[2].init(p[3], p[1]);
-        //   l[3].init(p[1], p[2]);
-        //   Next := nil;
-        //   planeNorm := origPoints[2]^.o.sub3d(origPoints[1]^.o)
-        //     .kreuz(origPoints[3]^.o.sub3d(origPoints[1]^.o));
-        //   planeNorm := planeNorm.mul3d(planeNorm.invBetrag3d);
-        //
     }
 
-    // pub fn tiefe(k: &Vector2) -> Float {}
+    pub fn tiefe(&self, ctx: &AppContext, k: &Vector2) -> Float {
+        let bv = ctx
+            .BlickR
+            .add3d(&ctx.iv.mul3d(k.x))
+            .add3d(&ctx.jv.mul3d(k.y));
+        let t = self.planeNorm.skalar(&bv);
+        if (t.abs() < epsilon2) {
+            100000000.0
+        } else {
+            (self.planeDist - self.planeNorm.skalar(&ctx.Auge)) / (t * bv.invBetrag3d())
+        }
+    }
 }
 
 pub fn calcColor(f: Float) -> Color {
@@ -206,54 +203,3 @@ pub fn calcColor(f: Float) -> Color {
         (f * 14.0).round() as Color
     }
 }
-
-// function dreieck.tiefe;
-// var
-//   bv: vector3d;
-//   t: float;
-// begin
-//   bv := blickr.add3d(iv.mul3d(k.x)).add3d(jv.mul3d(k.y));
-//   t := planeNorm.skalar(bv);
-//   if abs(t) < epsilon2 then
-//     exit(100000000);
-//   exit((planeDist - planeNorm.skalar(auge)) / (t * bv.invBetrag3d));
-// end;
-
-// constructor dliste.init;
-// begin
-//   Anker := nil;
-//   Last := nil;
-// end;
-
-// function dliste.add;
-// var
-//   h: pdreieck;
-// begin
-//   New(h, init(p1, p2, p3, ls));
-//   if anker = nil then
-//     anker := h;
-//   if last = nil then
-//     last := h
-//   else
-//   begin
-//     last^.Next := h;
-//     last := h;
-//   end;
-//   exit(h);
-// end;
-
-// function dliste.First;
-// begin
-//   aktuell := anker;
-//   exit(aktuell);
-// end;
-
-// function dliste.Next;
-// begin
-//   if aktuell <> nil then
-//     aktuell := aktuell^.Next;
-//   exit(aktuell);
-// end;
-
-// begin
-// end.
