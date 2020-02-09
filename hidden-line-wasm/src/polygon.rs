@@ -1,0 +1,860 @@
+use crate::appcontext::*;
+use crate::drawcontext::*;
+use crate::float::*;
+use crate::point::*;
+use crate::triangle::*;
+use crate::vec2::*;
+
+use rand::Rng;
+
+pub struct polygon<'a> {
+    delegate: dreiecktyp<'a>,
+    originalTriangle: &'a dreieck<'a>,
+    farbe: Color,
+}
+
+impl polygon<'_> {
+    pub fn initpoly<'a>(
+        p1: &point,
+        p2: &point,
+        p3: &point,
+        ls: u8,
+        aOriginalTriangle: &dreieck,
+    ) -> polygon<'a> {
+        panic!()
+    }
+    pub fn newpoly<'a>(aOriginalTriangle: &dreieck) -> polygon<'a> {
+        panic!()
+    }
+
+    pub fn yscan(&self, xscan: Float) -> Float {
+        xscan
+    }
+
+    fn draw4(&self, ctx: &mut dyn DrawContext) {
+        //TODO use min and max to get my1, my2
+
+        let p1 = self.delegate.p1;
+        let p2 = self.delegate.p2;
+        let p3 = self.delegate.p3;
+        let mut my1 = p1.b.y;
+        let mut my2 = my1;
+        if p2.b.y > my1 {
+            my2 = p2.b.y
+        } else {
+            my1 = p2.b.y;
+        }
+
+        if p3.b.y > my2 {
+            my2 = p3.b.y;
+        } else if p3.b.y < my1 {
+            my1 = p3.b.y;
+        }
+
+        let ym1 = my1.round() as i32;
+        let ym2 = my2.round() as i32;
+        let xm1 = p1.b.x.round() as i32;
+        let xm2 = p3.b.x.round() as i32;
+
+        for wx in xm1..xm2 {
+            for wy in ym1..ym2 {
+                let h = Vector2::new(wx as Float, wy as Float);
+                if self.delegate.punkttest(&h, "draw", false) == 0 {
+                    let my1 = 1.0 + 7.0 * self.yscan(wx as Float);
+
+                    let col = if my1 >= 15.0 {
+                        15
+                    } else if my1 <= 1.0 {
+                        1
+                    } else {
+                        my1.round() as Color
+                    };
+
+                    ctx.putpixel(wx, wy, col);
+                }
+            }
+        }
+    }
+
+    fn draw5(&self, ctx: &mut dyn DrawContext, appCtx: &AppContext) {
+        //TODO use min and max to get my1, my2
+        let p1 = self.delegate.p1;
+        let p2 = self.delegate.p2;
+        let p3 = self.delegate.p3;
+        let mut my1 = p1.b.y;
+        let mut my2 = my1;
+        if p2.b.y > my1 {
+            my2 = p2.b.y
+        } else {
+            my1 = p2.b.y;
+        }
+
+        if p3.b.y > my2 {
+            my2 = p3.b.y;
+        } else if p3.b.y < my1 {
+            my1 = p3.b.y;
+        }
+
+        let ym1 = my1.round() as i32;
+        let ym2 = my2.round() as i32;
+        let xm1 = p1.b.x.round() as i32;
+        let xm2 = p3.b.x.round() as i32;
+
+        for wx in xm1..xm2 {
+            for wy in ym1..ym2 {
+                let h = Vector2::new(wx as Float, wy as Float);
+                if self.delegate.punkttest(&h, "draw2", false) == 0 {
+                    let my1 = 1.0 + 7.0 * self.yscan(wx as Float);
+
+                    let col = calcColor(
+                        appCtx
+                            .tiefePerspektive
+                            .relative(self.originalTriangle.tiefe(appCtx, &h)),
+                    );
+
+                    ctx.putpixel(wx, wy, col);
+                }
+            }
+        }
+    }
+
+    pub fn drawpoly(&self, ctx: &mut DrawContext, appCtx: &AppContext) {
+        let cols = if appCtx.colmode {
+            let mut rng = rand::thread_rng();
+            rng.gen_range(1, 16)
+        } else {
+            self.delegate.cols
+        };
+
+        match appCtx.drawmode {
+            1 => self.delegate.draw1(ctx, cols),
+            2 => self.delegate.draw2(ctx, cols),
+            3 => self.delegate.draw3(ctx, cols),
+            4 => self.draw4(ctx),
+            5 => self.draw5(ctx, appCtx),
+            6 => self.delegate.draw1(ctx, cols),
+            7 => self
+                .delegate
+                .draw2(ctx, self.originalTriangle.delegate.cols),
+            8 => self.delegate.draw1(ctx, self.farbe),
+            9 => self
+                .delegate
+                .draw1(ctx, self.originalTriangle.delegate.cols),
+            _ => panic!("unexpected drawmode"),
+        }
+    }
+}
+
+// type
+//   punr = 1..3;
+
+//   pppoly = ^ppoly;
+//   ppoly = ^poly;
+
+//   poly = object(dreiecktyp)
+//     li, re, ne, pr: ppoly;
+//     so, su, pu, po: ppoly;
+//     ss, ps: pppoly;
+//     originalTriangle: pdreieck;
+//     drx, dry: integer;
+//     farbe: color;
+//     Count: int;
+//     ymin, ymax: float;
+
+//     destructor done;
+
+//     function yscan(xscan: float): float;
+//     procedure drawpoly;
+//   end;
+
+// var
+//   swurzel: ppoly;
+//   wurzel, First: array [punr] of ppoly;
+//   colmode: boolean;
+//   drawmode: integer;
+//   rand: boolean;
+//   tiefePerspektive: minmax;
+
+// procedure push(p: ppoly; pnr: punr; c: int);
+// function pop(pnr: punr): ppoly;
+// function del(p: ppoly; pnr: punr): ppoly;
+// function polytest(xscan: float; p1, p2: ppoly; schnitttest, ausgabe: boolean): byte;
+// procedure verbindeso(v, s: ppoly);
+// procedure verbindesu(v, s: ppoly);
+// procedure verbindeli(v, s: ppoly);
+// procedure verbindere(v, s: ppoly);
+// procedure verbindepo(v, s: ppoly);
+// procedure verbindepu(v, s: ppoly);
+// procedure verbindepr(v, s: ppoly);
+// procedure verbindene(v, s: ppoly);
+
+// implementation
+
+// destructor poly.done;                   {hier druff guggn!}
+// var
+//   i: integer;
+// begin
+//   {  outstring(aufr,false);}
+//   for i := 1 to 3 do
+//     if p[i] <> nil then
+//       dispose(p[i], done)
+//     else
+//       outstring('p[i]=nil');
+//   zaehl.polygons.del;
+// end;
+
+// constructor poly.initpoly;
+// var
+//   h: ppunkt;
+//   lsneu: lset;
+
+// begin
+//   zaehl.polygons.ins;
+
+//   if p1 = nil then
+//     outstring('p1=nil');
+//   if p2 = nil then
+//     outstring('p2=nil');
+//   if p3 = nil then
+//     outstring('p3=nil');
+
+//   p[1] := p1^.copy;
+//   p[2] := p2^.copy;
+//   p[3] := p3^.copy;
+
+//   if p[1]^.b.x > p[2]^.b.x then
+//   begin
+//     h := p[2];
+//     p[2] := p[1];
+//     p[1] := h;
+//     lsneu := [];
+//     if 1 in ls then
+//       lsneu := lsneu + [2];
+//     if 2 in ls then
+//       lsneu := lsneu + [1];
+//     if 3 in ls then
+//       lsneu := lsneu + [3];
+//     ls := lsneu;
+//   end;
+
+//   if p[1]^.b.x > p[3]^.b.x then
+//   begin
+//     h := p[3];
+//     p[3] := p[1];
+//     p[1] := h;
+//     lsneu := [];
+//     if 1 in ls then
+//       lsneu := lsneu + [3];
+//     if 2 in ls then
+//       lsneu := lsneu + [2];
+//     if 3 in ls then
+//       lsneu := lsneu + [1];
+//     ls := lsneu;
+//   end;
+
+//   if p[2]^.b.x > p[3]^.b.x then
+//   begin
+//     h := p[3];
+//     p[3] := p[2];
+//     p[2] := h;
+//     lsneu := [];
+//     if 1 in ls then
+//       lsneu := lsneu + [1];
+//     if 2 in ls then
+//       lsneu := lsneu + [3];
+//     if 3 in ls then
+//       lsneu := lsneu + [2];
+//     ls := lsneu;
+//   end;
+
+//   gl := ls;
+
+//   l[1].init(p[2], p[3]);
+//   l[2].init(p[3], p[1]);
+//   l[3].init(p[1], p[2]);
+
+//   originalTriangle := aOriginalTriangle;
+//   cols := green;
+
+//   ymin := p[1]^.b.y;
+//   ymax := p[1]^.b.y;
+
+//   if p[2]^.b.y < ymin then
+//     ymin := p[2]^.b.y
+//   else if p[2]^.b.y > ymax then
+//     ymax := p[2]^.b.y;
+
+//   if p[3]^.b.y < ymin then
+//     ymin := p[3]^.b.y
+//   else if p[3]^.b.y > ymax then
+//     ymax := p[3]^.b.y;
+// end;
+
+// constructor poly.newpoly;
+// var
+//   c: vector3d;
+//   faktor: float;
+// begin
+
+//   if ((drawmode = 7) or (drawmode = 9)) then
+//   begin
+//     c := aOriginalTriangle^.origPoints[1]^.o.sub3d(aOriginalTriangle^.origPoints[2]^.o)
+//       .kreuz(aOriginalTriangle^.origPoints[3]^.o.sub3d(
+//       aOriginalTriangle^.origPoints[2]^.o));
+//     faktor := (BlickR.invBetrag3d * c.invBetrag3d);
+//     aOriginalTriangle^.cols := calcColor(abs(BlickR.skalar(c) * faktor));
+//   end;
+
+//   initpoly(aOriginalTriangle^.p[1], aOriginalTriangle^.p[2],
+//     aOriginalTriangle^.p[3], aOriginalTriangle^.gl, aOriginalTriangle);
+// end;
+
+// procedure push;
+// var
+//   a: ppoly;
+//   fertig: boolean;
+
+// begin
+//   p^.Count := c;
+//   if pnr <> 3 then
+//     p^.farbe := pnr;
+//   zaehl.q[pnr].ins;
+//   p^.ne := nil;
+//   p^.li := nil;
+//   p^.re := nil;
+//   p^.ps := nil;
+//   p^.pr := nil;
+//   if wurzel[pnr] = nil then
+//   begin
+//     wurzel[pnr] := p;
+//     p^.ps := @wurzel[pnr];
+//     First[pnr] := p;
+//   end
+//   else
+//   begin
+//     a := wurzel[pnr];
+//     fertig := False;
+//     repeat
+//       if p^.p[pnr]^.b.x <= a^.p[pnr]^.b.x then
+//       begin
+//         if a^.li <> nil then
+//         begin
+//           a := a^.li;
+//         end
+//         else
+//         begin
+//           verbindeli(a, p);
+//           verbindene(a^.pr, p);
+//           verbindene(p, a);
+//           fertig := True;
+//         end;
+//       end
+//       else
+//       begin
+//         if a^.re <> nil then
+//         begin
+//           a := a^.re;
+//         end
+//         else
+//         begin
+//           verbindere(a, p);
+//           verbindene(p, a^.ne);
+//           verbindene(a, p);
+//           fertig := True;
+//         end;
+//       end
+//     until fertig;
+//   end;
+// {  if first[pnr]=nil then begin
+//     first[pnr]:=wurzel[pnr];
+//     outstring('first[pnr]is nil',false);
+//   end;}
+//   while First[pnr]^.li <> nil do
+//     First[pnr] := First[pnr]^.li;
+// end;
+
+// function pop;
+// begin
+//   exit(del(First[pnr], pnr));
+// end;
+
+// function del;
+// var
+//   h: ppoly;
+// begin
+//   if p = nil then
+//   begin
+//     exit(nil);
+//   end;
+//   zaehl.q[pnr].del;
+//   if p = First[pnr] then
+//     First[pnr] := First[pnr]^.ne;
+//   h := nil;
+//   if p^.re = nil then
+//     h := p^.li
+//   else if p^.li = nil then
+//     h := p^.re
+//   else
+//   begin
+//     if p^.ne = nil then
+//     begin
+//       outstring('p^.ne=nil');
+//     end;
+//     if p^.pr = nil then
+//     begin
+//       outstring('p^.pr=nil');
+//     end;
+//     rand := not rand;
+//     if rand then
+//     begin
+//       h := p^.pr;
+//       if h^.re <> nil then
+//         outstring('h^.re<>nil');
+//       if h = p^.li then
+//       begin
+//         verbindere(h, p^.re);
+//       end
+//       else
+//       begin
+//         h^.ps^ := h^.li;
+//         if h^.li <> nil then
+//         begin
+//           h^.li^.ps := h^.ps;
+//         end;
+//         verbindere(h, p^.re);
+//         verbindeli(h, p^.li);
+//       end;
+//     end
+//     else
+//     begin
+//       h := p^.ne;
+//       if h^.li <> nil then
+//         outstring('h^.li<>nil');
+//       if h = p^.re then
+//       begin
+//         verbindeli(h, p^.li);
+//       end
+//       else
+//       begin
+//         h^.ps^ := h^.re;
+//         if h^.re <> nil then
+//         begin
+//           h^.re^.ps := h^.ps;
+//         end;
+//         verbindere(h, p^.re);
+//         verbindeli(h, p^.li);
+//       end;
+//     end;
+//   end;
+//   p^.ps^ := h;
+//   if h <> nil then
+//     h^.ps := p^.ps;
+//   verbindepr(p^.ne, p^.pr);
+//   p^.ps := nil;
+//   p^.li := nil;
+//   p^.re := nil;
+//   p^.ne := nil;
+//   p^.pr := nil;
+
+//   exit(p);
+// end;
+
+// function poly.yscan;
+// var
+//   h: float;
+//   miny, maxy, x1, y1, x2, y2: float;
+// begin
+//   x1 := p[1]^.b.x;
+//   y1 := p[1]^.b.y;
+//   x2 := p[3]^.b.x;
+//   y2 := p[3]^.b.y;
+//   if y1 < y2 then
+//   begin
+//     miny := y1;
+//     maxy := y2;
+//   end
+//   else
+//   begin
+//     miny := y2;
+//     maxy := y1;
+//   end;
+//   if maxy < p[2]^.b.y then
+//     maxy := p[2]^.b.y
+//   else if p[2]^.b.y < miny then
+//     miny := p[2]^.b.y;
+//   if abs(x2 - x1) < epsilon1 then
+//     h := (y1 + y2)
+//   else
+//   begin
+//     h := y1 + (y2 - y1) * (xscan - x1) / (x2 - x1);
+//     if xscan < p[2]^.b.x then
+//     begin
+//       x2 := p[2]^.b.x;
+//       y2 := p[2]^.b.y;
+//     end
+//     else
+//     begin
+//       x1 := p[2]^.b.x;
+//       y1 := p[2]^.b.y;
+//     end;
+//     if abs(x2 - x1) < epsilon1 then
+//       h := y1 + y2
+//     else
+//       h := h + y1 + (y2 - y1) * (xscan - x1) / (x2 - x1);
+//   end;
+//   if (h < 2 * miny) or (h > 2 * maxy) then
+//   begin
+//     h := miny + maxy;
+//   end;
+//   exit(h / 2);
+// end;
+
+// function polytest;
+// var
+//   i, j, k: integer;
+//   pip, h1, h2, h3, h4: shortint;
+//   interset: intersectresult;
+//   xscanHelp: float;
+//   h: vector2d;
+//   schnitt, v1, v2: boolean;
+
+//   procedure test(p: vector2d);
+//   var
+//     d1, d2: float;
+//   begin
+//     if (p1^.punkttest(h, 'polytest.test1', ausgabe) = 0) and
+//       (p2^.punkttest(h, 'polytest.test2', ausgabe) = 0) then
+//     begin
+//       d1 := p1^.originalTriangle^.tiefe(p);
+//       d2 := p2^.originalTriangle^.tiefe(p);
+//       schnitt := abs(d1 - d2) > epsilon1;
+//       if p1^.originalTriangle = p2^.originalTriangle then
+//       begin
+//         v2 := True;
+//       end
+//       else
+//         v1 := d1 < d2;
+//       if ausgabe then
+//       begin
+//         outstring('v1:' + BoolToStr(v1) + 'v2:' + BoolToStr(v2) +
+//           ' schnitt:' + BoolToStr(schnitt));
+//         outvector2d('p', p);
+//         outfloat('d1', d1);
+//         outfloat('d2', d2);
+//         outfloat('d1-d2', d1 - d2);
+//       end;
+//     end;
+//   end;
+
+//   procedure addpl(v: vector2d);
+//   begin
+//     h := h.add2d(v);
+//     Inc(k);
+//   end;
+
+//   function outputPolyTest(Result: byte): byte;
+//   begin
+//     if ausgabe then
+//     begin
+//       outint('polytest: ', Result);
+//       outvector2d('p1^.p[1]^.b', p1^.p[1]^.b);
+//       outvector2d('p1^.p[2]^.b', p1^.p[2]^.b);
+//       outvector2d('p1^.p[3]^.b', p1^.p[3]^.b);
+//       outvector2d('p1^.originalTriangle^.p[1]^.b', p1^.originalTriangle^.p[1]^.b);
+//       outvector2d('p1^.originalTriangle^.p[2]^.b', p1^.originalTriangle^.p[2]^.b);
+//       outvector2d('p1^.originalTriangle^.p[3]^.b', p1^.originalTriangle^.p[3]^.b);
+//       outvector2d('p2^.p[1]^.b', p2^.p[1]^.b);
+//       outvector2d('p2^.p[2]^.b', p2^.p[2]^.b);
+//       outvector2d('p2^.p[3]^.b', p2^.p[3]^.b);
+//       outvector2d('p2^.originalTriangle^.p[1]^.b', p2^.originalTriangle^.p[1]^.b);
+//       outvector2d('p2^.originalTriangle^.p[2]^.b', p2^.originalTriangle^.p[2]^.b);
+//       outvector2d('p2^.originalTriangle^.p[3]^.b', p2^.originalTriangle^.p[3]^.b);
+//       p1^.draw3(1);
+//       p2^.draw3(2);
+
+//       readkey;
+//     end;
+//     exit(Result);
+//   end;
+
+// begin
+//   Inc(zaehl.ptest);
+//   if p1^.ymin - 1 > p2^.ymax then
+//     exit(1);
+
+//   if p2^.ymin - 1 > p1^.ymax then
+//     exit(2);
+
+//   schnitt := False;
+//   v2 := False;
+//   v1 := False;
+//   if schnitttest and (p1^.originalTriangle <> p2^.originalTriangle) then
+//   begin
+//     k := 0;
+//     h.init(0, 0);
+//     i := 1;
+//     j := 1;
+//     while (k < 6) and (j <= 3) do
+//     begin
+//       interset := linien.intersect(p1^.l[j], p2^.l[i]);
+//       if interset.match = 1 then
+//       begin
+//         h.x := h.x + p1^.l[j].a^.b.x + interset.lambda *
+//           (p1^.l[j].e^.b.x - p1^.l[j].a^.b.x) + p2^.l[i].a^.b.x +
+//           interset.mue * (p2^.l[i].e^.b.x - p2^.l[i].a^.b.x);
+//         h.y := h.y + p1^.l[j].a^.b.y + interset.lambda *
+//           (p1^.l[j].e^.b.y - p1^.l[j].a^.b.y) + p2^.l[i].a^.b.y +
+//           interset.mue * (p2^.l[i].e^.b.y - p2^.l[i].a^.b.y);
+//         Inc(k);
+//       end;
+//       Inc(i);
+//       if i = 4 then
+//       begin
+//         Inc(j);
+//         i := 1;
+//       end;
+//     end;
+
+//     h := h.div2d(2);
+
+//     i := 1;
+//     while {(k<6)and}(i <= 3) do
+//     begin
+//       pip := p2^.punkttest(p1^.p[i]^.b, 'polytest1', ausgabe);
+//       if (ausgabe) then
+//         outint('pip3 ', pip);
+//       case pip of
+//         0: addpl(p1^.p[i]^.b);
+//         {eckpunkte des oberen, die nur im(nicht auf)unteren sind}
+//         1..3:
+//         begin
+//           h1 := gleicheseite(p1^.p[i]^, p2^.l[pip].a^, p2^.p[pip]^,
+//             p1^.p[(i mod 3) + 1]^);
+//           h2 := gleicheseite(p1^.p[i]^, p2^.l[pip].a^, p2^.p[pip]^,
+//             p1^.p[((i + 1) mod 3) + 1]^);
+//           if (h1 = 1) or (h2 = 1) then
+//             addpl(p1^.p[i]^.b);
+//         end;
+//         11..13:
+//         begin
+//           h1 := gleicheseite(p1^.p[i]^, p1^.p[(i mod 3) + 1]^,
+//             p2^.p[((pip - 1) mod 3) + 1]^, p1^.p[((i + 1) mod 3) + 1]^);
+//           h2 := gleicheseite(p1^.p[i]^, p1^.p[((i + 1) mod 3) + 1]^,
+//             p2^.p[((pip - 1) mod 3) + 1]^, p1^.p[(i mod 3) + 1]^);
+//           h3 := gleicheseite(p1^.p[i]^, p1^.p[(i mod 3) + 1]^,
+//             p2^.p[(pip mod 3) + 1]^, p1^.p[((i + 1) mod 3) + 1]^);
+//           h4 := gleicheseite(p1^.p[i]^, p1^.p[((i + 1) mod 3) + 1]^,
+//             p2^.p[(pip mod 3) + 1]^, p1^.p[(i mod 3) + 1]^);
+//           if (h1 = -1) or (h2 = -1) or (h3 = -1) or (h4 = -1) then
+//             addpl(p1^.p[i]^.b);
+//         end
+//         else
+//       end;
+//       Inc(i);
+//     end;
+//     i := 1;
+//     while {(k<6)and}(i <= 3) do
+//     begin
+//       pip := p1^.punkttest(p2^.p[i]^.b, 'polytest2', ausgabe);
+//       if (ausgabe) then
+//         outint('pip4 ', pip);
+//       case pip of
+//         0: addpl(p2^.p[i]^.b);
+//         {eckpunkte des oberen, die nur im(nicht auf)unteren sind}
+//         1..3:
+//         begin
+//           h1 := gleicheseite(p2^.p[i]^, p1^.l[pip].a^, p1^.p[pip]^,
+//             p2^.p[(i mod 3) + 1]^);
+//           h2 := gleicheseite(p2^.p[i]^, p1^.l[pip].a^, p1^.p[pip]^,
+//             p2^.p[((i + 1) mod 3) + 1]^);
+//           if (h1 = 1) or (h2 = 1) then
+//             addpl(p2^.p[i]^.b);
+//         end;
+//         11..13:
+//         begin
+//           h1 := gleicheseite(p2^.p[i]^, p2^.p[(i mod 3) + 1]^,
+//             p1^.p[((pip - 1) mod 3) + 1]^, p2^.p[((i + 1) mod 3) + 1]^);
+//           h2 := gleicheseite(p2^.p[i]^, p2^.p[((i + 1) mod 3) + 1]^,
+//             p1^.p[((pip - 1) mod 3) + 1]^, p2^.p[(i mod 3) + 1]^);
+//           h3 := gleicheseite(p2^.p[i]^, p2^.p[(i mod 3) + 1]^,
+//             p1^.p[(pip mod 3) + 1]^, p2^.p[((i + 1) mod 3) + 1]^);
+//           h4 := gleicheseite(p2^.p[i]^, p2^.p[((i + 1) mod 3) + 1]^,
+//             p1^.p[(pip mod 3) + 1]^, p2^.p[(i mod 3) + 1]^);
+//           if (h1 = -1) or (h2 = -1) or (h3 = -1) or (h4 = -1) then
+//             addpl(p2^.p[i]^.b);
+//         end
+//         else
+//       end;
+//       Inc(i);
+//     end;
+// {    while (k<6)and(i<=3)do begin
+//       if p1^.punkttest(p2^.p[i]^.b)=0 then begin
+//         inc(k,2);
+//         h[x]:=h[x]+p2^.p[i]^.b[x];
+//         h[y]:=h[y]+p2^.p[i]^.b[y];
+//       end;
+//       inc(i);
+//     end;}
+//     if k > 0 then
+//     begin
+//       h := h.div2d(k);
+
+//       test(h);
+
+//     end;
+//   end;
+
+//   if not schnitt then
+//   begin
+//     h.x := (p1^.p[1]^.b.x + p1^.p[2]^.b.x + p1^.p[3]^.b.x) / 3;
+//     h.y := (p1^.p[1]^.b.y + p1^.p[2]^.b.y + p1^.p[3]^.b.y) / 3;
+//     test(h);
+//   end;
+
+//   if not schnitt then
+//   begin
+//     h.x := (p2^.p[1]^.b.x + p2^.p[2]^.b.x + p2^.p[3]^.b.x) / 3;
+//     h.y := (p2^.p[1]^.b.y + p2^.p[2]^.b.y + p2^.p[3]^.b.y) / 3;
+//     test(h);
+//   end;
+
+//   if not schnitt then
+//   begin
+//     h.x := (p1^.p[1]^.b.x + p1^.p[2]^.b.x + p1^.p[3]^.b.x + p2^.p[1]^.b.x +
+//       p2^.p[2]^.b.x + p2^.p[3]^.b.x) / 6;
+//     h.y := (p1^.p[1]^.b.y + p1^.p[2]^.b.y + p1^.p[3]^.b.y + p2^.p[1]^.b.y +
+//       p2^.p[2]^.b.y + p2^.p[3]^.b.y) / 6;
+//     test(h);
+//   end;
+
+//   if v2 then
+//     exit(outputPolyTest(5));
+
+//   if schnitt then
+//   begin
+//     if v1 then
+//       exit(outputPolyTest(3))
+//     else
+//       exit(outputPolyTest(4));
+//   end;
+
+//   if p1^.p[1]^.b.x < p2^.p[1]^.b.x then
+//     xscanHelp := p2^.p[1]^.b.x
+//   else
+//     xscanHelp := p1^.p[1]^.b.x;
+
+//   if p1^.p[3]^.b.x > p2^.p[3]^.b.x then
+//     xscanHelp := (xscanHelp + p2^.p[3]^.b.x) / 2
+//   else
+//     xscanHelp := (xscanHelp + p1^.p[3]^.b.x) / 2;
+
+//   if drawmode = 6 then
+//   begin
+//     marke(round(bmx + xscanHelp), round(bmy - p1^.yscan(xscanHelp)),
+//       yellow, 'p1^.yscan');
+//     marke(round(bmx + xscanHelp), round(bmy - p2^.yscan(xscanHelp)),
+//       lightmagenta, 'p2^.yscan');
+//   end;
+
+//   if p1^.yscan(xscanHelp) > p2^.yscan(xscanHelp) then
+//     exit(outputPolyTest(1))
+//   else
+//     exit(outputPolyTest(2));
+
+// end;
+
+// procedure verbindeso;
+// begin
+//   if v <> nil then
+//     v^.so := s;
+//   if s <> nil then
+//   begin
+//     if v <> nil then
+//       s^.ss := @v^.so
+//     else
+//       s^.ss := nil;
+//   end;
+// end;
+
+// procedure verbindesu;
+// begin
+//   if v <> nil then
+//     v^.su := s;
+//   if s <> nil then
+//   begin
+//     if v <> nil then
+//       s^.ss := @v^.su
+//     else
+//       s^.ss := nil;
+//   end;
+// end;
+
+// procedure verbindeli;
+// begin
+//   if v <> nil then
+//     v^.li := s;
+//   if s <> nil then
+//   begin
+//     if v <> nil then
+//       s^.ps := @v^.li
+//     else
+//       s^.ps := nil;
+//   end;
+// end;
+
+// procedure verbindere;
+// begin
+//   if v <> nil then
+//     v^.re := s;
+//   if s <> nil then
+//   begin
+//     if v <> nil then
+//       s^.ps := @v^.re
+//     else
+//       s^.ps := nil;
+//   end;
+// end;
+
+// procedure verbindepo;
+// begin
+//   if v <> nil then
+//     v^.po := s;
+//   if s <> nil then
+//     s^.pu := v;
+// end;
+
+// procedure verbindepu;
+// begin
+//   if v <> nil then
+//     v^.pu := s;
+//   if s <> nil then
+//     s^.po := v;
+// end;
+
+// procedure verbindepr;
+// begin
+//   if v <> nil then
+//     v^.pr := s;
+//   if s <> nil then
+//     s^.ne := v;
+// end;
+
+// procedure verbindene;
+// begin
+//   if v <> nil then
+//     v^.ne := s;
+//   if s <> nil then
+//     s^.pr := v;
+// end;
+
+// begin
+//   colmode := False;
+//   drawmode := 1;
+//   randomize;
+//   wurzel[1] := nil;
+//   First[1] := nil;
+//   wurzel[3] := nil;
+//   First[3] := nil;
+//   swurzel := nil;
+//   rand := False;
+// end.

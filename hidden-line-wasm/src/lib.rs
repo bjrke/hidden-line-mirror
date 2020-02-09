@@ -5,6 +5,7 @@ mod line;
 mod mat2;
 mod mat3;
 mod point;
+mod polygon;
 mod svgcontext;
 mod time;
 mod triangle;

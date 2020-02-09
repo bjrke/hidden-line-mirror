@@ -7,15 +7,15 @@ use crate::point::*;
 use crate::vec2::*;
 use crate::vec3::*;
 
-struct dreiecktyp<'a> {
-    p1: &'a point,
-    p2: &'a point,
-    p3: &'a point,
-    l1: Line<'a>,
-    l2: Line<'a>,
-    l3: Line<'a>,
-    gl: u8,
-    cols: Color,
+pub struct dreiecktyp<'a> {
+    pub p1: &'a point,
+    pub p2: &'a point,
+    pub p3: &'a point,
+    pub l1: Line<'a>,
+    pub l2: Line<'a>,
+    pub l3: Line<'a>,
+    pub gl: u8,
+    pub cols: Color,
 }
 
 impl dreiecktyp<'_> {
@@ -149,12 +149,12 @@ impl dreiecktyp<'_> {
 }
 
 pub struct dreieck<'a> {
-    delegate: dreiecktyp<'a>,
-    origPoint1: &'a punkt3d,
-    origPoint2: &'a punkt3d,
-    origPoint3: &'a punkt3d,
-    planeNorm: Vector3,
-    planeDist: Float,
+    pub delegate: dreiecktyp<'a>,
+    pub origPoint1: &'a punkt3d,
+    pub origPoint2: &'a punkt3d,
+    pub origPoint3: &'a punkt3d,
+    pub planeNorm: Vector3,
+    pub planeDist: Float,
 }
 
 impl dreieck<'_> {

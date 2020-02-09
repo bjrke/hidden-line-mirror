@@ -11,6 +11,9 @@ pub struct AppContext<'a> {
     pub BlickR: Vector3,
     pub iv: Vector3,
     pub jv: Vector3,
+    pub colmode: bool,
+    pub drawmode: u8,
+    pub tiefePerspektive: minmax,
 }
 
 //   dliste = object
