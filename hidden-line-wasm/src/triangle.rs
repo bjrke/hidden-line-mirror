@@ -19,6 +19,24 @@ pub struct dreiecktyp<'a> {
 }
 
 impl dreiecktyp<'_> {
+    pub fn l(&self, num: u8) -> &Line {
+        match num {
+            1 => &self.l1,
+            2 => &self.l2,
+            3 => &self.l3,
+            _ => panic!("no line number {}", num),
+        }
+    }
+
+    pub fn p(&self, num: u8) -> &point {
+        match num {
+            1 => self.p1,
+            2 => self.p2,
+            3 => self.p3,
+            _ => panic!("no line number {}", num),
+        }
+    }
+
     pub fn draw1(&self, ctx: &mut dyn DrawContext, c: Color) {
         if self.gl & 1 != 0 {
             self.l1.draw(ctx, c);

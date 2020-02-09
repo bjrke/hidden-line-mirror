@@ -1,6 +1,7 @@
 use crate::appcontext::*;
 use crate::drawcontext::*;
 use crate::float::*;
+use crate::line::*;
 use crate::point::*;
 use crate::triangle::*;
 use crate::vec2::*;
@@ -11,6 +12,8 @@ pub struct polygon<'a> {
     delegate: dreiecktyp<'a>,
     originalTriangle: &'a dreieck<'a>,
     farbe: Color,
+    ymin: Float,
+    ymax: Float,
 }
 
 impl polygon<'_> {
@@ -28,7 +31,39 @@ impl polygon<'_> {
     }
 
     pub fn yscan(&self, xscan: Float) -> Float {
-        xscan
+        let dreiecktyp { p1, p2, p3, .. } = self.delegate;
+        let mut x1 = p1.b.x;
+        let mut y1 = p1.b.y;
+        let mut x2 = p3.b.x;
+        let mut y2 = p3.b.y;
+
+        let miny = y1.min(y2).min(p2.b.y);
+        let maxy = y1.max(y2).max(p2.b.y);
+
+        let mut h;
+        if (x2 - x1).abs() < epsilon1 {
+            h = y1 + y2
+        } else {
+            h = y1 + (y2 - y1) * (xscan - x1) / (x2 - x1);
+            if xscan < p2.b.x {
+                x2 = p2.b.x;
+                y2 = p2.b.y;
+            } else {
+                x1 = p2.b.x;
+                y1 = p2.b.y;
+            }
+            if (x2 - x1).abs() < epsilon1 {
+                h = y1 + y2
+            } else {
+                h = h + y1 + (y2 - y1) * (xscan - x1) / (x2 - x1);
+            }
+        }
+
+        if h < 2.0 * miny || h > 2.0 * maxy {
+            h = miny + maxy;
+        }
+
+        h / 2.0
     }
 
     fn draw4(&self, ctx: &mut dyn DrawContext) {
@@ -145,6 +180,314 @@ impl polygon<'_> {
     }
 }
 
+pub fn polytest(
+    ctx: &AppContext,
+    xscan: Float,
+    p1: &polygon,
+    p2: &polygon,
+    schnitttest: bool,
+    ausgabe: bool,
+) -> u8 {
+    // Inc(zaehl.ptest);
+
+    if p1.ymin - 1.0 > p2.ymax {
+        return 1;
+    }
+
+    if p2.ymin - 1.0 > p1.ymax {
+        return 2;
+    }
+
+    let mut schnitt = false;
+
+    let mut h: Vector2 = Vector2::new(0.0, 0.0);
+
+    let mut v2 = false;
+    let mut v1 = false;
+    let mut test = move |p: &Vector2| {
+        if p1.delegate.punkttest(&h, "polytest.test1", ausgabe) == 0
+            && p2.delegate.punkttest(&h, "polytest.test2", ausgabe) == 0
+        {
+            let d1 = p1.originalTriangle.tiefe(ctx, p);
+            let d2 = p2.originalTriangle.tiefe(ctx, p);
+
+            schnitt = (d1 - d2).abs() > epsilon1;
+
+            if std::ptr::eq(p1.originalTriangle, p2.originalTriangle) {
+                v2 = true;
+            } else {
+                v1 = d1 < d2;
+            }
+
+            if ausgabe {
+                println!("v1: {} v2: {} schnitt: {}", v1, v2, schnitt);
+                println!("p {} d1 {} d2 {} d1-d2 {}", p, d1, d2, d1 - d2);
+            }
+        }
+    };
+
+    if schnitttest && !std::ptr::eq(p1.originalTriangle, p2.originalTriangle) {
+        let mut k = 0;
+
+        let mut i = 1;
+        let mut j = 1;
+        while (k < 6) && (j <= 3) {
+            let p1lj = p1.delegate.l(j);
+            let p2li = p2.delegate.l(i);
+            let interset = intersect(p1lj, p2li);
+            if interset.matched == 1 {
+                h = h.add2d(
+                    &p1lj
+                        .a
+                        .b
+                        .add2d(&p2li.a.b)
+                        .mul2d(1.0 - interset.lambda)
+                        .add2d(&p1lj.e.b.mul2d(interset.lambda)),
+                );
+                k += 1;
+            }
+
+            i += 1;
+            if i == 4 {
+                j += 1;
+                i = 1;
+            }
+        }
+
+        h = h.div2d(2.0);
+
+        i = 1;
+        while
+        /* k < 6 && */
+        i <= 3 {
+            let p1pi = p1.delegate.p(i);
+            let pip = p2.delegate.punkttest(&p1pi.b, "polytest1", ausgabe);
+            if ausgabe {
+                println!("pip3 {}", pip);
+            }
+
+            match pip {
+                0 => {
+                    h = h.add2d(&p1pi.b);
+                    k += 1;
+                }
+                // eckpunkte des oberen, die nur im(nicht auf)unteren sind
+                1 | 2 | 3 => {
+                    let h1 = gleicheseite(
+                        p1pi,
+                        &p2.delegate.l(pip).a,
+                        p2.delegate.p(pip),
+                        p1.delegate.p(i % 3 + 1),
+                    );
+                    let h2 = gleicheseite(
+                        p1pi,
+                        &p2.delegate.l(pip).a,
+                        p2.delegate.p(pip),
+                        p1.delegate.p((i + 1) % 3 + 1),
+                    );
+                    //TODO check epsilon?
+                    if h1 == 1.0 || h2 == 1.0 {
+                        h = h.add2d(&p1pi.b);
+                        k += 1;
+                    }
+                }
+                11 | 12 | 13 => {
+                    let h1 = gleicheseite(
+                        p1pi,
+                        p1.delegate.p(i % 3 + 1),
+                        p2.delegate.p(((pip - 1) % 3) + 1),
+                        p1.delegate.p(((i + 1) % 3) + 1),
+                    );
+                    let h2 = gleicheseite(
+                        p1pi,
+                        p1.delegate.p(((i + 1) % 3) + 1),
+                        p2.delegate.p(((pip - 1) % 3) + 1),
+                        p1.delegate.p(i % 3 + 1),
+                    );
+                    let h3 = gleicheseite(
+                        p1pi,
+                        p1.delegate.p(i % 3 + 1),
+                        p2.delegate.p(pip % 3 + 1),
+                        p1.delegate.p(((i + 1) % 3) + 1),
+                    );
+                    let h4 = gleicheseite(
+                        p1pi,
+                        p1.delegate.p(((i + 1) % 3) + 1),
+                        p2.delegate.p(pip % 3 + 1),
+                        p1.delegate.p(i % 3 + 1),
+                    );
+                    //TODO check epsilon?
+                    if h1 == -1.0 || h2 == -1.0 || h3 == -1.0 || h4 == -1.0 {
+                        h = h.add2d(&p1pi.b);
+                        k += 1;
+                    }
+                }
+                _ => {}
+            }
+
+            i += 1;
+        }
+        i = 1;
+        while
+        /* k < 6 && */
+        i <= 3 {
+            let p2pi = p2.delegate.p(i);
+            let pip = p1.delegate.punkttest(&p2pi.b, "polytest2", ausgabe);
+            if ausgabe {
+                println!("pip4 {}", pip);
+            }
+            match pip {
+                0 => {
+                    h = h.add2d(&p2pi.b);
+                    k += 1;
+                }
+                //eckpunkte des oberen, die nur im(nicht auf)unteren sind
+                1 | 2 | 3 => {
+                    let h1 = gleicheseite(
+                        p2pi,
+                        p1.delegate.l(pip).a,
+                        p1.delegate.p(pip),
+                        p2.delegate.p(i % 3 + 1),
+                    );
+                    let h2 = gleicheseite(
+                        p2pi,
+                        p1.delegate.l(pip).a,
+                        p1.delegate.p(pip),
+                        p2.delegate.p(((i + 1) % 3) + 1),
+                    );
+                    if h1 == 1.0 || h2 == 1.0 {
+                        h = h.add2d(&p2pi.b);
+                        k += 1;
+                    }
+                }
+                11 | 12 | 13 => {
+                    let h1 = gleicheseite(
+                        p2pi,
+                        p2.delegate.p(i % 3 + 1),
+                        p1.delegate.p(((pip - 1) % 3) + 1),
+                        p2.delegate.p(((i + 1) % 3) + 1),
+                    );
+                    let h2 = gleicheseite(
+                        p2pi,
+                        p2.delegate.p(((i + 1) % 3) + 1),
+                        p1.delegate.p(((pip - 1) % 3) + 1),
+                        p2.delegate.p(i % 3 + 1),
+                    );
+                    let h3 = gleicheseite(
+                        p2pi,
+                        p2.delegate.p(i % 3 + 1),
+                        p1.delegate.p(pip % 3 + 1),
+                        p2.delegate.p(((i + 1) % 3) + 1),
+                    );
+                    let h4 = gleicheseite(
+                        p2pi,
+                        p2.delegate.p(((i + 1) % 3) + 1),
+                        p1.delegate.p(pip % 3 + 1),
+                        p2.delegate.p(i % 3 + 1),
+                    );
+                    if h1 == -1.0 || h2 == -1.0 || h3 == -1.0 || h4 == -1.0 {
+                        h = h.add2d(&p2pi.b);
+                        k += 1;
+                    }
+                }
+                _ => {}
+            }
+            i += 1;
+        }
+
+        // {    while (k<6)and(i<=3)do begin
+        //       if p1^.punkttest(p2^.p[i]^.b)=0 then begin
+        //         inc(k,2);
+        //         h[x]:=h[x]+p2^.p[i]^.b[x];
+        //         h[y]:=h[y]+p2^.p[i]^.b[y];
+        //       end;
+        //       inc(i);
+        //     end;}
+
+        if k > 0 {
+            h = h.div2d(k as Float);
+            test(&h);
+        }
+    }
+
+    let p1p1b = &p1.delegate.p1.b;
+    let p1p2b = &p1.delegate.p2.b;
+    let p1p3b = &p1.delegate.p3.b;
+
+    if !schnitt {
+        test(&p1p1b.add2d(p1p2b).add2d(p1p3b).div2d(3.0));
+    }
+
+    let p2p1b = &p2.delegate.p1.b;
+    let p2p2b = &p2.delegate.p2.b;
+    let p2p3b = &p2.delegate.p3.b;
+
+    if !schnitt {
+        test(&p2p1b.add2d(&p2p2b).add2d(p2p3b).div2d(3.0));
+    }
+
+    if !schnitt {
+        test(
+            &p1p1b
+                .add2d(&p1p2b)
+                .add2d(&p1p3b)
+                .add2d(&p2p1b)
+                .add2d(&p2p2b)
+                .add2d(p2p3b)
+                .div2d(6.0),
+        );
+    }
+
+    let result = if v2 {
+        5
+    } else if schnitt {
+        if v1 {
+            3
+        } else {
+            4
+        }
+    } else {
+        let xscanHelp = (p1p1b.x.max(p2p1b.x) + p1p3b.x.min(p2p3b.x)) / 2.0;
+
+        //   if drawmode = 6 then
+        //   begin
+        //     marke(round(bmx + xscanHelp), round(bmy - p1^.yscan(xscanHelp)),
+        //       yellow, 'p1^.yscan');
+        //     marke(round(bmx + xscanHelp), round(bmy - p2^.yscan(xscanHelp)),
+        //       lightmagenta, 'p2^.yscan');
+        //   end;
+
+        if p1.yscan(xscanHelp) > p2.yscan(xscanHelp) {
+            1
+        } else {
+            2
+        }
+    };
+
+    if ausgabe {
+        //     begin
+        //       outint('polytest: ', Result);
+        //       outvector2d('p1^.p[1]^.b', p1^.p[1]^.b);
+        //       outvector2d('p1^.p[2]^.b', p1^.p[2]^.b);
+        //       outvector2d('p1^.p[3]^.b', p1^.p[3]^.b);
+        //       outvector2d('p1^.originalTriangle^.p[1]^.b', p1^.originalTriangle^.p[1]^.b);
+        //       outvector2d('p1^.originalTriangle^.p[2]^.b', p1^.originalTriangle^.p[2]^.b);
+        //       outvector2d('p1^.originalTriangle^.p[3]^.b', p1^.originalTriangle^.p[3]^.b);
+        //       outvector2d('p2^.p[1]^.b', p2^.p[1]^.b);
+        //       outvector2d('p2^.p[2]^.b', p2^.p[2]^.b);
+        //       outvector2d('p2^.p[3]^.b', p2^.p[3]^.b);
+        //       outvector2d('p2^.originalTriangle^.p[1]^.b', p2^.originalTriangle^.p[1]^.b);
+        //       outvector2d('p2^.originalTriangle^.p[2]^.b', p2^.originalTriangle^.p[2]^.b);
+        //       outvector2d('p2^.originalTriangle^.p[3]^.b', p2^.originalTriangle^.p[3]^.b);
+        //       p1^.draw3(1);
+        //       p2^.draw3(2);
+
+        //       readkey;
+    }
+
+    result
+}
+
 // type
 //   punr = 1..3;
 
@@ -163,8 +506,6 @@ impl polygon<'_> {
 
 //     destructor done;
 
-//     function yscan(xscan: float): float;
-//     procedure drawpoly;
 //   end;
 
 // var
@@ -178,7 +519,7 @@ impl polygon<'_> {
 // procedure push(p: ppoly; pnr: punr; c: int);
 // function pop(pnr: punr): ppoly;
 // function del(p: ppoly; pnr: punr): ppoly;
-// function polytest(xscan: float; p1, p2: ppoly; schnitttest, ausgabe: boolean): byte;
+//
 // procedure verbindeso(v, s: ppoly);
 // procedure verbindesu(v, s: ppoly);
 // procedure verbindeli(v, s: ppoly);
@@ -457,310 +798,6 @@ impl polygon<'_> {
 //   p^.pr := nil;
 
 //   exit(p);
-// end;
-
-// function poly.yscan;
-// var
-//   h: float;
-//   miny, maxy, x1, y1, x2, y2: float;
-// begin
-//   x1 := p[1]^.b.x;
-//   y1 := p[1]^.b.y;
-//   x2 := p[3]^.b.x;
-//   y2 := p[3]^.b.y;
-//   if y1 < y2 then
-//   begin
-//     miny := y1;
-//     maxy := y2;
-//   end
-//   else
-//   begin
-//     miny := y2;
-//     maxy := y1;
-//   end;
-//   if maxy < p[2]^.b.y then
-//     maxy := p[2]^.b.y
-//   else if p[2]^.b.y < miny then
-//     miny := p[2]^.b.y;
-//   if abs(x2 - x1) < epsilon1 then
-//     h := (y1 + y2)
-//   else
-//   begin
-//     h := y1 + (y2 - y1) * (xscan - x1) / (x2 - x1);
-//     if xscan < p[2]^.b.x then
-//     begin
-//       x2 := p[2]^.b.x;
-//       y2 := p[2]^.b.y;
-//     end
-//     else
-//     begin
-//       x1 := p[2]^.b.x;
-//       y1 := p[2]^.b.y;
-//     end;
-//     if abs(x2 - x1) < epsilon1 then
-//       h := y1 + y2
-//     else
-//       h := h + y1 + (y2 - y1) * (xscan - x1) / (x2 - x1);
-//   end;
-//   if (h < 2 * miny) or (h > 2 * maxy) then
-//   begin
-//     h := miny + maxy;
-//   end;
-//   exit(h / 2);
-// end;
-
-// function polytest;
-// var
-//   i, j, k: integer;
-//   pip, h1, h2, h3, h4: shortint;
-//   interset: intersectresult;
-//   xscanHelp: float;
-//   h: vector2d;
-//   schnitt, v1, v2: boolean;
-
-//   procedure test(p: vector2d);
-//   var
-//     d1, d2: float;
-//   begin
-//     if (p1^.punkttest(h, 'polytest.test1', ausgabe) = 0) and
-//       (p2^.punkttest(h, 'polytest.test2', ausgabe) = 0) then
-//     begin
-//       d1 := p1^.originalTriangle^.tiefe(p);
-//       d2 := p2^.originalTriangle^.tiefe(p);
-//       schnitt := abs(d1 - d2) > epsilon1;
-//       if p1^.originalTriangle = p2^.originalTriangle then
-//       begin
-//         v2 := True;
-//       end
-//       else
-//         v1 := d1 < d2;
-//       if ausgabe then
-//       begin
-//         outstring('v1:' + BoolToStr(v1) + 'v2:' + BoolToStr(v2) +
-//           ' schnitt:' + BoolToStr(schnitt));
-//         outvector2d('p', p);
-//         outfloat('d1', d1);
-//         outfloat('d2', d2);
-//         outfloat('d1-d2', d1 - d2);
-//       end;
-//     end;
-//   end;
-
-//   procedure addpl(v: vector2d);
-//   begin
-//     h := h.add2d(v);
-//     Inc(k);
-//   end;
-
-//   function outputPolyTest(Result: byte): byte;
-//   begin
-//     if ausgabe then
-//     begin
-//       outint('polytest: ', Result);
-//       outvector2d('p1^.p[1]^.b', p1^.p[1]^.b);
-//       outvector2d('p1^.p[2]^.b', p1^.p[2]^.b);
-//       outvector2d('p1^.p[3]^.b', p1^.p[3]^.b);
-//       outvector2d('p1^.originalTriangle^.p[1]^.b', p1^.originalTriangle^.p[1]^.b);
-//       outvector2d('p1^.originalTriangle^.p[2]^.b', p1^.originalTriangle^.p[2]^.b);
-//       outvector2d('p1^.originalTriangle^.p[3]^.b', p1^.originalTriangle^.p[3]^.b);
-//       outvector2d('p2^.p[1]^.b', p2^.p[1]^.b);
-//       outvector2d('p2^.p[2]^.b', p2^.p[2]^.b);
-//       outvector2d('p2^.p[3]^.b', p2^.p[3]^.b);
-//       outvector2d('p2^.originalTriangle^.p[1]^.b', p2^.originalTriangle^.p[1]^.b);
-//       outvector2d('p2^.originalTriangle^.p[2]^.b', p2^.originalTriangle^.p[2]^.b);
-//       outvector2d('p2^.originalTriangle^.p[3]^.b', p2^.originalTriangle^.p[3]^.b);
-//       p1^.draw3(1);
-//       p2^.draw3(2);
-
-//       readkey;
-//     end;
-//     exit(Result);
-//   end;
-
-// begin
-//   Inc(zaehl.ptest);
-//   if p1^.ymin - 1 > p2^.ymax then
-//     exit(1);
-
-//   if p2^.ymin - 1 > p1^.ymax then
-//     exit(2);
-
-//   schnitt := False;
-//   v2 := False;
-//   v1 := False;
-//   if schnitttest and (p1^.originalTriangle <> p2^.originalTriangle) then
-//   begin
-//     k := 0;
-//     h.init(0, 0);
-//     i := 1;
-//     j := 1;
-//     while (k < 6) and (j <= 3) do
-//     begin
-//       interset := linien.intersect(p1^.l[j], p2^.l[i]);
-//       if interset.match = 1 then
-//       begin
-//         h.x := h.x + p1^.l[j].a^.b.x + interset.lambda *
-//           (p1^.l[j].e^.b.x - p1^.l[j].a^.b.x) + p2^.l[i].a^.b.x +
-//           interset.mue * (p2^.l[i].e^.b.x - p2^.l[i].a^.b.x);
-//         h.y := h.y + p1^.l[j].a^.b.y + interset.lambda *
-//           (p1^.l[j].e^.b.y - p1^.l[j].a^.b.y) + p2^.l[i].a^.b.y +
-//           interset.mue * (p2^.l[i].e^.b.y - p2^.l[i].a^.b.y);
-//         Inc(k);
-//       end;
-//       Inc(i);
-//       if i = 4 then
-//       begin
-//         Inc(j);
-//         i := 1;
-//       end;
-//     end;
-
-//     h := h.div2d(2);
-
-//     i := 1;
-//     while {(k<6)and}(i <= 3) do
-//     begin
-//       pip := p2^.punkttest(p1^.p[i]^.b, 'polytest1', ausgabe);
-//       if (ausgabe) then
-//         outint('pip3 ', pip);
-//       case pip of
-//         0: addpl(p1^.p[i]^.b);
-//         {eckpunkte des oberen, die nur im(nicht auf)unteren sind}
-//         1..3:
-//         begin
-//           h1 := gleicheseite(p1^.p[i]^, p2^.l[pip].a^, p2^.p[pip]^,
-//             p1^.p[(i mod 3) + 1]^);
-//           h2 := gleicheseite(p1^.p[i]^, p2^.l[pip].a^, p2^.p[pip]^,
-//             p1^.p[((i + 1) mod 3) + 1]^);
-//           if (h1 = 1) or (h2 = 1) then
-//             addpl(p1^.p[i]^.b);
-//         end;
-//         11..13:
-//         begin
-//           h1 := gleicheseite(p1^.p[i]^, p1^.p[(i mod 3) + 1]^,
-//             p2^.p[((pip - 1) mod 3) + 1]^, p1^.p[((i + 1) mod 3) + 1]^);
-//           h2 := gleicheseite(p1^.p[i]^, p1^.p[((i + 1) mod 3) + 1]^,
-//             p2^.p[((pip - 1) mod 3) + 1]^, p1^.p[(i mod 3) + 1]^);
-//           h3 := gleicheseite(p1^.p[i]^, p1^.p[(i mod 3) + 1]^,
-//             p2^.p[(pip mod 3) + 1]^, p1^.p[((i + 1) mod 3) + 1]^);
-//           h4 := gleicheseite(p1^.p[i]^, p1^.p[((i + 1) mod 3) + 1]^,
-//             p2^.p[(pip mod 3) + 1]^, p1^.p[(i mod 3) + 1]^);
-//           if (h1 = -1) or (h2 = -1) or (h3 = -1) or (h4 = -1) then
-//             addpl(p1^.p[i]^.b);
-//         end
-//         else
-//       end;
-//       Inc(i);
-//     end;
-//     i := 1;
-//     while {(k<6)and}(i <= 3) do
-//     begin
-//       pip := p1^.punkttest(p2^.p[i]^.b, 'polytest2', ausgabe);
-//       if (ausgabe) then
-//         outint('pip4 ', pip);
-//       case pip of
-//         0: addpl(p2^.p[i]^.b);
-//         {eckpunkte des oberen, die nur im(nicht auf)unteren sind}
-//         1..3:
-//         begin
-//           h1 := gleicheseite(p2^.p[i]^, p1^.l[pip].a^, p1^.p[pip]^,
-//             p2^.p[(i mod 3) + 1]^);
-//           h2 := gleicheseite(p2^.p[i]^, p1^.l[pip].a^, p1^.p[pip]^,
-//             p2^.p[((i + 1) mod 3) + 1]^);
-//           if (h1 = 1) or (h2 = 1) then
-//             addpl(p2^.p[i]^.b);
-//         end;
-//         11..13:
-//         begin
-//           h1 := gleicheseite(p2^.p[i]^, p2^.p[(i mod 3) + 1]^,
-//             p1^.p[((pip - 1) mod 3) + 1]^, p2^.p[((i + 1) mod 3) + 1]^);
-//           h2 := gleicheseite(p2^.p[i]^, p2^.p[((i + 1) mod 3) + 1]^,
-//             p1^.p[((pip - 1) mod 3) + 1]^, p2^.p[(i mod 3) + 1]^);
-//           h3 := gleicheseite(p2^.p[i]^, p2^.p[(i mod 3) + 1]^,
-//             p1^.p[(pip mod 3) + 1]^, p2^.p[((i + 1) mod 3) + 1]^);
-//           h4 := gleicheseite(p2^.p[i]^, p2^.p[((i + 1) mod 3) + 1]^,
-//             p1^.p[(pip mod 3) + 1]^, p2^.p[(i mod 3) + 1]^);
-//           if (h1 = -1) or (h2 = -1) or (h3 = -1) or (h4 = -1) then
-//             addpl(p2^.p[i]^.b);
-//         end
-//         else
-//       end;
-//       Inc(i);
-//     end;
-// {    while (k<6)and(i<=3)do begin
-//       if p1^.punkttest(p2^.p[i]^.b)=0 then begin
-//         inc(k,2);
-//         h[x]:=h[x]+p2^.p[i]^.b[x];
-//         h[y]:=h[y]+p2^.p[i]^.b[y];
-//       end;
-//       inc(i);
-//     end;}
-//     if k > 0 then
-//     begin
-//       h := h.div2d(k);
-
-//       test(h);
-
-//     end;
-//   end;
-
-//   if not schnitt then
-//   begin
-//     h.x := (p1^.p[1]^.b.x + p1^.p[2]^.b.x + p1^.p[3]^.b.x) / 3;
-//     h.y := (p1^.p[1]^.b.y + p1^.p[2]^.b.y + p1^.p[3]^.b.y) / 3;
-//     test(h);
-//   end;
-
-//   if not schnitt then
-//   begin
-//     h.x := (p2^.p[1]^.b.x + p2^.p[2]^.b.x + p2^.p[3]^.b.x) / 3;
-//     h.y := (p2^.p[1]^.b.y + p2^.p[2]^.b.y + p2^.p[3]^.b.y) / 3;
-//     test(h);
-//   end;
-
-//   if not schnitt then
-//   begin
-//     h.x := (p1^.p[1]^.b.x + p1^.p[2]^.b.x + p1^.p[3]^.b.x + p2^.p[1]^.b.x +
-//       p2^.p[2]^.b.x + p2^.p[3]^.b.x) / 6;
-//     h.y := (p1^.p[1]^.b.y + p1^.p[2]^.b.y + p1^.p[3]^.b.y + p2^.p[1]^.b.y +
-//       p2^.p[2]^.b.y + p2^.p[3]^.b.y) / 6;
-//     test(h);
-//   end;
-
-//   if v2 then
-//     exit(outputPolyTest(5));
-
-//   if schnitt then
-//   begin
-//     if v1 then
-//       exit(outputPolyTest(3))
-//     else
-//       exit(outputPolyTest(4));
-//   end;
-
-//   if p1^.p[1]^.b.x < p2^.p[1]^.b.x then
-//     xscanHelp := p2^.p[1]^.b.x
-//   else
-//     xscanHelp := p1^.p[1]^.b.x;
-
-//   if p1^.p[3]^.b.x > p2^.p[3]^.b.x then
-//     xscanHelp := (xscanHelp + p2^.p[3]^.b.x) / 2
-//   else
-//     xscanHelp := (xscanHelp + p1^.p[3]^.b.x) / 2;
-
-//   if drawmode = 6 then
-//   begin
-//     marke(round(bmx + xscanHelp), round(bmy - p1^.yscan(xscanHelp)),
-//       yellow, 'p1^.yscan');
-//     marke(round(bmx + xscanHelp), round(bmy - p2^.yscan(xscanHelp)),
-//       lightmagenta, 'p2^.yscan');
-//   end;
-
-//   if p1^.yscan(xscanHelp) > p2^.yscan(xscanHelp) then
-//     exit(outputPolyTest(1))
-//   else
-//     exit(outputPolyTest(2));
-
 // end;
 
 // procedure verbindeso;
