@@ -22,12 +22,92 @@ impl polygon<'_> {
         p2: &point,
         p3: &point,
         ls: u8,
-        aOriginalTriangle: &dreieck,
+        originalTriangle: &'a dreieck,
     ) -> polygon<'a> {
-        panic!()
+        //   zaehl.polygons.ins;
+
+        let mut p1 = p1.copy();
+        let mut p2 = p2.copy();
+        let mut p3 = p3.copy();
+
+        let gl = ls;
+
+        if p1.b.x > p2.b.x {
+            let h = p2;
+            p2 = p1;
+            p1 = h;
+            let mut glneu = 0;
+            if gl & 1 != 0 {
+                glneu += 2;
+            }
+            if gl & 2 != 0 {
+                glneu += 1;
+            }
+            gl = glneu + gl & 4;
+        }
+
+        if p1.b.x > p3.b.x {
+            let h = p3;
+            p3 = p1;
+            p1 = h;
+            let mut glneu = 0;
+            if gl & 1 != 0 {
+                glneu += 4;
+            }
+            if gl & 4 != 0 {
+                glneu += 1;
+            }
+            gl = glneu + gl & 2;
+        }
+
+        if p2.b.x > p3.b.x {
+            let h = p3;
+            p3 = p2;
+            p2 = h;
+            let glneu = 0;
+            if gl & 2 != 0 {
+                glneu += 4;
+            }
+            if gl & 4 != 0 {
+                glneu += 2;
+            }
+            gl = glneu + gl & 1;
+        }
+
+        polygon {
+            delegate: dreiecktyp {
+                p1: &p1,
+                p2: &p2,
+                p3: &p3,
+                l1: Line::new(&p2, &p3),
+                l2: Line::new(&p3, &p1),
+                l3: Line::new(&p1, &p2),
+                gl,
+                cols: 15,
+            },
+            farbe: 15,
+            originalTriangle,
+            ymin: p1.b.y.min(p2.b.y).min(p3.b.y),
+            ymax: p1.b.y.max(p2.b.y).max(p3.b.y),
+        }
     }
-    pub fn newpoly<'a>(aOriginalTriangle: &dreieck) -> polygon<'a> {
-        panic!()
+    pub fn newpoly<'a>(aOriginalTriangle: &'a dreieck) -> polygon<'a> {
+        //   if ((drawmode = 7) or (drawmode = 9)) then
+        //   begin
+        //     let c := aOriginalTriangle^.origPoints[1]^.o.sub3d(aOriginalTriangle^.origPoints[2]^.o)
+        //       .kreuz(aOriginalTriangle^.origPoints[3]^.o.sub3d(
+        //       aOriginalTriangle^.origPoints[2]^.o));
+        //     let faktor := (BlickR.invBetrag3d * c.invBetrag3d);
+        //     aOriginalTriangle^.cols := calcColor(abs(BlickR.skalar(c) * faktor));
+        //   end;
+
+        polygon::initpoly(
+            aOriginalTriangle.delegate.p1,
+            aOriginalTriangle.delegate.p2,
+            aOriginalTriangle.delegate.p3,
+            aOriginalTriangle.delegate.gl,
+            aOriginalTriangle,
+        )
     }
 
     pub fn yscan(&self, xscan: Float) -> Float {
@@ -542,112 +622,6 @@ pub fn polytest(
 //     else
 //       outstring('p[i]=nil');
 //   zaehl.polygons.del;
-// end;
-
-// constructor poly.initpoly;
-// var
-//   h: ppunkt;
-//   lsneu: lset;
-
-// begin
-//   zaehl.polygons.ins;
-
-//   if p1 = nil then
-//     outstring('p1=nil');
-//   if p2 = nil then
-//     outstring('p2=nil');
-//   if p3 = nil then
-//     outstring('p3=nil');
-
-//   p[1] := p1^.copy;
-//   p[2] := p2^.copy;
-//   p[3] := p3^.copy;
-
-//   if p[1]^.b.x > p[2]^.b.x then
-//   begin
-//     h := p[2];
-//     p[2] := p[1];
-//     p[1] := h;
-//     lsneu := [];
-//     if 1 in ls then
-//       lsneu := lsneu + [2];
-//     if 2 in ls then
-//       lsneu := lsneu + [1];
-//     if 3 in ls then
-//       lsneu := lsneu + [3];
-//     ls := lsneu;
-//   end;
-
-//   if p[1]^.b.x > p[3]^.b.x then
-//   begin
-//     h := p[3];
-//     p[3] := p[1];
-//     p[1] := h;
-//     lsneu := [];
-//     if 1 in ls then
-//       lsneu := lsneu + [3];
-//     if 2 in ls then
-//       lsneu := lsneu + [2];
-//     if 3 in ls then
-//       lsneu := lsneu + [1];
-//     ls := lsneu;
-//   end;
-
-//   if p[2]^.b.x > p[3]^.b.x then
-//   begin
-//     h := p[3];
-//     p[3] := p[2];
-//     p[2] := h;
-//     lsneu := [];
-//     if 1 in ls then
-//       lsneu := lsneu + [1];
-//     if 2 in ls then
-//       lsneu := lsneu + [3];
-//     if 3 in ls then
-//       lsneu := lsneu + [2];
-//     ls := lsneu;
-//   end;
-
-//   gl := ls;
-
-//   l[1].init(p[2], p[3]);
-//   l[2].init(p[3], p[1]);
-//   l[3].init(p[1], p[2]);
-
-//   originalTriangle := aOriginalTriangle;
-//   cols := green;
-
-//   ymin := p[1]^.b.y;
-//   ymax := p[1]^.b.y;
-
-//   if p[2]^.b.y < ymin then
-//     ymin := p[2]^.b.y
-//   else if p[2]^.b.y > ymax then
-//     ymax := p[2]^.b.y;
-
-//   if p[3]^.b.y < ymin then
-//     ymin := p[3]^.b.y
-//   else if p[3]^.b.y > ymax then
-//     ymax := p[3]^.b.y;
-// end;
-
-// constructor poly.newpoly;
-// var
-//   c: vector3d;
-//   faktor: float;
-// begin
-
-//   if ((drawmode = 7) or (drawmode = 9)) then
-//   begin
-//     c := aOriginalTriangle^.origPoints[1]^.o.sub3d(aOriginalTriangle^.origPoints[2]^.o)
-//       .kreuz(aOriginalTriangle^.origPoints[3]^.o.sub3d(
-//       aOriginalTriangle^.origPoints[2]^.o));
-//     faktor := (BlickR.invBetrag3d * c.invBetrag3d);
-//     aOriginalTriangle^.cols := calcColor(abs(BlickR.skalar(c) * faktor));
-//   end;
-
-//   initpoly(aOriginalTriangle^.p[1], aOriginalTriangle^.p[2],
-//     aOriginalTriangle^.p[3], aOriginalTriangle^.gl, aOriginalTriangle);
 // end;
 
 // procedure push;

@@ -8,8 +8,6 @@ pub struct point {
   pub gz: u8,
 }
 
-type punkt = point;
-
 impl point {
   pub fn new0() -> point {
     point::new(Vector2::new(0.0, 0.0), 0)
@@ -22,6 +20,13 @@ impl point {
 
   pub fn draw(&self, ctx: &mut dyn DrawContext, c: Color) {
     ctx.circle(self.b.x, -self.b.y, 2.0, c);
+  }
+
+  pub fn copy(&self) -> point {
+    point {
+      b: self.b,
+      gz: self.gz,
+    }
   }
 }
 
