@@ -14,6 +14,7 @@ pub struct AppContext<'a> {
     pub colmode: bool,
     pub drawmode: u8,
     pub tiefePerspektive: minmax,
+    pub ausgabeInsert: bool,
 }
 
 //   dliste = object

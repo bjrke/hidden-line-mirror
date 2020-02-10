@@ -9,11 +9,11 @@ use crate::vec2::*;
 use rand::Rng;
 
 pub struct polygon<'a> {
-    delegate: dreiecktyp<'a>,
-    originalTriangle: &'a dreieck<'a>,
-    farbe: Color,
-    ymin: Float,
-    ymax: Float,
+    pub delegate: dreiecktyp<'a>,
+    pub originalTriangle: &'a dreieck<'a>,
+    pub farbe: Color,
+    pub ymin: Float,
+    pub ymax: Float,
 }
 
 impl polygon<'_> {

@@ -10,10 +10,10 @@ pub struct point {
 
 impl point {
   pub fn new0() -> point {
-    point::new(Vector2::new(0.0, 0.0), 0)
+    point::new(&Vector2::new(0.0, 0.0), 0)
   }
-  pub fn new(bv: Vector2, ls: u8) -> point {
-    point { b: bv, gz: ls }
+  pub fn new(bv: &Vector2, ls: u8) -> point {
+    point { b: *bv, gz: ls }
   }
 
   pub fn done() {}
