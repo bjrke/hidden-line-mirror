@@ -18,60 +18,61 @@ pub struct polygon<'a> {
 
 impl polygon<'_> {
     pub fn initpoly<'a>(
-        p1: &point,
-        p2: &point,
-        p3: &point,
+        p1: &'a point,
+        p2: &'a point,
+        p3: &'a point,
         ls: u8,
         originalTriangle: &'a dreieck,
     ) -> polygon<'a> {
         //   zaehl.polygons.ins;
 
-        let mut p1 = p1.copy();
-        let mut p2 = p2.copy();
-        let mut p3 = p3.copy();
+        //TODO copy?
+        let mut p1 = p1;
+        let mut p2 = p2;
+        let mut p3 = p3;
 
-        let gl = ls;
+        let mut gl = ls;
 
         if p1.b.x > p2.b.x {
             let h = p2;
             p2 = p1;
             p1 = h;
-            let mut glneu = 0;
+            let mut glneu = gl & 4;
             if gl & 1 != 0 {
                 glneu += 2;
             }
             if gl & 2 != 0 {
                 glneu += 1;
             }
-            gl = glneu + gl & 4;
+            gl = glneu;
         }
 
         if p1.b.x > p3.b.x {
             let h = p3;
             p3 = p1;
             p1 = h;
-            let mut glneu = 0;
+            let mut glneu = gl & 2;
             if gl & 1 != 0 {
                 glneu += 4;
             }
             if gl & 4 != 0 {
                 glneu += 1;
             }
-            gl = glneu + gl & 2;
+            gl = glneu;
         }
 
         if p2.b.x > p3.b.x {
             let h = p3;
             p3 = p2;
             p2 = h;
-            let glneu = 0;
+            let mut glneu = gl & 1;
             if gl & 2 != 0 {
                 glneu += 4;
             }
             if gl & 4 != 0 {
                 glneu += 2;
             }
-            gl = glneu + gl & 1;
+            gl = glneu;
         }
 
         polygon {

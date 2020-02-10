@@ -31,7 +31,7 @@ impl point {
 }
 
 pub struct punkt3d {
-  pub b: punkt,
+  pub b: point,
   pub o: Vector3,
 }
 
