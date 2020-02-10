@@ -1,5 +1,6 @@
 mod appcontext;
 mod drawcontext;
+mod dreidext;
 mod float;
 mod line;
 mod mat2;
@@ -12,7 +13,6 @@ mod time;
 mod triangle;
 mod vec2;
 mod vec3;
-
 use wasm_bindgen::prelude::*;
 
 #[cfg(feature = "wee_alloc")]

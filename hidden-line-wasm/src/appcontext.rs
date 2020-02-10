@@ -1,3 +1,5 @@
+use crate::float::*;
+use crate::point::*;
 use crate::time::*;
 use crate::triangle::*;
 use crate::vec3::*;
@@ -17,9 +19,28 @@ pub struct AppContext<'a> {
     pub ausgabeInsert: bool,
 }
 
+pub struct Scene<'a> {
+    points: Vec<Box<punkt3d>>,
+
+    dreiecks: Vec<dreieck<'a>>,
+}
+
+impl<'a> Scene<'a> {
+    pub fn addo(&mut self, x: Float, y: Float, z: Float) -> usize {
+        let p = Box::new(punkt3d::new(x, y, z));
+        self.points.push(p);
+        self.points.len()
+    }
+
+    pub fn add(&'a mut self, p1: usize, p2: usize, p3: usize, ls: u8) -> usize {
+        let d = dreieck::new(&self.points[p1], &self.points[p2], &self.points[p3], ls);
+        self.dreiecks.push(d);
+        self.dreiecks.len()
+    }
+}
+
 //   dliste = object
 //   public
-//     function add(p1, p2, p3: ppunkt3d; ls: lset): pdreieck;
 //     function First: pdreieck;
 //     function Next: pdreieck;
 //     constructor init;
