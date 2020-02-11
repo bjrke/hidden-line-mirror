@@ -42,89 +42,98 @@ impl TriFan {
         self.Last
     }
 
-    pub fn done<'a>(&self, scene: &'a mut Scene<'a>) -> usize {
+    pub fn done<'a>(&self, scene: &'a mut Scene<'a>) {
         scene.add(self.Center, self.Last, self.First, 7)
     }
 }
 
-//   TriStrip = object
-//     l1, l2: ppunkt3d;
-//     w: boolean;
-//     constructor Init(cx, cy, cz, ax, ay, az, bx, by, bz: float);
-//     destructor done;
-//     function add(ax, ay, az: float): ppunkt3d;
-//   end;
+struct TriStrip {
+    l1: usize,
+    l2: usize,
+    w: bool,
+}
 
-//   QuadStrip = object
-//     l1, l2: ppunkt3d;
-//     constructor Init(ax, ay, az, bx, by, bz, dx, dy, dz, cx, cy, cz: float);
-//     procedure add(bx, by, bz, ax, ay, az: float);
-//     destructor done;
-//   end;
+impl TriStrip {
+    pub fn Init<'a>(
+        scene: &'a mut Scene<'a>,
+        cx: Float,
+        cy: Float,
+        cz: Float,
+        ax: Float,
+        ay: Float,
+        az: Float,
+        bx: Float,
+        by: Float,
+        bz: Float,
+    ) -> TriStrip {
+        let l1 = scene.addo(ax, ay, az);
+        let l2 = scene.addo(bx, by, bz);
+        let c = scene.addo(cx, cy, cz);
+        scene.add(c, l1, l2, 7);
+        TriStrip { l1, l2, w: true }
+    }
+
+    pub fn add<'a>(&mut self, scene: &'a mut Scene<'a>, ax: Float, ay: Float, az: Float) -> usize {
+        let help = scene.addo(ax, ay, az);
+        if self.w {
+            scene.add(self.l1, help, self.l2, 7);
+        } else {
+            scene.add(self.l1, self.l2, help, 7);
+        }
+        self.w = !self.w;
+
+        self.l1 = self.l2;
+        self.l2 = help;
+        self.l2
+    }
+}
+
+struct QuadStrip {
+    l1: usize,
+    l2: usize,
+}
+
+impl QuadStrip {
+    pub fn Init<'a>(
+        scene: &'a mut Scene<'a>,
+        ax: Float,
+        ay: Float,
+        az: Float,
+
+        bx: Float,
+        by: Float,
+        bz: Float,
+    ) -> QuadStrip {
+        let h = scene.addo(ax, ay, az);
+        let b = scene.addo(bx, by, bz);
+        QuadStrip { l1: b, l2: h }
+    }
+
+    pub fn add<'a>(
+        &mut self,
+        scene: &'a mut Scene<'a>,
+        bx: Float,
+        by: Float,
+        bz: Float,
+        ax: Float,
+        ay: Float,
+        az: Float,
+    ) {
+        let h1 = scene.addo(ax, ay, az);
+        let h2 = scene.addo(bx, by, bz);
+
+        scene.quad(self.l2, self.l1, h1, h2);
+
+        self.l1 = h1;
+        self.l2 = h2;
+    }
+}
 
 // procedure tetraeder(ax, ay, az, bx, by, bz, cx, cy, cz, dx, dy, dz: float);
 // procedure kugel(mx, my, mz, r: float; l, b: int);
 // procedure kegel(mx, my, mz, r1x, r1y, r1z, r2x, r2y, r2z, hx, hy, hz: float; b: int);
 // procedure cube(ex, ey, ez, ax, ay, az, bx, by, bz, cx, cy, cz: float);
 // procedure triangle(ax, ay, az, bx, by, bz, cx, cy, cz: float);
-
-// implementation
-
-// constructor TriStrip.Init;
-// begin
-//   l1 := points^.addo(ax, ay, az);
-//   l2 := points^.addo(bx, by, bz);
-//   dreiecks.add(points^.addo(cx, cy, cz), l1, l2, [1, 2, 3]);
-//   w := True;
-// end;
-
-// destructor TriStrip.done;
-// begin
-// end;
-
-// function TriStrip.add;
-// var
-//   help: ppunkt3d;
-// begin
-//   help := points^.addo(ax, ay, az);
-//   if w then
-//     dreiecks.add(l1, help, l2, [1, 2, 3])
-//   else
-//     dreiecks.add(l1, l2, help, [1, 2, 3]);
-//   w := not w;
-//   l1 := l2;
-//   l2 := help;
-//   exit(l2);
-// end;
-
-// constructor QuadStrip.Init;
-// var
-//   h: ppunkt3d;
-// begin
-//   h := points^.addo(ax, ay, az);
-//   l1 := points^.addo(cx, cy, cz);
-//   l2 := points^.addo(dx, dy, dz);
-//   dreiecks.add(h, points^.addo(bx, by, bz), l1, [1, 3]);
-//   dreiecks.add(h, l1, l2, [1, 2]);
-// end;
-
-// destructor QuadStrip.done;
-// begin
-// end;
-
-// procedure QuadStrip.add;
-// var
-//   h1, h2: ppunkt3d;
-// begin
-//   h1 := points^.addo(ax, ay, az);
-//   h2 := points^.addo(bx, by, bz);
-
-//   dreiecks.add(l2, l1, h1, [1, 3]);
-//   dreiecks.add(l2, h1, h2, [1, 2]);
-
-//   l1 := h1;
-//   l2 := h2;
-// end;
 
 // procedure tetraeder;
 // var
