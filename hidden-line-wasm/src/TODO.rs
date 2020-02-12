@@ -1,10 +1,8 @@
 /*
 
 
-polyswee.pas
-dreidext.pas
+
 dreidplot.pas
-projekt.pas
 
 
 

@@ -5,6 +5,7 @@ mod float;
 mod line;
 mod mat2;
 mod mat3;
+mod plot;
 mod point;
 mod polygon;
 mod polysweep;
@@ -13,6 +14,7 @@ mod time;
 mod triangle;
 mod vec2;
 mod vec3;
+
 use wasm_bindgen::prelude::*;
 
 #[cfg(feature = "wee_alloc")]
