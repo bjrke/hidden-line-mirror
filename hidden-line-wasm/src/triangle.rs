@@ -153,7 +153,7 @@ impl dreiecktyp {
         }
     }
     pub fn flaechentest(&self) -> bool {
-        colinear(&self.p1.b, &self.p2.b, &self.p3.b)
+        !colinear(&self.p1.b, &self.p2.b, &self.p3.b)
     }
 }
 

@@ -5,16 +5,33 @@ use crate::vec2::*;
 pub struct SvgContext {
     svg: web_sys::SvgElement,
     document: web_sys::Document,
+    scale: Float,
 }
 
 impl SvgContext {
     pub fn new(svg: web_sys::SvgElement) -> SvgContext {
         let document = svg.owner_document().unwrap();
-        SvgContext { svg, document }
+        SvgContext {
+            svg,
+            document,
+            scale: 1000.0,
+        }
     }
 
     pub fn append(&mut self, element: web_sys::Element) {
         self.svg.append_child(&element).unwrap();
+    }
+
+    pub fn scale(&self, f: Float) -> String {
+        (self.scale * f).to_string()
+    }
+
+    pub fn scale_x(&self, f: Float) -> String {
+        self.scale(f)
+    }
+
+    pub fn scale_y(&self, f: Float) -> String {
+        self.scale(-f)
     }
 }
 
@@ -24,9 +41,9 @@ impl DrawContext for SvgContext {
             .document
             .create_element_ns(Some("http://www.w3.org/2000/svg"), "circle")
             .unwrap();
-        circle.set_attribute("cx", &x.to_string()).unwrap();
-        circle.set_attribute("cy", &y.to_string()).unwrap();
-        circle.set_attribute("r", &r.to_string()).unwrap();
+        circle.set_attribute("cx", &self.scale_x(x)).unwrap();
+        circle.set_attribute("cy", &self.scale_y(y)).unwrap();
+        circle.set_attribute("r", &self.scale(r)).unwrap();
         circle.set_attribute("fill", &htmlColor(c)).unwrap();
         self.append(circle);
     }
@@ -36,10 +53,10 @@ impl DrawContext for SvgContext {
             .document
             .create_element_ns(Some("http://www.w3.org/2000/svg"), "line")
             .unwrap();
-        line.set_attribute("x1", &xa.to_string()).unwrap();
-        line.set_attribute("y1", &ya.to_string()).unwrap();
-        line.set_attribute("x2", &xe.to_string()).unwrap();
-        line.set_attribute("y2", &ye.to_string()).unwrap();
+        line.set_attribute("x1", &self.scale_x(xa)).unwrap();
+        line.set_attribute("y1", &self.scale_y(ya)).unwrap();
+        line.set_attribute("x2", &self.scale_x(xe)).unwrap();
+        line.set_attribute("y2", &self.scale_y(ye)).unwrap();
         line.set_attribute("stroke", &htmlColor(c)).unwrap();
         self.append(line);
     }
@@ -52,7 +69,7 @@ impl DrawContext for SvgContext {
 
         let points: Vec<String> = coordinates
             .iter()
-            .map(|p| format!("{},{}", p.x, p.y))
+            .map(|p| format!("{},{}", self.scale_x(p.x), self.scale_y(p.y)))
             .collect();
 
         polygon.set_attribute("points", &points.join(" ")).unwrap();
@@ -65,8 +82,8 @@ impl DrawContext for SvgContext {
             .document
             .create_element_ns(Some("http://www.w3.org/2000/svg"), "rect")
             .unwrap();
-        rect.set_attribute("x", &x.to_string()).unwrap();
-        rect.set_attribute("y", &y.to_string()).unwrap();
+        rect.set_attribute("x", &self.scale_x(x as Float)).unwrap();
+        rect.set_attribute("y", &self.scale_y(y as Float)).unwrap();
         rect.set_attribute("width", "1").unwrap();
         rect.set_attribute("height", "1").unwrap();
         rect.set_attribute("fill", &htmlColor(c)).unwrap();

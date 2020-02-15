@@ -36,12 +36,12 @@ impl SceneBuilder {
 
     pub fn push(&mut self, p: Vector3) -> usize {
         self.points.push(p);
-        self.points.len()
+        self.points.len() - 1
     }
 
     pub fn triangle(&mut self, p1: usize, p2: usize, p3: usize, lset: u8) -> usize {
         self.triangles.push(Triangle { p1, p2, p3, lset });
-        self.triangles.len()
+        self.triangles.len() - 1
     }
 
     pub fn quad(&mut self, p1: usize, p2: usize, p3: usize, p4: usize) {

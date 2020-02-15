@@ -4,7 +4,7 @@ use crate::dreidext::*;
 use crate::float::*;
 use crate::time::*;
 use crate::vec3::*;
-use std::time::SystemTime;
+// use std::time::SystemTime;
 
 // program dreidplot;
 // uses ptccrt, ptcgraph, vector, dreidext, projekt, dreiecke, polyswee, polygon,
@@ -119,7 +119,7 @@ pub fn init() -> AppContext {
         iv: Vector3::new(1.0, 0.0, 0.0),
         jv: Vector3::new(0.0, 0.0, 1.0),
         backface: true,
-        drawmode: 1,
+        drawmode: 7,
         ausgabeInsert: false,
         colmode: false,
         zaehl: ctyp::init(),
@@ -137,9 +137,9 @@ pub fn darstellung(ctx: &mut dyn DrawContext, appCtx: &mut AppContext) {
     println!("BlickR: {}", appCtx.BlickR);
     println!("Oben x 10000: {}", appCtx.jv.mul3d(10000.0));
 
-    let start = SystemTime::now();
+    // let start = SystemTime::now();
     //   sweep;
-    println!("Zeit: {}", start.elapsed().unwrap().as_secs());
+    // println!("Zeit: {}", start.elapsed().unwrap().as_secs());
     appCtx.zaehl.ausgabe();
 
     //TODO
