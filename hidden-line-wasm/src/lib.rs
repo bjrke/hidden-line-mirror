@@ -36,11 +36,9 @@ pub fn main_js() -> Result<(), JsValue> {
 #[wasm_bindgen]
 pub fn lets_go(svg: web_sys::SvgElement) -> HiddenLine {
     svg.set_attribute("viewBox", "-128 -128 256 256").unwrap();
-    let mut svgcontext = SvgContext::new(svg);
-
     let mut result = HiddenLine {
         radius: 100.0,
-        svgcontext,
+        svgcontext: SvgContext::new(svg),
     };
 
     result.draw();
