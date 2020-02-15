@@ -5,25 +5,25 @@ use crate::line::*;
 use crate::point::*;
 use crate::triangle::*;
 use crate::vec2::*;
-
 use rand::Rng;
+use std::rc::Rc;
 
-pub struct polygon<'a> {
+pub struct polygon {
     pub delegate: dreiecktyp,
-    pub originalTriangle: &'a dreieck,
+    pub originalTriangle: Rc<dreieck>,
     pub farbe: Color,
     pub ymin: Float,
     pub ymax: Float,
 }
 
-impl polygon<'_> {
-    pub fn initpoly<'a>(
+impl polygon {
+    pub fn initpoly(
         p1: &point,
         p2: &point,
         p3: &point,
         ls: u8,
-        originalTriangle: &'a dreieck,
-    ) -> polygon<'a> {
+        originalTriangle: Rc<dreieck>,
+    ) -> polygon {
         //   zaehl.polygons.ins;
 
         //TODO copy?
@@ -92,7 +92,7 @@ impl polygon<'_> {
             ymax: p1.b.y.max(p2.b.y).max(p3.b.y),
         }
     }
-    pub fn newpoly<'a>(aOriginalTriangle: &'a dreieck) -> polygon<'a> {
+    pub fn newpoly(aOriginalTriangle: Rc<dreieck>) -> polygon {
         //   if ((drawmode = 7) or (drawmode = 9)) then
         //   begin
         //     let c := aOriginalTriangle^.origPoints[1]^.o.sub3d(aOriginalTriangle^.origPoints[2]^.o)
@@ -107,7 +107,7 @@ impl polygon<'_> {
             &aOriginalTriangle.delegate.p2,
             &aOriginalTriangle.delegate.p3,
             aOriginalTriangle.delegate.gl,
-            aOriginalTriangle,
+            aOriginalTriangle.clone(), //TODO find a way to prevent cloning
         )
     }
 
@@ -294,7 +294,7 @@ pub fn polytest(
 
             schnitt = (d1 - d2).abs() > epsilon1;
 
-            if std::ptr::eq(p1.originalTriangle, p2.originalTriangle) {
+            if Rc::ptr_eq(&p1.originalTriangle, &p2.originalTriangle) {
                 v2 = true;
             } else {
                 v1 = d1 < d2;
@@ -307,7 +307,7 @@ pub fn polytest(
         }
     };
 
-    if schnitttest && !std::ptr::eq(p1.originalTriangle, p2.originalTriangle) {
+    if schnitttest && !Rc::ptr_eq(&p1.originalTriangle, &p2.originalTriangle) {
         let mut k = 0;
 
         let mut i = 1;

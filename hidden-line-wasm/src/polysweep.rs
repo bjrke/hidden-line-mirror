@@ -387,7 +387,8 @@ pub fn polypoly(appCtx: &AppContext, xscan: Float, p1: &dreieck, p2: &polygon) {
                             ls += 4;
                         }
 
-                        let mut ph = polygon::initpoly(pli, plj, plk, ls, p2.originalTriangle);
+                        let mut ph =
+                            polygon::initpoly(pli, plj, plk, ls, p2.originalTriangle.clone());
 
                         let h = p1
                             .delegate

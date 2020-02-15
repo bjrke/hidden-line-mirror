@@ -46,6 +46,8 @@ impl AppContext {
 
         let ED = self.BlickR.skalar(&self.Auge) + epsilon1;
 
+        let mut polys = Vec::new();
+
         for j in scene.dreiecks.iter_mut() {
             if self.BlickR.skalar(&j.origPoint1.o) > ED  &&
                 self.BlickR.skalar(&j.origPoint2.o) > ED  &&
@@ -57,7 +59,7 @@ impl AppContext {
             (j.delegate.p2.b.x - j.delegate.p1.b.x)))
             {
                 if j.delegate.flaechentest() {
-                    let h = polygon::newpoly(&j);
+                    polys.push(polygon::newpoly(j.clone()));
                     //         polygon.push(h, 1, -2)
                 }
             }
@@ -70,7 +72,7 @@ impl AppContext {
 pub struct Scene {
     points: Vec<Rc<punkt3d>>,
 
-    dreiecks: Vec<dreieck>,
+    dreiecks: Vec<Rc<dreieck>>,
 }
 
 impl punkt3d {
@@ -110,12 +112,12 @@ impl Scene {
         }
 
         for t in appCtx.sceneBuilder.triangles.iter() {
-            result.dreiecks.push(dreieck::new(
-                Rc::clone(&result.points[t.p1]),
-                Rc::clone(&result.points[t.p2]),
-                Rc::clone(&result.points[t.p3]),
+            result.dreiecks.push(Rc::new(dreieck::new(
+                result.points[t.p1].clone(),
+                result.points[t.p2].clone(),
+                result.points[t.p3].clone(),
                 t.lset,
-            ));
+            )));
         }
         result
     }

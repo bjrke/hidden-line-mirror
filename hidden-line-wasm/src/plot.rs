@@ -136,6 +136,8 @@ pub fn darstellung(appCtx: &mut AppContext) {
     println!("Zeit: {}", start.elapsed().unwrap().as_secs());
     appCtx.zaehl.ausgabe();
 
+    //TODO
+
     //   OutInt('höchste Tiefe Suchbaum:',mtf);
     //   if wurzel[1]<>nil then outstring('wurzel[1]');
     //   if wurzel[2]<>nil then outstring('wurzel[2]');
