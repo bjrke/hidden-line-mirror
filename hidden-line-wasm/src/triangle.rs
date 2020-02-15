@@ -6,19 +6,20 @@ use crate::mat3::*;
 use crate::point::*;
 use crate::vec2::*;
 use crate::vec3::*;
+use std::rc::Rc;
 
-pub struct dreiecktyp<'a> {
-    pub p1: &'a point,
-    pub p2: &'a point,
-    pub p3: &'a point,
-    pub l1: Line<'a>,
-    pub l2: Line<'a>,
-    pub l3: Line<'a>,
+pub struct dreiecktyp {
+    pub p1: point,
+    pub p2: point,
+    pub p3: point,
+    pub l1: Line,
+    pub l2: Line,
+    pub l3: Line,
     pub gl: u8,
     pub cols: Color,
 }
 
-impl dreiecktyp<'_> {
+impl dreiecktyp {
     pub fn l(&self, num: u8) -> &Line {
         match num {
             1 => &self.l1,
@@ -30,9 +31,9 @@ impl dreiecktyp<'_> {
 
     pub fn p(&self, num: u8) -> &point {
         match num {
-            1 => self.p1,
-            2 => self.p2,
-            3 => self.p3,
+            1 => &self.p1,
+            2 => &self.p2,
+            3 => &self.p3,
             _ => panic!("no line number {}", num),
         }
     }
@@ -166,35 +167,40 @@ impl dreiecktyp<'_> {
     }
 }
 
-pub struct dreieck<'a> {
-    pub delegate: dreiecktyp<'a>,
-    pub origPoint1: &'a punkt3d,
-    pub origPoint2: &'a punkt3d,
-    pub origPoint3: &'a punkt3d,
+pub struct dreieck {
+    pub delegate: dreiecktyp,
+    pub origPoint1: Rc<punkt3d>,
+    pub origPoint2: Rc<punkt3d>,
+    pub origPoint3: Rc<punkt3d>,
     pub planeNorm: Vector3,
     pub planeDist: Float,
 }
 
-impl dreieck<'_> {
-    pub fn new<'a>(p1: &'a punkt3d, p2: &'a punkt3d, p3: &'a punkt3d, ls: u8) -> dreieck<'a> {
+impl dreieck {
+    pub fn new(p1: Rc<punkt3d>, p2: Rc<punkt3d>, p3: Rc<punkt3d>, ls: u8) -> dreieck {
         let planeNorm = p2.o.sub3d(&p1.o).kreuz(&p3.o.sub3d(&p1.o)).normalize();
 
+        let dp1 = p1.b;
+        let dp2 = p2.b;
+        let dp3 = p3.b;
+
+        let planeDist = planeNorm.skalar(&p1.o);
         dreieck {
             origPoint1: p1,
             origPoint2: p2,
             origPoint3: p3,
             delegate: dreiecktyp {
-                p1: &p1.b,
-                p2: &p2.b,
-                p3: &p3.b,
+                p1: dp1,
+                p2: dp2,
+                p3: dp3,
                 gl: ls,
-                l1: Line::new(&p2.b, &p3.b),
-                l2: Line::new(&p3.b, &p1.b),
-                l3: Line::new(&p1.b, &p2.b),
+                l1: Line::new(&dp2, &dp3),
+                l2: Line::new(&dp3, &dp1),
+                l3: Line::new(&dp1, &dp2),
                 cols: 0,
             },
             planeNorm,
-            planeDist: planeNorm.skalar(&p1.o),
+            planeDist,
         }
     }
 

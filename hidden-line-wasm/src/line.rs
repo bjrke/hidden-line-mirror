@@ -3,17 +3,17 @@ use crate::float::*;
 use crate::mat2::*;
 use crate::point::*;
 
-pub struct Line<'a> {
-    pub a: &'a point,
-    pub e: &'a point,
+pub struct Line {
+    pub a: point,
+    pub e: point,
 }
 
-impl Line<'_> {
-    pub fn new<'a>(p1: &'a point, p2: &'a point) -> Line<'a> {
+impl Line {
+    pub fn new(p1: &point, p2: &point) -> Line {
         if p1.b.x < p2.b.x {
-            Line { a: p1, e: p2 }
+            Line { a: *p1, e: *p2 }
         } else {
-            Line { a: p2, e: p1 }
+            Line { a: *p2, e: *p1 }
         }
     }
 

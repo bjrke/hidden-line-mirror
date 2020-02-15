@@ -5,15 +5,63 @@ use crate::triangle::*;
 use crate::vec2::*;
 use crate::vec3::*;
 
+#[derive(Clone, Copy)]
+pub struct Triangle {
+    pub p1: usize,
+
+    pub p2: usize,
+
+    pub p3: usize,
+
+    pub lset: u8,
+}
+
+pub struct SceneBuilder {
+    pub points: Vec<Vector3>,
+
+    pub triangles: Vec<Triangle>,
+}
+
+impl SceneBuilder {
+    pub fn new() -> SceneBuilder {
+        SceneBuilder {
+            points: Vec::new(),
+            triangles: Vec::new(),
+        }
+    }
+
+    pub fn point(&mut self, x: Float, y: Float, z: Float) -> usize {
+        self.push(Vector3::new(x, y, z))
+    }
+
+    pub fn push(&mut self, p: Vector3) -> usize {
+        self.points.push(p);
+        self.points.len()
+    }
+
+    pub fn triangle(&mut self, p1: usize, p2: usize, p3: usize, lset: u8) -> usize {
+        self.triangles.push(Triangle { p1, p2, p3, lset });
+        self.triangles.len()
+    }
+
+    pub fn quad(&mut self, p1: usize, p2: usize, p3: usize, p4: usize) {
+        self.triangle(p1, p2, p3, 5);
+        self.triangle(p1, p3, p4, 3);
+        // self.add(p1, p2, p3, 5);
+        // self.add(p1, p3, p4, 3);
+    }
+}
+
 struct TriFan {
     Center: usize,
     Last: usize,
     First: usize,
+    scene: SceneBuilder,
 }
 
 impl TriFan {
-    pub fn Init<'a>(
-        scene: &'a mut Scene<'a>,
+    pub fn Init(
+        mut scene: SceneBuilder,
         cx: Float,
         cy: Float,
         cz: Float,
@@ -24,38 +72,41 @@ impl TriFan {
         by: Float,
         bz: Float,
     ) -> TriFan {
-        let Center = scene.addo(cx, cy, cz);
-        let Last = scene.addo(ax, ay, az);
-        let First = scene.addo(bx, by, bz);
-        scene.add(Center, First, Last, 7);
+        let Center = scene.point(cx, cy, cz);
+        let Last = scene.point(ax, ay, az);
+        let First = scene.point(bx, by, bz);
+        scene.triangle(Center, First, Last, 7);
         TriFan {
+            scene,
             Center,
             Last,
             First,
         }
     }
 
-    pub fn add<'a>(&mut self, scene: &'a mut Scene<'a>, ax: Float, ay: Float, az: Float) -> usize {
-        let help = scene.addo(ax, ay, az);
-        scene.add(self.Center, self.Last, help, 7);
+    pub fn add(&mut self, ax: Float, ay: Float, az: Float) -> usize {
+        let help = self.scene.point(ax, ay, az);
+        self.scene.triangle(self.Center, self.Last, help, 7);
         self.Last = help;
         self.Last
     }
 
-    pub fn done<'a>(&self, scene: &'a mut Scene<'a>) {
-        scene.add(self.Center, self.Last, self.First, 7)
+    pub fn done(mut self) -> SceneBuilder {
+        self.scene.triangle(self.Center, self.Last, self.First, 7);
+        self.scene
     }
 }
 
-struct TriStrip {
+pub struct TriStrip {
     l1: usize,
     l2: usize,
     w: bool,
+    scene: SceneBuilder,
 }
 
 impl TriStrip {
-    pub fn Init<'a>(
-        scene: &'a mut Scene<'a>,
+    pub fn Init(
+        mut scene: SceneBuilder,
         cx: Float,
         cy: Float,
         cz: Float,
@@ -66,19 +117,24 @@ impl TriStrip {
         by: Float,
         bz: Float,
     ) -> TriStrip {
-        let l1 = scene.addo(ax, ay, az);
-        let l2 = scene.addo(bx, by, bz);
-        let c = scene.addo(cx, cy, cz);
-        scene.add(c, l1, l2, 7);
-        TriStrip { l1, l2, w: true }
+        let l1 = scene.point(ax, ay, az);
+        let l2 = scene.point(bx, by, bz);
+        let c = scene.point(cx, cy, cz);
+        scene.triangle(c, l1, l2, 7);
+        TriStrip {
+            l1,
+            l2,
+            w: true,
+            scene,
+        }
     }
 
-    pub fn add<'a>(&mut self, scene: &'a mut Scene<'a>, ax: Float, ay: Float, az: Float) -> usize {
-        let help = scene.addo(ax, ay, az);
+    pub fn add(&mut self, ax: Float, ay: Float, az: Float) -> usize {
+        let help = self.scene.point(ax, ay, az);
         if self.w {
-            scene.add(self.l1, help, self.l2, 7);
+            self.scene.triangle(self.l1, help, self.l2, 7);
         } else {
-            scene.add(self.l1, self.l2, help, 7);
+            self.scene.triangle(self.l1, self.l2, help, 7);
         }
         self.w = !self.w;
 
@@ -86,46 +142,52 @@ impl TriStrip {
         self.l2 = help;
         self.l2
     }
+
+    pub fn build(self) -> SceneBuilder {
+        self.scene
+    }
 }
 
-struct QuadStrip {
+pub struct QuadStrip {
     l1: usize,
     l2: usize,
+    scene: SceneBuilder,
 }
 
 impl QuadStrip {
-    pub fn Init<'a>(
-        scene: &'a mut Scene<'a>,
+    pub fn init(
+        scene: SceneBuilder,
         ax: Float,
         ay: Float,
         az: Float,
-
         bx: Float,
         by: Float,
         bz: Float,
     ) -> QuadStrip {
-        let h = scene.addo(ax, ay, az);
-        let b = scene.addo(bx, by, bz);
-        QuadStrip { l1: b, l2: h }
+        QuadStrip::new(scene, Vector3::new(ax, ay, az), Vector3::new(bx, by, bz))
     }
 
-    pub fn add<'a>(
-        &mut self,
-        scene: &'a mut Scene<'a>,
-        bx: Float,
-        by: Float,
-        bz: Float,
-        ax: Float,
-        ay: Float,
-        az: Float,
-    ) {
-        let h1 = scene.addo(ax, ay, az);
-        let h2 = scene.addo(bx, by, bz);
+    pub fn new(mut scene: SceneBuilder, a: Vector3, b: Vector3) -> QuadStrip {
+        let l2 = scene.push(a);
+        let l1 = scene.push(b);
+        QuadStrip { l1, l2, scene }
+    }
 
-        scene.quad(self.l2, self.l1, h1, h2);
+    pub fn add(&mut self, bx: Float, by: Float, bz: Float, ax: Float, ay: Float, az: Float) {
+        self.addV(Vector3::new(bx, by, bz), Vector3::new(ax, ay, az));
+    }
+    pub fn addV(&mut self, b: Vector3, a: Vector3) {
+        let h1 = self.scene.push(a);
+        let h2 = self.scene.push(b);
+
+        self.scene.quad(self.l2, self.l1, h1, h2);
 
         self.l1 = h1;
         self.l2 = h2;
+    }
+
+    pub fn build(self) -> SceneBuilder {
+        self.scene
     }
 }
 

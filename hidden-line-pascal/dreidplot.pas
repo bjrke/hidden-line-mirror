@@ -6,6 +6,12 @@ var
   p:ppoly;
   palettePos: Integer;
 
+procedure movePalette(dir: Integer);
+begin
+    palettePos := (palettePos + Length(palette) + dir) MOD Length(palette);
+    SetAllPalette(palette[palettePos]);
+end;
+
 procedure init;
 var {a,b,c:int;}
     {h:^triStrip;}
@@ -43,7 +49,8 @@ begin
 //  setallpalette(bpal);
   backface:=true;
 
-  drawmode := 1;
+  drawmode := 9;
+  movePalette(1);
 
 { tetraeder(0,0,0, -1,0,-2, 1,1,-2 ,1,-1,-2);
 
@@ -180,14 +187,8 @@ begin
       'f','F':colmode:=not colmode;
       't','T':tausgabe:=not tausgabe;
       'b','B':backface:=not backface;
-      'p':begin
-        palettePos := (palettePos + 1) MOD Length(palette);
-        SetAllPalette(palette[palettePos]);
-      end;
-      'P':begin
-        palettePos := (palettePos + Length(palette) - 1) MOD Length(palette);
-        SetAllPalette(palette[palettePos]);
-      end;
+      'p':movePalette(1);
+      'P':movePalette(-1);
       '0':drawmode:=1;
       '1':drawmode:=1;
       '2':drawmode:=2;

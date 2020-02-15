@@ -9,8 +9,8 @@ use crate::vec2::*;
 use rand::Rng;
 
 pub struct polygon<'a> {
-    pub delegate: dreiecktyp<'a>,
-    pub originalTriangle: &'a dreieck<'a>,
+    pub delegate: dreiecktyp,
+    pub originalTriangle: &'a dreieck,
     pub farbe: Color,
     pub ymin: Float,
     pub ymax: Float,
@@ -18,18 +18,18 @@ pub struct polygon<'a> {
 
 impl polygon<'_> {
     pub fn initpoly<'a>(
-        p1: &'a point,
-        p2: &'a point,
-        p3: &'a point,
+        p1: &point,
+        p2: &point,
+        p3: &point,
         ls: u8,
         originalTriangle: &'a dreieck,
     ) -> polygon<'a> {
         //   zaehl.polygons.ins;
 
         //TODO copy?
-        let mut p1 = p1;
-        let mut p2 = p2;
-        let mut p3 = p3;
+        let mut p1 = *p1;
+        let mut p2 = *p2;
+        let mut p3 = *p3;
 
         let mut gl = ls;
 
@@ -77,9 +77,9 @@ impl polygon<'_> {
 
         polygon {
             delegate: dreiecktyp {
-                p1: &p1,
-                p2: &p2,
-                p3: &p3,
+                p1: p1,
+                p2: p2,
+                p3: p3,
                 l1: Line::new(&p2, &p3),
                 l2: Line::new(&p3, &p1),
                 l3: Line::new(&p1, &p2),
@@ -103,9 +103,9 @@ impl polygon<'_> {
         //   end;
 
         polygon::initpoly(
-            aOriginalTriangle.delegate.p1,
-            aOriginalTriangle.delegate.p2,
-            aOriginalTriangle.delegate.p3,
+            &aOriginalTriangle.delegate.p1,
+            &aOriginalTriangle.delegate.p2,
+            &aOriginalTriangle.delegate.p3,
             aOriginalTriangle.delegate.gl,
             aOriginalTriangle,
         )
@@ -426,13 +426,13 @@ pub fn polytest(
                 1 | 2 | 3 => {
                     let h1 = gleicheseite(
                         p2pi,
-                        p1.delegate.l(pip).a,
+                        &p1.delegate.l(pip).a,
                         p1.delegate.p(pip),
                         p2.delegate.p(i % 3 + 1),
                     );
                     let h2 = gleicheseite(
                         p2pi,
-                        p1.delegate.l(pip).a,
+                        &p1.delegate.l(pip).a,
                         p1.delegate.p(pip),
                         p2.delegate.p(((i + 1) % 3) + 1),
                     );

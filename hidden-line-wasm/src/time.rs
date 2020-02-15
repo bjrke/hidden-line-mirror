@@ -4,11 +4,11 @@ use crate::float;
 use crate::float::Float;
 
 pub struct dtyp {
-  insert: longint,
-  Delete: longint,
-  maximum: longint,
-  minimum: longint,
-  aktuell: longint,
+  pub insert: longint,
+  pub Delete: longint,
+  pub maximum: longint,
+  pub minimum: longint,
+  pub aktuell: longint,
 }
 
 impl dtyp {
@@ -159,8 +159,6 @@ impl minmax {
   cset = set of char;
 
 function gettime2: longint;
-procedure starttime;
-procedure outtime;
 function readkey2(include: cset): char;
 
 implementation
@@ -173,55 +171,7 @@ var
 
 
 
-procedure starttime;
-begin
-  time := gettime2;
-end;
 
-function gettime2;
-var
-  h, m, s, s100: word;
-begin
-  gettime(h, m, s, s100);
-  exit(360000 * h + 6000 * m + s * 100 + s100);
-end;
-
-procedure outtime;
-var
-  t: longint;
-  h, m: word;
-  s: float;
-  s1, s2: string;
-begin
-  s1 := '';
-  t := time;
-  starttime;
-  t := time - t;
-  h := t div 360000;
-  m := (t - h * 360000) div 6000;
-  s := (t - h * 360000 - m * 6000) / 100;
-  if h > 0 then
-  begin
-    str(h, s1);
-    s1 := s1 + 'h';
-  end;
-  if (h > 0) or (m > 0) then
-  begin
-    str(m, s2);
-    if m = 0 then
-      s1 := s1 + '0';
-    if m < 10 then
-      s1 := s1 + '0';
-    s1 := s1 + s2 + 'm';
-    if s = 0 then
-      s1 := s1 + '0';
-    if s < 10 then
-      s1 := s1 + '0';
-  end;
-  str(s: 0: 2, s2);
-  s1 := s1 + s2 + 's';
-  outstring('Zeit: ' + s1);
-end;
 
 function readkey2;
 var

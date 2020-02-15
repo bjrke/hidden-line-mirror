@@ -3,6 +3,7 @@ use crate::float::*;
 use crate::vec2::*;
 use crate::vec3::*;
 
+#[derive(Clone, Copy)]
 pub struct point {
   pub b: Vector2,
   pub gz: u8,
@@ -37,8 +38,12 @@ pub struct punkt3d {
 
 impl punkt3d {
   pub fn new(ax: Float, ay: Float, az: Float) -> punkt3d {
+    punkt3d::newV(&Vector3::new(ax, ay, az))
+  }
+
+  pub fn newV(o: &Vector3) -> punkt3d {
     punkt3d {
-      o: Vector3::new(ax, ay, az),
+      o: *o,
       b: point::new0(),
     }
   }

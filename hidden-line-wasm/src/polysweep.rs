@@ -284,13 +284,13 @@ pub fn polypoly(appCtx: &AppContext, xscan: Float, p1: &dreieck, p2: &polygon) {
             1 | 2 | 3 => {
                 let h1 = gleicheseite(
                     p1pi,
-                    p2.delegate.l(pip).a,
+                    &p2.delegate.l(pip).a,
                     p2.delegate.p(pip),
                     p1.delegate.p(i % 3 + 1),
                 );
                 let h2 = gleicheseite(
                     p1pi,
-                    p2.delegate.l(pip).a,
+                    &p2.delegate.l(pip).a,
                     p2.delegate.p(pip),
                     p1.delegate.p((i + 1) % 3 + 1),
                 );
@@ -330,13 +330,13 @@ pub fn polypoly(appCtx: &AppContext, xscan: Float, p1: &dreieck, p2: &polygon) {
             1 | 2 | 3 => {
                 let h1 = gleicheseite(
                     p2pi,
-                    p1.delegate.l(pip).a,
+                    &p1.delegate.l(pip).a,
                     p1.delegate.p(pip),
                     p2.delegate.p(i % 3 + 1),
                 );
                 let h2 = gleicheseite(
                     p2pi,
-                    p1.delegate.l(pip).a,
+                    &p1.delegate.l(pip).a,
                     p1.delegate.p(pip),
                     p2.delegate.p((i + 1) % 3 + 1),
                 );
@@ -494,7 +494,7 @@ pub fn loesche(xscan: Float, p: &polygon) /* -> &polygon */
 }
 
 pub fn insert(xscan: Float, p: &polygon, schnitttest: bool) {
-    // procedure insert(xscan: float; p: ppoly; schnitttest: boolean);
+
     // var
     //   h, o, u, a: ppoly;
     //   ak: pppoly;
@@ -634,7 +634,6 @@ pub fn insert(xscan: Float, p: &polygon, schnitttest: bool) {
     //       cls;
     //     end;
     //   end;
-    // end;
 }
 
 pub fn sweep() {

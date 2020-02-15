@@ -1,3 +1,4 @@
+use crate::dreidext::*;
 use crate::float::*;
 use crate::mat3::*;
 use crate::point::*;
@@ -5,11 +6,12 @@ use crate::polygon::*;
 use crate::time::*;
 use crate::triangle::*;
 use crate::vec3::*;
+use std::rc::Rc;
 
-pub struct AppContext<'a> {
+pub struct AppContext {
     pub zaehl: ctyp,
 
-    pub dreiecks: Vec<dreieck<'a>>,
+    pub dreiecks: Vec<dreieck>,
 
     pub Auge: Vector3,
     pub BlickR: Vector3,
@@ -19,11 +21,11 @@ pub struct AppContext<'a> {
     pub drawmode: u8,
     pub tiefePerspektive: minmax,
     pub ausgabeInsert: bool,
-    pub scene: Scene<'a>,
+    pub sceneBuilder: SceneBuilder,
     pub backface: bool,
 }
 
-impl AppContext<'_> {
+impl AppContext {
     pub fn neukamera(&mut self) {
         //   cls;
 
@@ -39,33 +41,12 @@ impl AppContext<'_> {
         self.jv = jv;
     }
 
-    pub fn perspektive(&mut self) {
-        self.tiefePerspektive = minmax::new();
-        for p in self.scene.points.iter_mut() {
-            let mut K = Matrix3::new(self.iv, self.jv, self.Auge.sub3d(&p.o));
-
-            let kd = K.det3d();
-            if kd.abs() > epsilon2 {
-                K.x = self.BlickR.neg3d();
-                p.b.b.x = K.det3d() / kd;
-                K.y = K.x;
-                K.x = self.iv;
-                p.b.b.y = K.det3d() / kd;
-
-                if self.drawmode == 5 {
-                    self.tiefePerspektive
-                        .update(1.0 / p.o.sub3d(&self.Auge).invBetrag3d());
-                }
-            }
-        }
-    }
-
     pub fn rechnung(&mut self) {
-        self.perspektive();
+        let mut scene = Scene::new(&self);
 
         let ED = self.BlickR.skalar(&self.Auge) + epsilon1;
 
-        for j in self.scene.dreiecks.iter_mut() {
+        for j in scene.dreiecks.iter_mut() {
             if self.BlickR.skalar(&j.origPoint1.o) > ED  &&
                 self.BlickR.skalar(&j.origPoint2.o) > ED  &&
                self.BlickR.skalar(&j.origPoint3.o) > ED  &&
@@ -86,39 +67,57 @@ impl AppContext<'_> {
     }
 }
 
-pub struct Scene<'a> {
-    points: Vec<Box<punkt3d>>,
+pub struct Scene {
+    points: Vec<Rc<punkt3d>>,
 
-    dreiecks: Vec<dreieck<'a>>,
+    dreiecks: Vec<dreieck>,
 }
 
-impl<'a> Scene<'a> {
-    pub fn addo(&mut self, x: Float, y: Float, z: Float) -> usize {
-        let p = Box::new(punkt3d::new(x, y, z));
-        self.points.push(p);
-        self.points.len()
-    }
+impl punkt3d {
+    pub fn perspektive(mut self, appCtx: &AppContext) -> Self {
+        // self.tiefePerspektive = minmax::new();
 
-    pub fn add(&'a mut self, p1: usize, p2: usize, p3: usize, ls: u8) {
-        let d = dreieck::new(&self.points[p1], &self.points[p2], &self.points[p3], ls);
-        self.dreiecks.push(d);
-    }
+        let mut K = Matrix3::new(appCtx.iv, appCtx.jv, appCtx.Auge.sub3d(&self.o));
 
-    pub fn quad(&'a mut self, p1: usize, p2: usize, p3: usize, p4: usize) {
-        self.dreiecks.push(dreieck::new(
-            &self.points[p1],
-            &self.points[p2],
-            &self.points[p3],
-            5,
-        ));
-        self.dreiecks.push(dreieck::new(
-            &self.points[p1],
-            &self.points[p3],
-            &self.points[p4],
-            3,
-        ));
-        // self.add(p1, p2, p3, 5);
-        // self.add(p1, p3, p4, 3);
+        let kd = K.det3d();
+        if kd.abs() > epsilon2 {
+            K.x = appCtx.BlickR.neg3d();
+            self.b.b.x = K.det3d() / kd;
+            K.y = K.x;
+            K.x = appCtx.iv;
+            self.b.b.y = K.det3d() / kd;
+
+            // if self.drawmode == 5 {
+            //     self.tiefePerspektive
+            //         .update(1.0 / p.o.sub3d(&self.Auge).invBetrag3d());
+            // }
+        }
+        self
+    }
+}
+
+impl Scene {
+    pub fn new(appCtx: &AppContext) -> Scene {
+        let mut result = Scene {
+            points: Vec::new(),
+            dreiecks: Vec::new(),
+        };
+
+        for p in appCtx.sceneBuilder.points.iter() {
+            result
+                .points
+                .push(Rc::new(punkt3d::newV(p).perspektive(&appCtx)));
+        }
+
+        for t in appCtx.sceneBuilder.triangles.iter() {
+            result.dreiecks.push(dreieck::new(
+                Rc::clone(&result.points[t.p1]),
+                Rc::clone(&result.points[t.p2]),
+                Rc::clone(&result.points[t.p3]),
+                t.lset,
+            ));
+        }
+        result
     }
 }
 
