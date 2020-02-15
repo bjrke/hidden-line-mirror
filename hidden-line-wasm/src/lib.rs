@@ -15,6 +15,10 @@ mod triangle;
 mod vec2;
 mod vec3;
 
+use crate::drawcontext::*;
+use crate::float::*;
+use crate::svgcontext::*;
+use crate::vec2::*;
 use wasm_bindgen::prelude::*;
 
 #[cfg(feature = "wee_alloc")]
@@ -29,44 +33,47 @@ pub fn main_js() -> Result<(), JsValue> {
     Ok(())
 }
 
-fn circle(document: web_sys::Document) -> web_sys::Element {
-    let circle = document
-        .create_element_ns(Some("http://www.w3.org/2000/svg"), "circle")
-        .unwrap();
-    circle.set_attribute("cx", "0").unwrap();
-    circle.set_attribute("cy", "0").unwrap();
-    circle.set_attribute("r", "100").unwrap();
-    circle.set_attribute("stroke", "black").unwrap();
-    circle.set_attribute("fill", "blue").unwrap();
-    circle
-}
-
 #[wasm_bindgen]
 pub fn lets_go(svg: web_sys::SvgElement) -> HiddenLine {
-    let document = svg.owner_document().unwrap();
-    let circle = circle(document);
-    svg.append_child(&circle).unwrap();
-
     svg.set_attribute("viewBox", "-128 -128 256 256").unwrap();
+    let mut svgcontext = SvgContext::new(svg);
 
-    HiddenLine {
-        radius: 100,
-        circle,
-    }
+    let mut result = HiddenLine {
+        radius: 100.0,
+        svgcontext,
+    };
+
+    result.draw();
+    result
 }
 
 #[wasm_bindgen]
 pub struct HiddenLine {
-    radius: i32,
-    circle: web_sys::Element,
+    svgcontext: SvgContext,
+    radius: Float,
 }
 
 #[wasm_bindgen]
 impl HiddenLine {
     pub fn on_click(&mut self) {
-        self.radius += 1;
-        self.circle
-            .set_attribute("r", &self.radius.to_string())
-            .unwrap();
+        self.radius -= 1.0;
+        self.draw();
+    }
+
+    pub fn draw(&mut self) {
+        self.svgcontext.cls();
+        self.svgcontext.poly(
+            &[
+                Vector2::new(-self.radius, -self.radius),
+                Vector2::new(self.radius, -self.radius),
+                Vector2::new(self.radius, self.radius),
+                Vector2::new(-self.radius, self.radius),
+            ],
+            0,
+        );
+        self.svgcontext.circle(0.0, 0.0, self.radius, 5);
+        self.svgcontext.line(0.0, 0.0, self.radius, self.radius, 3);
+        self.svgcontext
+            .putpixel((self.radius / 2.0) as i32, (self.radius / 2.0) as i32, 15);
     }
 }

@@ -51,17 +51,7 @@ impl dreiecktyp {
     }
 
     pub fn draw2(&self, ctx: &mut dyn DrawContext, c: Color) {
-        ctx.poly(
-            &[
-                self.p1.b.x,
-                -self.p1.b.y,
-                self.p2.b.x,
-                -self.p2.b.y,
-                self.p3.b.x,
-                -self.p3.b.y,
-            ],
-            c,
-        );
+        ctx.poly(&[self.p1.b, self.p2.b, self.p3.b], c);
     }
 
     pub fn draw3(&self, ctx: &mut dyn DrawContext, c: Color) {

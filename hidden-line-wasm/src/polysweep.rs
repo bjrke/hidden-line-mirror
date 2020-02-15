@@ -92,8 +92,8 @@ pub fn drawtree(xscan: Float) {
     //     begin
     //       setcolor(c);
     //       line(s^.drx, s^.dry, z^.drx, z^.dry);
-    //       line(bmx - 4 * s^.dry + round(xscan), bmy - round(s^.yscan(xscan)),
-    //         bmx - 4 * z^.dry + round(xscan), bmy - round(z^.yscan(xscan)));
+    //       line(bmx - 4 * s^.dry + round(xscan), bmy + round(s^.yscan(xscan)),
+    //         bmx - 4 * z^.dry + round(xscan), bmy + round(z^.yscan(xscan)));
     //     end;
     //   end;
 

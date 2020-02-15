@@ -20,7 +20,7 @@ impl point {
   pub fn done() {}
 
   pub fn draw(&self, ctx: &mut dyn DrawContext, c: Color) {
-    ctx.circle(self.b.x, -self.b.y, 2.0, c);
+    ctx.circle(self.b.x, self.b.y, 2.0, c);
   }
 
   pub fn copy(&self) -> point {
