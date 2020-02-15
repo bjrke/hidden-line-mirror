@@ -15,6 +15,7 @@ mod triangle;
 mod vec2;
 mod vec3;
 
+use crate::appcontext::*;
 use crate::drawcontext::*;
 use crate::float::*;
 use crate::svgcontext::*;
@@ -39,6 +40,7 @@ pub fn lets_go(svg: web_sys::SvgElement) -> HiddenLine {
     let mut result = HiddenLine {
         radius: 100.0,
         svgcontext: SvgContext::new(svg),
+        appCtx: plot::init(),
     };
 
     result.draw();
@@ -48,6 +50,7 @@ pub fn lets_go(svg: web_sys::SvgElement) -> HiddenLine {
 #[wasm_bindgen]
 pub struct HiddenLine {
     svgcontext: SvgContext,
+    appCtx: AppContext,
     radius: Float,
 }
 
@@ -60,18 +63,7 @@ impl HiddenLine {
 
     pub fn draw(&mut self) {
         self.svgcontext.cls();
-        self.svgcontext.poly(
-            &[
-                Vector2::new(-self.radius, -self.radius),
-                Vector2::new(self.radius, -self.radius),
-                Vector2::new(self.radius, self.radius),
-                Vector2::new(-self.radius, self.radius),
-            ],
-            0,
-        );
-        self.svgcontext.circle(0.0, 0.0, self.radius, 5);
-        self.svgcontext.line(0.0, 0.0, self.radius, self.radius, 3);
-        self.svgcontext
-            .putpixel((self.radius / 2.0) as i32, (self.radius / 2.0) as i32, 15);
+
+        plot::darstellung(&mut self.svgcontext, &mut self.appCtx);
     }
 }

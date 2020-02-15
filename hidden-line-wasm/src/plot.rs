@@ -1,11 +1,10 @@
 use crate::appcontext::*;
+use crate::drawcontext::*;
 use crate::dreidext::*;
 use crate::float::*;
-use crate::mat3::*;
-use crate::point::*;
 use crate::time::*;
 use crate::vec3::*;
-use std::time::{Duration, SystemTime};
+use std::time::SystemTime;
 
 // program dreidplot;
 // uses ptccrt, ptcgraph, vector, dreidext, projekt, dreiecke, polyswee, polygon,
@@ -21,7 +20,7 @@ pub fn fkt(x: Float, y: Float) -> Float {
     // y.sin() * x / 10.0
 }
 
-pub fn init(appCtx: &mut AppContext) {
+pub fn init() -> AppContext {
     // var {a,b,c:int;}
     //     {h:^triStrip;}
     //     qs:^quadstrip;
@@ -39,14 +38,9 @@ pub fn init(appCtx: &mut AppContext) {
     // begin
     //   tausgabe:=true;
 
-    appCtx.Auge = Vector3::new(30.0, 40.0, 50.0);
-    appCtx.BlickR = appCtx.Auge.div3d(-10.0);
-    //  appCtx.BlickR = Vector3::new(-3.0, -6.0, -12.0);
-    appCtx.jv = Vector3::new(0.0, 0.0, 1.0);
-
-    let backface = true;
-
-    let drawmode = 1;
+    let Auge = Vector3::new(30.0, 40.0, 50.0);
+    let BlickR = Auge.div3d(-10.0);
+    //   BlickR = Vector3::new(-3.0, -6.0, -12.0);
 
     // { tetraeder(0,0,0, -1,0,-2, 1,1,-2 ,1,-1,-2);
 
@@ -64,10 +58,10 @@ pub fn init(appCtx: &mut AppContext) {
     let sw = 0.5;
     let mut xx = -ad;
 
-    let mut scene = SceneBuilder::new();
+    let mut sceneBuilder = SceneBuilder::new();
     while xx < ad {
         let mut qs = QuadStrip::init(
-            scene,
+            sceneBuilder,
             xx,
             -ad,
             fkt(xx, -ad),
@@ -82,7 +76,7 @@ pub fn init(appCtx: &mut AppContext) {
             yy = yy + sw;
         }
         xx = xx + sw;
-        scene = qs.build();
+        sceneBuilder = qs.build();
     }
 
     // {  for a:=1 to 20 do begin
@@ -118,13 +112,25 @@ pub fn init(appCtx: &mut AppContext) {
     //       end
     //   end}
 
-    appCtx.sceneBuilder = scene;
+    AppContext {
+        sceneBuilder,
+        Auge,
+        BlickR,
+        iv: Vector3::new(1.0, 0.0, 0.0),
+        jv: Vector3::new(0.0, 0.0, 1.0),
+        backface: true,
+        drawmode: 1,
+        ausgabeInsert: false,
+        colmode: false,
+        zaehl: ctyp::init(),
+        tiefePerspektive: minmax::new(),
+    }
 }
 
-pub fn darstellung(appCtx: &mut AppContext) {
+pub fn darstellung(ctx: &mut dyn DrawContext, appCtx: &mut AppContext) {
     appCtx.zaehl = ctyp::init();
     appCtx.neukamera();
-    appCtx.rechnung();
+    let polys = appCtx.rechnung();
 
     println!("Anzahl Polygone: {}", appCtx.zaehl.q1.maximum);
     println!("Auge: {}", appCtx.Auge);
@@ -138,6 +144,9 @@ pub fn darstellung(appCtx: &mut AppContext) {
 
     //TODO
 
+    for poly in polys {
+        poly.drawpoly(ctx, appCtx)
+    }
     //   OutInt('höchste Tiefe Suchbaum:',mtf);
     //   if wurzel[1]<>nil then outstring('wurzel[1]');
     //   if wurzel[2]<>nil then outstring('wurzel[2]');

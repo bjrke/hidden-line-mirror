@@ -11,8 +11,6 @@ use std::rc::Rc;
 pub struct AppContext {
     pub zaehl: ctyp,
 
-    pub dreiecks: Vec<dreieck>,
-
     pub Auge: Vector3,
     pub BlickR: Vector3,
     pub iv: Vector3,
@@ -41,7 +39,7 @@ impl AppContext {
         self.jv = jv;
     }
 
-    pub fn rechnung(&mut self) {
+    pub fn rechnung(&mut self) -> Vec<polygon> {
         let mut scene = Scene::new(&self);
 
         let ED = self.BlickR.skalar(&self.Auge) + epsilon1;
@@ -65,6 +63,7 @@ impl AppContext {
             }
         }
 
+        polys
         //   {  xscan:=-1e20;}
     }
 }
