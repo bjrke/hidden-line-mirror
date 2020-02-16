@@ -511,7 +511,7 @@ pub fn insert(xscan: Float, p: &polygon, schnitttest: bool) {
     //     Inc(zaehl.Count);
     //     if drawmode = 6 then
     //     begin
-    //       p^.draw2(15);
+    //       p^.draw_poly(15);
     //       outint('zähler', zaehl.Count);
     //       outstring(format('insert %p', [p]));
     //     end;

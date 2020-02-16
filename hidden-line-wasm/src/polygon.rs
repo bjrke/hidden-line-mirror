@@ -5,10 +5,8 @@ use crate::line::*;
 use crate::point::*;
 use crate::triangle::*;
 use crate::vec2::*;
-use rand::Rng;
+use rand::{thread_rng, Rng};
 use std::rc::Rc;
-
-extern crate rand;
 
 pub struct polygon {
     pub delegate: dreiecktyp,
@@ -222,25 +220,29 @@ impl polygon {
 
     pub fn drawpoly(&self, ctx: &mut DrawContext, appCtx: &AppContext) {
         let cols = if appCtx.colmode {
-            rand::thread_rng().gen()
+            thread_rng().gen()
         } else {
             self.delegate.cols
         };
 
         match appCtx.drawmode {
-            1 => self.delegate.draw1(ctx, cols),
-            2 => self.delegate.draw2(ctx, cols),
+            0 => {
+                self.delegate.draw_poly(ctx, 0.0);
+                self.delegate.draw_line_set(ctx, cols);
+            }
+            1 => self.delegate.draw_line_set(ctx, cols),
+            2 => self.delegate.draw_poly(ctx, cols),
             3 => self.delegate.draw3(ctx, cols),
             4 => self.draw4(ctx),
             5 => self.draw5(ctx, appCtx),
-            6 => self.delegate.draw1(ctx, cols),
+            6 => self.delegate.draw_line_set(ctx, cols),
             7 => self
                 .delegate
-                .draw2(ctx, self.originalTriangle.delegate.cols),
-            8 => self.delegate.draw1(ctx, self.farbe),
+                .draw_poly(ctx, self.originalTriangle.delegate.cols),
+            8 => self.delegate.draw_line_set(ctx, self.farbe),
             9 => self
                 .delegate
-                .draw1(ctx, self.originalTriangle.delegate.cols),
+                .draw_line_set(ctx, self.originalTriangle.delegate.cols),
             _ => panic!("unexpected drawmode"),
         }
     }

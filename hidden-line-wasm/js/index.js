@@ -8,7 +8,16 @@ import("../pkg/index.js").then(
             formula.value = decodeURIComponent(location.hash.substr(1));
         } else {
             formula.value =
-                "var h = Math.sqrt(x * x + y * y);\nreturn 25 * Math.cos(h) / (2 + h);";
+                "let h=0;\n" +
+                "const step=Math.PI/36;\n" +
+                "for (let a=0; a<Math.PI; a+=step) {\n" +
+                "  const c=Math.cos(a);\n" +
+                "  const s=Math.sin(a);\n" +
+                "  const xd=x*c-y*s;\n" +
+                "  const yd=x*s+y*c;\n" +
+                "  h += Math.cos(a*Math.sqrt(xd*xd*25+yd*yd*100))/(Math.PI+a);\n" +
+                "}\n" +
+                "return h/10;"
         }
         const autoSize = () => {
             formula.style.height = "auto";
@@ -33,9 +42,6 @@ import("../pkg/index.js").then(
         const svg = document.getElementsByTagName("svg").item(0);
         const hiddenLine = wasm.lets_go(svg);
         hiddenLine.set_function(getF());
-        svg.addEventListener("click", () => {
-            hiddenLine.on_click()
-        }, true);
 
         let h = false;
         svg.addEventListener("keydown", e => {
@@ -46,8 +52,6 @@ import("../pkg/index.js").then(
             hiddenLine.on_key(key);
             window.setTimeout(() => { h = false; });
         }, true);
-
-
 
         formulaForm.addEventListener("submit", (e) => {
             const f = getF();

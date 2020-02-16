@@ -4,6 +4,8 @@ use crate::dreidext::*;
 use crate::float::*;
 use crate::time::*;
 use crate::vec3::*;
+use rand::seq::SliceRandom;
+use rand::thread_rng;
 // use std::time::SystemTime;
 
 // program dreidplot;
@@ -44,8 +46,8 @@ pub fn init_scene<F: Fn(Float, Float) -> Float>(f: F) -> SceneBuilder {
 
     // {  cube (0,0,0, 1,0,0, 0,1,0, 0,0,1);}
 
-    let ad = 13.0;
-    let sw = 0.5;
+    let ad = 1.0;
+    let sw = 0.02;
     let mut xx = -ad;
 
     let mut scene = SceneBuilder::new();
@@ -97,8 +99,8 @@ pub fn init_scene<F: Fn(Float, Float) -> Float>(f: F) -> SceneBuilder {
 }
 
 pub fn init() -> AppContext {
-    let Auge = Vector3::new(30.0, 40.0, 50.0);
-    let BlickR = Auge.div3d(-10.0);
+    let Auge = Vector3::new(3.0, 4.0, 5.0);
+    let BlickR = Auge.div3d(-2.0);
     //   BlickR = Vector3::new(-3.0, -6.0, -12.0);
 
     AppContext {
@@ -107,8 +109,8 @@ pub fn init() -> AppContext {
         BlickR,
         iv: Vector3::new(1.0, 0.0, 0.0),
         jv: Vector3::new(0.0, 0.0, 1.0),
-        backface: true,
-        drawmode: 9,
+        backface: false,
+        drawmode: 0,
         ausgabeInsert: false,
         colmode: false,
         zaehl: ctyp::init(),
@@ -119,7 +121,7 @@ pub fn init() -> AppContext {
 pub fn darstellung(ctx: &mut dyn DrawContext, appCtx: &mut AppContext) {
     appCtx.zaehl = ctyp::init();
     appCtx.neukamera();
-    let polys = appCtx.rechnung();
+    let mut polys = appCtx.rechnung();
 
     println!("Anzahl Polygone: {}", appCtx.zaehl.q1.maximum);
     println!("Auge: {}", appCtx.Auge);
@@ -130,9 +132,9 @@ pub fn darstellung(ctx: &mut dyn DrawContext, appCtx: &mut AppContext) {
     //   sweep;
     // println!("Zeit: {}", start.elapsed().unwrap().as_secs());
     appCtx.zaehl.ausgabe();
-
     //TODO
 
+    polys.shuffle(&mut thread_rng());
     for poly in polys {
         poly.drawpoly(ctx, appCtx)
     }

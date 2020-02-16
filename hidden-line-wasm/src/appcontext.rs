@@ -103,7 +103,7 @@ impl AppContext {
             //         palettePos := (palettePos + Length(palette) - 1) MOD Length(palette);
             //         SetAllPalette(palette[palettePos]);
             //       end;
-            '0' => self.drawmode = 1,
+            '0' => self.drawmode = 0,
             '1' => self.drawmode = 1,
             '2' => self.drawmode = 2,
             '3' => self.drawmode = 3,

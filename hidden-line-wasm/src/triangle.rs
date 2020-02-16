@@ -38,7 +38,7 @@ impl dreiecktyp {
         }
     }
 
-    pub fn draw1(&self, ctx: &mut dyn DrawContext, c: Color) {
+    pub fn draw_line_set(&self, ctx: &mut dyn DrawContext, c: Color) {
         if self.gl & 1 != 0 {
             self.l1.draw(ctx, c);
         }
@@ -50,7 +50,7 @@ impl dreiecktyp {
         }
     }
 
-    pub fn draw2(&self, ctx: &mut dyn DrawContext, c: Color) {
+    pub fn draw_poly(&self, ctx: &mut dyn DrawContext, c: Color) {
         ctx.poly(&[self.p1.b, self.p2.b, self.p3.b], c);
     }
 
