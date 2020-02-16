@@ -14,7 +14,7 @@ impl SvgContext {
         SvgContext {
             svg,
             document,
-            scale: 2000.0,
+            scale: 1000.0,
         }
     }
 

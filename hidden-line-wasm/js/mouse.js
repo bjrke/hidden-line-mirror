@@ -3,8 +3,9 @@ export default function registerMouse(svg) {
     let origin;
 
     function onPointerDown(event) {
+        const { width, height } = svg.getBoundingClientRect();
         origin = {
-            ratio: Math.max(viewBox.width / svg.getBoundingClientRect().width, viewBox.height / svg.getBoundingClientRect().height),
+            rectSize: Math.min(width, height),
             ...getPointFromEvent(event)
         }
     }
@@ -12,8 +13,7 @@ export default function registerMouse(svg) {
     let viewBox = {
         x: -1000,
         y: -1000,
-        width: 2000,
-        height: 2000
+        size: 2000
     };
 
     let newViewBox = null;
@@ -27,15 +27,15 @@ export default function registerMouse(svg) {
             const { x, y } = getPointFromEvent(event);
 
             newViewBox = { ...viewBox };
-            newViewBox.x -= (x - origin.x) * origin.ratio;
-            newViewBox.y -= (y - origin.y) * origin.ratio;
+            newViewBox.x -= (x - origin.x) * viewBox.size / origin.rectSize;
+            newViewBox.y -= (y - origin.y) * viewBox.size / origin.rectSize;
 
             setViewBox(newViewBox);
         }
     }
 
     function setViewBox(vb) {
-        svg.setAttribute("viewBox", `${vb.x} ${vb.y} ${vb.width} ${vb.height}`);
+        svg.setAttribute("viewBox", `${vb.x} ${vb.y} ${vb.size} ${vb.size}`);
     }
 
     function onPointerUp() {
@@ -73,14 +73,16 @@ export default function registerMouse(svg) {
     function onWheel(event) {
         event.preventDefault();
 
-        const scale = 1 + event.deltaY / 100;
+        const additionalSize = viewBox.size * event.deltaY / 100;
+        const rect = svg.getBoundingClientRect();
+        const rectSize = Math.min(rect.width, rect.height);
+        const p = getPointFromEvent(event);
 
-        const { width, height } = viewBox;
+        const f = additionalSize / (2 * rectSize);
+        viewBox.x -= (2 * p.x + rectSize - rect.width) * f;
+        viewBox.y -= (2 * p.y + rectSize - rect.height) * f;
+        viewBox.size += additionalSize;
 
-        viewBox.x += (1 - scale) * width / 2;
-        viewBox.y += (1 - scale) * height / 2;
-        viewBox.width *= scale;
-        viewBox.height *= scale;
         setViewBox(viewBox);
     }
 

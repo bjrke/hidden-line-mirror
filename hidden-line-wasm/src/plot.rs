@@ -99,9 +99,8 @@ pub fn init_scene<F: Fn(Float, Float) -> Float>(f: F) -> SceneBuilder {
 }
 
 pub fn init() -> AppContext {
-    let Auge = Vector3::new(3.0, 4.0, 5.0);
+    let Auge = Vector3::new(1.5, 2.0, 2.5);
     let BlickR = Auge.div3d(-2.0);
-    //   BlickR = Vector3::new(-3.0, -6.0, -12.0);
 
     AppContext {
         sceneBuilder: SceneBuilder::new(),
@@ -133,6 +132,11 @@ pub fn darstellung(ctx: &mut dyn DrawContext, actx: &mut AppContext) {
     // println!("Zeit: {}", start.elapsed().unwrap().as_secs());
     actx.zaehl.ausgabe();
     //TODO
+
+    ctx.circle(0.99, 0.99, 0.01, 1.0);
+    ctx.circle(0.99, -0.99, 0.01, 1.0);
+    ctx.circle(-0.99, 0.99, 0.01, 1.0);
+    ctx.circle(-0.99, -0.99, 0.01, 1.0);
 
     polys.shuffle(&mut thread_rng());
     for poly in polys {
