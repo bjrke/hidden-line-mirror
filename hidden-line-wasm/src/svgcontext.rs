@@ -14,7 +14,7 @@ impl SvgContext {
         SvgContext {
             svg,
             document,
-            scale: 1000.0,
+            scale: 2000.0,
         }
     }
 
@@ -23,7 +23,7 @@ impl SvgContext {
     }
 
     pub fn scale(&self, f: Float) -> String {
-        (self.scale * f).to_string()
+        format!("{:.0}", self.scale * f)
     }
 
     pub fn scale_x(&self, f: Float) -> String {
@@ -105,23 +105,12 @@ impl DrawContext for SvgContext {
 }
 
 fn htmlColor(c: Color) -> String {
-    let hex = match c {
-        0 => '0',
-        1 => '1',
-        2 => '2',
-        3 => '3',
-        4 => '4',
-        5 => '5',
-        6 => '6',
-        7 => '7',
-        8 => '8',
-        9 => '9',
-        10 => 'A',
-        11 => 'B',
-        12 => 'C',
-        13 => 'D',
-        14 => 'E',
-        _ => 'F',
+    let x = if c >= 1.0 {
+        255
+    } else if c <= 0.0 {
+        0
+    } else {
+        (c * 255.0).round() as u8
     };
-    format!("#{}{}{}", hex, hex, hex)
+    format!("#{:02x}{:02x}{:02x}", x, x, x)
 }

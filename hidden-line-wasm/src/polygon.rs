@@ -8,6 +8,8 @@ use crate::vec2::*;
 use rand::Rng;
 use std::rc::Rc;
 
+extern crate rand;
+
 pub struct polygon {
     pub delegate: dreiecktyp,
     pub originalTriangle: Rc<dreieck>,
@@ -75,6 +77,8 @@ impl polygon {
             gl = glneu;
         }
 
+        let cols = originalTriangle.delegate.cols;
+
         polygon {
             delegate: dreiecktyp {
                 p1: p1,
@@ -84,9 +88,9 @@ impl polygon {
                 l2: Line::new(&p3, &p1),
                 l3: Line::new(&p1, &p2),
                 gl,
-                cols: 15,
+                cols,
             },
-            farbe: 15,
+            farbe: cols,
             originalTriangle,
             ymin: p1.b.y.min(p2.b.y).min(p3.b.y),
             ymax: p1.b.y.max(p2.b.y).max(p3.b.y),
@@ -167,16 +171,7 @@ impl polygon {
             for wy in ym1..ym2 {
                 let h = Vector2::new(wx as Float, wy as Float);
                 if self.delegate.punkttest(&h, "draw", false) == 0 {
-                    let my1 = 1.0 + 7.0 * self.yscan(wx as Float);
-
-                    let col = if my1 >= 15.0 {
-                        15
-                    } else if my1 <= 1.0 {
-                        1
-                    } else {
-                        my1.round() as Color
-                    };
-
+                    let col = 0.5 + 0.5 * self.yscan(wx as Float);
                     ctx.putpixel(wx, wy, col);
                 }
             }
@@ -227,8 +222,7 @@ impl polygon {
 
     pub fn drawpoly(&self, ctx: &mut DrawContext, appCtx: &AppContext) {
         let cols = if appCtx.colmode {
-            let mut rng = rand::thread_rng();
-            rng.gen_range(1, 16)
+            rand::thread_rng().gen()
         } else {
             self.delegate.cols
         };

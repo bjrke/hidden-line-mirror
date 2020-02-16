@@ -54,8 +54,8 @@ pub fn init() -> AppContext {
 
     // {  cube (0,0,0, 1,0,0, 0,1,0, 0,0,1);}
 
-    let ad = 13.0;
-    let sw = 0.5;
+    let ad = 26.0;
+    let sw = 1.0 / 3.0;
     let mut xx = -ad;
 
     let mut sceneBuilder = SceneBuilder::new();

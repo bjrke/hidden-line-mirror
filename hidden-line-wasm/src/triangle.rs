@@ -209,11 +209,5 @@ impl dreieck {
 }
 
 pub fn calcColor(f: Float) -> Color {
-    if f <= 0.0 {
-        1
-    } else if f >= 1.0 {
-        15
-    } else {
-        (f * 14.0).round() as Color
-    }
+    f
 }

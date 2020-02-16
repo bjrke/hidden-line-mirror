@@ -402,11 +402,11 @@ pub fn polypoly(appCtx: &AppContext, xscan: Float, p1: &dreieck, p2: &polygon) {
                             && ph.delegate.flaechentest()
                         {
                             if (ph.delegate.p1.b.x >= xscan) {
-                                ph.delegate.cols = 2; //15
-                                                      // push(ph, 1, zaehl.Count);
+                                ph.delegate.cols = 2.0 / 16.0; //15
+                                                               // push(ph, 1, zaehl.Count);
                             } else {
-                                ph.delegate.cols = 3; //4
-                                                      // push(ph, 2, zaehl.Count);
+                                ph.delegate.cols = 3.0 / 16.0; //4
+                                                               // push(ph, 2, zaehl.Count);
                             }
                         }
                     }
