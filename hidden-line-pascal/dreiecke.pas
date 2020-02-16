@@ -109,7 +109,7 @@ end;
 
 function dreiecktyp.punkttest;
 var
-  K: matrix3d;
+  K: Matrix3;
   h, b1: vector3d;
   kd: float;
   la1, la2, la3: float;

@@ -28,5 +28,3 @@ impl std::fmt::Display for Matrix3 {
         write!(f, "({}, {}, {})", self.x, self.y, self.z)
     }
 }
-
-type matrix3d = Matrix3;

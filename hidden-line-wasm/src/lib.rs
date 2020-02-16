@@ -19,7 +19,6 @@ use crate::appcontext::*;
 use crate::drawcontext::*;
 use crate::float::*;
 use crate::svgcontext::*;
-use crate::vec2::*;
 use wasm_bindgen::prelude::*;
 
 #[cfg(feature = "wee_alloc")]
@@ -41,7 +40,7 @@ pub fn lets_go(svg: web_sys::SvgElement) -> HiddenLine {
     let mut result = HiddenLine {
         radius: 100.0,
         svgcontext: SvgContext::new(svg),
-        appCtx: plot::init(),
+        app_ctx: plot::init(),
     };
 
     result.draw();
@@ -51,7 +50,7 @@ pub fn lets_go(svg: web_sys::SvgElement) -> HiddenLine {
 #[wasm_bindgen]
 pub struct HiddenLine {
     svgcontext: SvgContext,
-    appCtx: AppContext,
+    app_ctx: AppContext,
     radius: Float,
 }
 
@@ -65,6 +64,6 @@ impl HiddenLine {
     pub fn draw(&mut self) {
         self.svgcontext.cls();
 
-        plot::darstellung(&mut self.svgcontext, &mut self.appCtx);
+        plot::darstellung(&mut self.svgcontext, &mut self.app_ctx);
     }
 }

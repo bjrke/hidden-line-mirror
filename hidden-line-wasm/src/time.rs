@@ -38,8 +38,8 @@ impl dtyp {
     }
   }
 
-  pub fn ausgabe(&self, Name: &str) {
-    println!("{}", Name);
+  pub fn ausgabe(&self, name: &str) {
+    println!("{}", name);
     if self.insert == self.Delete && self.insert != 0 {
       println!("  Einfügungen = Löschungen: {}", self.insert)
     } else {

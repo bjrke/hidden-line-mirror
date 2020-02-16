@@ -44,7 +44,7 @@ impl DrawContext for SvgContext {
         circle.set_attribute("cx", &self.scale_x(x)).unwrap();
         circle.set_attribute("cy", &self.scale_y(y)).unwrap();
         circle.set_attribute("r", &self.scale(r)).unwrap();
-        circle.set_attribute("fill", &htmlColor(c)).unwrap();
+        circle.set_attribute("fill", &html_color(c)).unwrap();
         self.append(circle);
     }
 
@@ -57,7 +57,7 @@ impl DrawContext for SvgContext {
         line.set_attribute("y1", &self.scale_y(ya)).unwrap();
         line.set_attribute("x2", &self.scale_x(xe)).unwrap();
         line.set_attribute("y2", &self.scale_y(ye)).unwrap();
-        line.set_attribute("stroke", &htmlColor(c)).unwrap();
+        line.set_attribute("stroke", &html_color(c)).unwrap();
         self.append(line);
     }
 
@@ -73,7 +73,7 @@ impl DrawContext for SvgContext {
             .collect();
 
         polygon.set_attribute("points", &points.join(" ")).unwrap();
-        let color = &htmlColor(c);
+        let color = &html_color(c);
         polygon.set_attribute("fill", color).unwrap();
         polygon.set_attribute("stroke", color).unwrap();
         self.append(polygon);
@@ -88,7 +88,7 @@ impl DrawContext for SvgContext {
         rect.set_attribute("y", &self.scale_y(y as Float)).unwrap();
         rect.set_attribute("width", "1").unwrap();
         rect.set_attribute("height", "1").unwrap();
-        rect.set_attribute("fill", &htmlColor(c)).unwrap();
+        rect.set_attribute("fill", &html_color(c)).unwrap();
         self.append(rect);
     }
 
@@ -104,7 +104,7 @@ impl DrawContext for SvgContext {
     }
 }
 
-fn htmlColor(c: Color) -> String {
+fn html_color(c: Color) -> String {
     let x = if c >= 1.0 {
         255
     } else if c <= 0.0 {

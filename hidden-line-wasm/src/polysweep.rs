@@ -217,7 +217,7 @@ pub fn sdelete(xscan: Float, p: &polygon) /* -> &polygon */
     // end;
 }
 
-pub fn lineSetBit(i: u8) -> u8 {
+pub fn line_set_bit(i: u8) -> u8 {
     match i {
         1 => 1,
         2 => 2,
@@ -265,7 +265,7 @@ pub fn polypoly(appCtx: &AppContext, xscan: Float, p1: &dreieck, p2: &polygon) {
                     .add2d(&p2lie.mul2d(intersect.lambda))
                     .div2d(2.0);
 
-                addpl(&h, p2.delegate.gl & lineSetBit(i));
+                addpl(&h, p2.delegate.gl & line_set_bit(i));
             }
         }
     }
@@ -295,7 +295,7 @@ pub fn polypoly(appCtx: &AppContext, xscan: Float, p1: &dreieck, p2: &polygon) {
                     p1.delegate.p((i + 1) % 3 + 1),
                 );
                 if h1 == 1.0 || h2 == 1.0 {
-                    addpl(&p1pi.b, p2.delegate.gl & lineSetBit(pip));
+                    addpl(&p1pi.b, p2.delegate.gl & line_set_bit(pip));
                 }
             }
             11 | 12 | 13 => {
@@ -308,7 +308,7 @@ pub fn polypoly(appCtx: &AppContext, xscan: Float, p1: &dreieck, p2: &polygon) {
                 let h3 = gleicheseite(p1pi, p1n, p2n, p1l);
                 let h4 = gleicheseite(p1pi, p1l, p2n, p1n);
                 if h1 == -1.0 || h2 == -1.0 || h3 == -1.0 || h4 == -1.0 {
-                    addpl(&p1pi.b, p2.delegate.gl & !lineSetBit(pip - 10));
+                    addpl(&p1pi.b, p2.delegate.gl & !line_set_bit(pip - 10));
                 }
             }
             _ => { // 3 draußen brauchen wir nich
@@ -341,10 +341,10 @@ pub fn polypoly(appCtx: &AppContext, xscan: Float, p1: &dreieck, p2: &polygon) {
                     p2.delegate.p((i + 1) % 3 + 1),
                 );
                 if h1 == -1.0 || h2 == -1.0 {
-                    addpl(&p2pi.b, p2.delegate.gl & !lineSetBit(i));
+                    addpl(&p2pi.b, p2.delegate.gl & !line_set_bit(i));
                 }
             }
-            20 => addpl(&p2pi.b, p2.delegate.gl & !lineSetBit(i)),
+            20 => addpl(&p2pi.b, p2.delegate.gl & !line_set_bit(i)),
             //eckpunkte des unteren, die alle draußen sind
             _ => {}
         }
