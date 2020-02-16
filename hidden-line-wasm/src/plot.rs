@@ -118,25 +118,25 @@ pub fn init() -> AppContext {
     }
 }
 
-pub fn darstellung(ctx: &mut dyn DrawContext, appCtx: &mut AppContext) {
-    appCtx.zaehl = ctyp::init();
-    appCtx.neukamera();
-    let mut polys = appCtx.rechnung();
+pub fn darstellung(ctx: &mut dyn DrawContext, actx: &mut AppContext) {
+    actx.zaehl = ctyp::init();
+    actx.neukamera();
+    let mut polys = actx.rechnung();
 
-    println!("Anzahl Polygone: {}", appCtx.zaehl.q1.maximum);
-    println!("Auge: {}", appCtx.Auge);
-    println!("BlickR: {}", appCtx.BlickR);
-    println!("Oben x 10000: {}", appCtx.jv.mul3d(10000.0));
+    println!("Anzahl Polygone: {}", actx.zaehl.q1.maximum);
+    println!("Auge: {}", actx.Auge);
+    println!("BlickR: {}", actx.BlickR);
+    println!("Oben x 10000: {}", actx.jv.mul3d(10000.0));
 
     // let start = SystemTime::now();
     //   sweep;
     // println!("Zeit: {}", start.elapsed().unwrap().as_secs());
-    appCtx.zaehl.ausgabe();
+    actx.zaehl.ausgabe();
     //TODO
 
     polys.shuffle(&mut thread_rng());
     for poly in polys {
-        poly.drawpoly(ctx, appCtx)
+        poly.drawpoly(ctx, actx)
     }
     //   OutInt('höchste Tiefe Suchbaum:',mtf);
     //   if wurzel[1]<>nil then outstring('wurzel[1]');

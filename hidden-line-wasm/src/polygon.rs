@@ -176,7 +176,7 @@ impl polygon {
         }
     }
 
-    fn draw5(&self, ctx: &mut dyn DrawContext, appCtx: &AppContext) {
+    fn draw5(&self, ctx: &mut dyn DrawContext, actx: &AppContext) {
         //TODO use min and max to get my1, my2
         let p1 = self.delegate.p1;
         let p2 = self.delegate.p2;
@@ -207,9 +207,9 @@ impl polygon {
                     let my1 = 1.0 + 7.0 * self.yscan(wx as Float);
 
                     let col = calcColor(
-                        appCtx
+                        actx
                             .tiefePerspektive
-                            .relative(self.originalTriangle.tiefe(appCtx, &h)),
+                            .relative(self.originalTriangle.tiefe(actx, &h)),
                     );
 
                     ctx.putpixel(wx, wy, col);
@@ -218,14 +218,14 @@ impl polygon {
         }
     }
 
-    pub fn drawpoly(&self, ctx: &mut DrawContext, appCtx: &AppContext) {
-        let cols = if appCtx.colmode {
+    pub fn drawpoly(&self, ctx: &mut DrawContext, actx: &AppContext) {
+        let cols = if actx.colmode {
             thread_rng().gen()
         } else {
             self.delegate.cols
         };
 
-        match appCtx.drawmode {
+        match actx.drawmode {
             0 => {
                 self.delegate.draw_poly(ctx, 0.0);
                 self.delegate.draw_line_set(ctx, cols);
@@ -234,7 +234,7 @@ impl polygon {
             2 => self.delegate.draw_poly(ctx, cols),
             3 => self.delegate.draw3(ctx, cols),
             4 => self.draw4(ctx),
-            5 => self.draw5(ctx, appCtx),
+            5 => self.draw5(ctx, actx),
             6 => self.delegate.draw_line_set(ctx, cols),
             7 => self
                 .delegate

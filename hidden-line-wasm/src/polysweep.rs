@@ -226,7 +226,7 @@ pub fn line_set_bit(i: u8) -> u8 {
     }
 }
 
-pub fn polypoly(appCtx: &AppContext, xscan: Float, p1: &dreieck, p2: &polygon) {
+pub fn polypoly(actx: &AppContext, xscan: Float, p1: &dreieck, p2: &polygon) {
     // var
     //   ll: array[1..20] of linie;
     //   am: array[1..20, 1..20] of boolean;
@@ -242,7 +242,7 @@ pub fn polypoly(appCtx: &AppContext, xscan: Float, p1: &dreieck, p2: &polygon) {
 
     let mut addpl = |p: &Vector2, ls: u8| {
         pl.push(point::new(p, ls));
-        if (appCtx.ausgabeInsert) {
+        if (actx.ausgabeInsert) {
             println!("addpl({}): {}", pl.len(), p);
         }
     };
@@ -275,8 +275,8 @@ pub fn polypoly(appCtx: &AppContext, xscan: Float, p1: &dreieck, p2: &polygon) {
 
         let pip = p2
             .delegate
-            .punkttest(&p1pi.b, "polypoly1", appCtx.ausgabeInsert);
-        if appCtx.ausgabeInsert {
+            .punkttest(&p1pi.b, "polypoly1", actx.ausgabeInsert);
+        if actx.ausgabeInsert {
             println!("pip1 {}", pip);
         }
         match pip {
@@ -320,8 +320,8 @@ pub fn polypoly(appCtx: &AppContext, xscan: Float, p1: &dreieck, p2: &polygon) {
         let p2pi = p2.delegate.p(i);
         let pip = p1
             .delegate
-            .punkttest(&p2pi.b, "polypoly2", appCtx.ausgabeInsert);
-        if appCtx.ausgabeInsert {
+            .punkttest(&p2pi.b, "polypoly2", actx.ausgabeInsert);
+        if actx.ausgabeInsert {
             println!("pip2 {}", pip);
         }
 
@@ -353,7 +353,7 @@ pub fn polypoly(appCtx: &AppContext, xscan: Float, p1: &dreieck, p2: &polygon) {
     for (i, pli) in pl.iter().enumerate() {
         for (j, plj) in pl.iter().take(i).enumerate() {
             let li = Line::new(pli, plj);
-            if !p1.delegate.linientest(&li, appCtx.ausgabeInsert) {
+            if !p1.delegate.linientest(&li, actx.ausgabeInsert) {
                 if !ll.iter().any(|l| match intersect(&li, l).matched {
                     1 | 2 | 3 => true,
                     _ => false,
@@ -373,7 +373,7 @@ pub fn polypoly(appCtx: &AppContext, xscan: Float, p1: &dreieck, p2: &polygon) {
 
                     let h = pli.b.add2d(&plj.b).add2d(&plk.b).div2d(3.0);
 
-                    if p1.delegate.punkttest(&h, "addppl1", appCtx.ausgabeInsert) == 20
+                    if p1.delegate.punkttest(&h, "addppl1", actx.ausgabeInsert) == 20
                         && !colinear(&pli.b, &plj.b, &plk.b)
                     {
                         let mut ls = 0;
@@ -398,7 +398,7 @@ pub fn polypoly(appCtx: &AppContext, xscan: Float, p1: &dreieck, p2: &polygon) {
                             .add2d(&p1.delegate.p3.b)
                             .div2d(3.0);
 
-                        if ph.delegate.punkttest(&h, "addppl2", appCtx.ausgabeInsert) == 20
+                        if ph.delegate.punkttest(&h, "addppl2", actx.ausgabeInsert) == 20
                             && ph.delegate.flaechentest()
                         {
                             if (ph.delegate.p1.b.x >= xscan) {

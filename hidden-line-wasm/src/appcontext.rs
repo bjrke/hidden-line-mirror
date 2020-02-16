@@ -125,17 +125,17 @@ pub struct Scene {
 }
 
 impl punkt3d {
-    pub fn perspektive(mut self, appCtx: &AppContext) -> Self {
+    pub fn perspektive(mut self, actx: &AppContext) -> Self {
         // self.tiefePerspektive = minmax::new();
 
-        let mut K = Matrix3::new(appCtx.iv, appCtx.jv, appCtx.Auge.sub3d(&self.o));
+        let mut K = Matrix3::new(actx.iv, actx.jv, actx.Auge.sub3d(&self.o));
 
         let kd = K.det3d();
         if kd.abs() > epsilon2 {
-            K.x = appCtx.BlickR.neg3d();
+            K.x = actx.BlickR.neg3d();
             self.b.b.x = K.det3d() / kd;
             K.y = K.x;
-            K.x = appCtx.iv;
+            K.x = actx.iv;
             self.b.b.y = K.det3d() / kd;
 
             // if self.drawmode == 5 {
@@ -148,26 +148,26 @@ impl punkt3d {
 }
 
 impl Scene {
-    pub fn new(appCtx: &AppContext) -> Scene {
+    pub fn new(actx: &AppContext) -> Scene {
         let mut result = Scene {
             points: Vec::new(),
             dreiecks: Vec::new(),
         };
 
-        for p in appCtx.sceneBuilder.points.iter() {
+        for p in actx.sceneBuilder.points.iter() {
             result
                 .points
-                .push(Rc::new(punkt3d::newV(p).perspektive(&appCtx)));
+                .push(Rc::new(punkt3d::newV(p).perspektive(&actx)));
         }
 
-        for t in appCtx.sceneBuilder.triangles.iter() {
+        for t in actx.sceneBuilder.triangles.iter() {
             let p1 = &result.points[t.p1];
             let p2 = &result.points[t.p2];
             let p3 = &result.points[t.p3];
 
             let c = p1.o.sub3d(&p2.o).kreuz(&p3.o.sub3d(&p2.o));
-            let faktor = appCtx.BlickR.invBetrag3d() * c.invBetrag3d();
-            let cols = calcColor((appCtx.BlickR.skalar(&c) * faktor).abs());
+            let faktor = actx.BlickR.invBetrag3d() * c.invBetrag3d();
+            let cols = calcColor((actx.BlickR.skalar(&c) * faktor).abs());
 
             result.dreiecks.push(Rc::new(dreieck::new(
                 p1.clone(),

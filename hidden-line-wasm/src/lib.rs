@@ -36,8 +36,6 @@ pub fn main_js() -> Result<(), JsValue> {
 
 #[wasm_bindgen]
 pub fn lets_go(svg: web_sys::SvgElement) -> HiddenLine {
-    svg.set_attribute("viewBox", "-1000 -1000 2000 2000")
-        .unwrap();
     let mut result = HiddenLine {
         svgcontext: SvgContext::new(svg),
         app_ctx: plot::init(),

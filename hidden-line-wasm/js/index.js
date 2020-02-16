@@ -1,3 +1,5 @@
+import registerMouse from "./mouse";
+
 import("../pkg/index.js").then(
     wasm => {
         const formula = document.getElementById("formula");
@@ -66,5 +68,7 @@ import("../pkg/index.js").then(
         });
 
         svg.focus();
+        registerMouse(svg);
     }
+
 ).catch(console.error);
