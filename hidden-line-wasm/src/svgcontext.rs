@@ -73,7 +73,9 @@ impl DrawContext for SvgContext {
             .collect();
 
         polygon.set_attribute("points", &points.join(" ")).unwrap();
-        polygon.set_attribute("fill", &htmlColor(c)).unwrap();
+        let color = &htmlColor(c);
+        polygon.set_attribute("fill", color).unwrap();
+        polygon.set_attribute("stroke", color).unwrap();
         self.append(polygon);
     }
 

@@ -167,7 +167,7 @@ pub struct dreieck {
 }
 
 impl dreieck {
-    pub fn new(p1: Rc<punkt3d>, p2: Rc<punkt3d>, p3: Rc<punkt3d>, ls: u8) -> dreieck {
+    pub fn new(p1: Rc<punkt3d>, p2: Rc<punkt3d>, p3: Rc<punkt3d>, ls: u8, cols: Color) -> dreieck {
         let planeNorm = p2.o.sub3d(&p1.o).kreuz(&p3.o.sub3d(&p1.o)).normalize();
 
         let dp1 = p1.b;
@@ -187,7 +187,7 @@ impl dreieck {
                 l1: Line::new(&dp2, &dp3),
                 l2: Line::new(&dp3, &dp1),
                 l3: Line::new(&dp1, &dp2),
-                cols: 0,
+                cols,
             },
             planeNorm,
             planeDist,

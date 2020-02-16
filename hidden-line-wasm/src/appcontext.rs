@@ -111,11 +111,20 @@ impl Scene {
         }
 
         for t in appCtx.sceneBuilder.triangles.iter() {
+            let p1 = &result.points[t.p1];
+            let p2 = &result.points[t.p2];
+            let p3 = &result.points[t.p3];
+
+            let c = p1.o.sub3d(&p2.o).kreuz(&p3.o.sub3d(&p2.o));
+            let faktor = appCtx.BlickR.invBetrag3d() * c.invBetrag3d();
+            let cols = calcColor((appCtx.BlickR.skalar(&c) * faktor).abs());
+
             result.dreiecks.push(Rc::new(dreieck::new(
-                result.points[t.p1].clone(),
-                result.points[t.p2].clone(),
-                result.points[t.p3].clone(),
+                p1.clone(),
+                p2.clone(),
+                p3.clone(),
                 t.lset,
+                cols,
             )));
         }
         result

@@ -93,15 +93,6 @@ impl polygon {
         }
     }
     pub fn newpoly(aOriginalTriangle: Rc<dreieck>) -> polygon {
-        //   if ((drawmode = 7) or (drawmode = 9)) then
-        //   begin
-        //     let c := aOriginalTriangle^.origPoints[1]^.o.sub3d(aOriginalTriangle^.origPoints[2]^.o)
-        //       .kreuz(aOriginalTriangle^.origPoints[3]^.o.sub3d(
-        //       aOriginalTriangle^.origPoints[2]^.o));
-        //     let faktor := (BlickR.invBetrag3d * c.invBetrag3d);
-        //     aOriginalTriangle^.cols := calcColor(abs(BlickR.skalar(c) * faktor));
-        //   end;
-
         polygon::initpoly(
             &aOriginalTriangle.delegate.p1,
             &aOriginalTriangle.delegate.p2,
