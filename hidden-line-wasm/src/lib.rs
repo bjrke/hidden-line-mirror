@@ -61,6 +61,11 @@ impl HiddenLine {
         self.draw();
     }
 
+    pub fn on_key(&mut self, ch: char) {
+        self.app_ctx.on_key(ch);
+        self.draw();
+    }
+
     pub fn draw(&mut self) {
         self.svgcontext.cls();
 

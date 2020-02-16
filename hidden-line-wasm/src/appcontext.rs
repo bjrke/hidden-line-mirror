@@ -25,8 +25,6 @@ pub struct AppContext {
 
 impl AppContext {
     pub fn neukamera(&mut self) {
-        //   cls;
-
         let iv = self.BlickR.kreuz(&self.jv);
         //  if iv.betrag3d=0 then outstring('i=0');
 
@@ -47,10 +45,10 @@ impl AppContext {
         let mut polys = Vec::new();
 
         for j in scene.dreiecks.iter_mut() {
-            if self.BlickR.skalar(&j.origPoint1.o) > ED  &&
-                self.BlickR.skalar(&j.origPoint2.o) > ED  &&
-               self.BlickR.skalar(&j.origPoint3.o) > ED  &&
-             // test if not behind view plane
+            // test if not behind view plane
+            if self.BlickR.skalar(&j.origPoint1.o) > ED &&
+               self.BlickR.skalar(&j.origPoint2.o) > ED &&
+               self.BlickR.skalar(&j.origPoint3.o) > ED &&
                // evtl kann man das mit der Lichtberechnung beim Initialisieren des Polygons kombinieren
                (!self.backface || ((j.delegate.p3.b.x - j.delegate.p1.b.x) *
             (j.delegate.p2.b.y - j.delegate.p1.b.y) + epsilon1 < (j.delegate.p3.b.y - j.delegate.p1.b.y) *
@@ -65,6 +63,58 @@ impl AppContext {
 
         polys
         //   {  xscan:=-1e20;}
+    }
+
+    pub fn on_key(&mut self, ch: char) {
+        match ch {
+            'a' => self.Auge = self.Auge.move3d(&self.BlickR, 1.0),
+            'A' => self.Auge = self.Auge.move3d(&self.BlickR, 10.0),
+            'y' | 'z' => self.Auge = self.Auge.move3d(&self.BlickR, -1.0),
+            'Y' | 'Z' => self.Auge = self.Auge.move3d(&self.BlickR, -10.0),
+            'k' => self.Auge = self.Auge.move3d(&self.iv, -1.0),
+            'K' => self.Auge = self.Auge.move3d(&self.iv, -10.0),
+            'l' => self.Auge = self.Auge.move3d(&self.iv, 1.0),
+            'L' => self.Auge = self.Auge.move3d(&self.iv, 10.0),
+            's' => self.Auge = self.Auge.move3d(&self.jv, -1.0),
+            'S' => self.Auge = self.Auge.move3d(&self.jv, -10.0),
+            'x' => self.Auge = self.Auge.move3d(&self.jv, 1.0),
+            'X' => self.Auge = self.Auge.move3d(&self.jv, 10.0),
+            'd' => RotVec(&mut self.BlickR, &mut self.jv, 1.0),
+            'D' => RotVec(&mut self.BlickR, &mut self.jv, 10.0),
+            'c' => RotVec(&mut self.jv, &mut self.BlickR, 1.0),
+            'C' => RotVec(&mut self.jv, &mut self.BlickR, 10.0),
+            ',' => RotVec(&mut self.iv, &mut self.BlickR, 1.0),
+            ';' | '<' => RotVec(&mut self.iv, &mut self.BlickR, 10.0),
+            '.' => RotVec(&mut self.BlickR, &mut self.iv, 1.0),
+            ':' | '>' => RotVec(&mut self.BlickR, &mut self.iv, 10.0),
+            'o' => RotVec(&mut self.jv, &mut self.iv, 1.0),
+            'O' => RotVec(&mut self.jv, &mut self.iv, 10.0),
+
+            'i' => RotVec(&mut self.iv, &mut self.jv, 1.0),
+            'I' => RotVec(&mut self.iv, &mut self.jv, 10.0),
+            'f' | 'F' => self.colmode = !self.colmode,
+            // 't' | 'T' => self.tausgabe = !self.tausgabe,
+            'b' | 'B' => self.backface = !self.backface,
+            //       'p':begin
+            //         palettePos := (palettePos + 1) MOD Length(palette);
+            //         SetAllPalette(palette[palettePos]);
+            //       end;
+            //       'P':begin
+            //         palettePos := (palettePos + Length(palette) - 1) MOD Length(palette);
+            //         SetAllPalette(palette[palettePos]);
+            //       end;
+            '0' => self.drawmode = 1,
+            '1' => self.drawmode = 1,
+            '2' => self.drawmode = 2,
+            '3' => self.drawmode = 3,
+            '4' => self.drawmode = 4,
+            '5' => self.drawmode = 5,
+            //       '6':begin drawmode=6;zumalen=[0..255];tausgabe=true;end;
+            '7' => self.drawmode = 7,
+            '8' => self.drawmode = 8,
+            '9' => self.drawmode = 9,
+            _ => {}
+        }
     }
 }
 

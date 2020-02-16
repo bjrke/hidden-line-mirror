@@ -54,8 +54,8 @@ pub fn init() -> AppContext {
 
     // {  cube (0,0,0, 1,0,0, 0,1,0, 0,0,1);}
 
-    let ad = 26.0;
-    let sw = 1.0 / 3.0;
+    let ad = 13.0;
+    let sw = 0.5;
     let mut xx = -ad;
 
     let mut sceneBuilder = SceneBuilder::new();
@@ -174,48 +174,6 @@ pub fn darstellung(ctx: &mut dyn DrawContext, appCtx: &mut AppContext) {
     //   end;
     // end;
 }
-
-// procedure tastatur;
-// begin
-//   repeat
-//     ch:=readkey2([#27,'A','B','Y','Z','K','L','S','X','D','C','F','T','P',',',';','<','>','.',':','O','I','0'..'9']);
-//     case ch of
-//       'a':auge := auge.move3d(BlickR,1);       'A':auge := auge.move3d(BlickR,10);
-//       'y','z':auge := auge.move3d(BlickR,-1);  'Y','Z':auge := auge.move3d(BlickR,-10);
-//       'k':auge := auge.move3d(iv,-1);          'K':auge := auge.move3d(iv,-10);
-//       'l':auge := auge.move3d(iv,1);           'L':auge := auge.move3d(iv,10);
-//       's':auge := auge.move3d(jv,1);           'S':auge := auge.move3d(jv,10);
-//       'x':auge := auge.move3d(jv,-1);          'X':auge := auge.move3d(jv,-10);
-//       'd':RotVec(@BlickR, @jv,1);              'D':RotVec(@BlickR, @jv, 10);
-//       'c':RotVec(@jv, @BlickR, 1);             'C':RotVec(@jv, @BlickR, 10);
-//       ',':RotVec(@iv, @BlickR, 1);             ';','<':RotVec(@iv, @BlickR, 10);
-//       '.':RotVec(@BlickR, @iv, 1);             ':','>':RotVec(@BlickR, @iv, 10);
-//       'o':RotVec(@jv, @iv, 1);                 'O':RotVec(@jv, @iv, 10);
-//       'i':RotVec(@iv, @jv, 1);                 'I':RotVec(@iv, @jv, 10);
-//       'f','F':colmode:=not colmode;
-//       't','T':tausgabe:=not tausgabe;
-//       'b','B':backface:=not backface;
-//       'p':begin
-//         palettePos := (palettePos + 1) MOD Length(palette);
-//         SetAllPalette(palette[palettePos]);
-//       end;
-//       'P':begin
-//         palettePos := (palettePos + Length(palette) - 1) MOD Length(palette);
-//         SetAllPalette(palette[palettePos]);
-//       end;
-//       '0':drawmode:=1;
-//       '1':drawmode:=1;
-//       '2':drawmode:=2;
-//       '3':drawmode:=3;
-//       '4':drawmode:=4;
-//       '5':drawmode:=5;
-//       '6':begin drawmode:=6;zumalen:=[0..255];tausgabe:=true;end;
-//       '7':drawmode:=7;
-//       '8':drawmode:=8;
-//       '9':drawmode:=9;
-//     end;
-//   until (not (Upcase(ch) in ['P']));
-// end;
 
 // begin
 //   init;
