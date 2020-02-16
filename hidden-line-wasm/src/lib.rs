@@ -36,11 +36,10 @@ pub fn main_js() -> Result<(), JsValue> {
 
 #[wasm_bindgen]
 pub fn lets_go(svg: web_sys::SvgElement) -> HiddenLine {
-    let mut result = HiddenLine {
+    HiddenLine {
         svgcontext: SvgContext::new(svg),
         app_ctx: plot::init(),
-    };
-    result
+    }
 }
 
 #[wasm_bindgen]
@@ -52,8 +51,9 @@ pub struct HiddenLine {
 #[wasm_bindgen]
 impl HiddenLine {
     pub fn on_key(&mut self, ch: char) {
-        self.app_ctx.on_key(ch);
-        self.draw();
+        if self.app_ctx.on_key(ch) {
+            self.draw();
+        }
     }
 
     pub fn set_function(&mut self, f: &js_sys::Function) {

@@ -65,7 +65,7 @@ impl AppContext {
         //   {  xscan:=-1e20;}
     }
 
-    pub fn on_key(&mut self, ch: char) {
+    pub fn on_key(&mut self, ch: char) -> bool {
         match ch {
             'a' => self.Auge = self.Auge.move3d(&self.BlickR, 1.0),
             'A' => self.Auge = self.Auge.move3d(&self.BlickR, 10.0),
@@ -113,8 +113,9 @@ impl AppContext {
             '7' => self.drawmode = 7,
             '8' => self.drawmode = 8,
             '9' => self.drawmode = 9,
-            _ => {}
+            _ => return false,
         }
+        true
     }
 }
 
