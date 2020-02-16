@@ -39,12 +39,9 @@ pub fn lets_go(svg: web_sys::SvgElement) -> HiddenLine {
     svg.set_attribute("viewBox", "-1000 -1000 2000 2000")
         .unwrap();
     let mut result = HiddenLine {
-        radius: 100.0,
         svgcontext: SvgContext::new(svg),
         app_ctx: plot::init(),
     };
-
-    result.draw();
     result
 }
 
@@ -52,16 +49,10 @@ pub fn lets_go(svg: web_sys::SvgElement) -> HiddenLine {
 pub struct HiddenLine {
     svgcontext: SvgContext,
     app_ctx: AppContext,
-    radius: Float,
 }
 
 #[wasm_bindgen]
 impl HiddenLine {
-    pub fn on_click(&mut self) {
-        self.radius -= 1.0;
-        self.draw();
-    }
-
     pub fn on_key(&mut self, ch: char) {
         self.app_ctx.on_key(ch);
         self.draw();

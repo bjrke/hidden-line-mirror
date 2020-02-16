@@ -14,12 +14,6 @@ use crate::vec3::*;
 //   p:ppoly;
 //   palettePos: Integer;
 
-pub fn fkt(x: Float, y: Float) -> Float {
-    let h = (x.sqr() + y.sqr()).sqrt();
-    30.0 * h.cos() / (2.0 + h)
-    // y.sin() * x / 10.0
-}
-
 pub fn init_scene<F: Fn(Float, Float) -> Float>(f: F) -> SceneBuilder {
     // var {a,b,c:int;}
     //     {h:^triStrip;}
@@ -108,7 +102,7 @@ pub fn init() -> AppContext {
     //   BlickR = Vector3::new(-3.0, -6.0, -12.0);
 
     AppContext {
-        sceneBuilder: init_scene(fkt),
+        sceneBuilder: SceneBuilder::new(),
         Auge,
         BlickR,
         iv: Vector3::new(1.0, 0.0, 0.0),
