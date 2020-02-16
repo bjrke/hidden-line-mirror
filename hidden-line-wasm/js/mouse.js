@@ -70,4 +70,20 @@ export default function registerMouse(svg) {
         };
     }
 
+    function onWheel(event) {
+        event.preventDefault();
+
+        const p = event.targetTouches ? event.targetTouches[0] : event;
+        const scale = 1 + event.deltaY / 100;
+
+        const { x, y, width, height } = viewBox;
+
+        viewBox.x += (1 - scale) * width / 2;
+        viewBox.y += (1 - scale) * height / 2;
+        viewBox.width *= scale;
+        viewBox.height *= scale;
+        setViewBox(viewBox);
+    }
+
+    document.addEventListener("wheel", onWheel);
 }
