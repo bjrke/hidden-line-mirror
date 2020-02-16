@@ -19,6 +19,7 @@ use crate::appcontext::*;
 use crate::drawcontext::*;
 use crate::float::*;
 use crate::svgcontext::*;
+use js_sys;
 use wasm_bindgen::prelude::*;
 
 #[cfg(feature = "wee_alloc")]
@@ -66,7 +67,18 @@ impl HiddenLine {
         self.draw();
     }
 
-    pub fn draw(&mut self) {
+    pub fn set_function(&mut self, f: &js_sys::Function) {
+        self.app_ctx.sceneBuilder = plot::init_scene(|x, y| {
+            f.call2(&JsValue::NULL, &JsValue::from(x), &JsValue::from(y))
+                .unwrap()
+                .as_f64()
+                .unwrap() as Float
+        });
+
+        self.draw();
+    }
+
+    fn draw(&mut self) {
         self.svgcontext.cls();
 
         plot::darstellung(&mut self.svgcontext, &mut self.app_ctx);

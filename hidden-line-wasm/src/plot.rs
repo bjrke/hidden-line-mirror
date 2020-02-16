@@ -20,7 +20,7 @@ pub fn fkt(x: Float, y: Float) -> Float {
     // y.sin() * x / 10.0
 }
 
-pub fn init() -> AppContext {
+pub fn init_scene<F: Fn(Float, Float) -> Float>(f: F) -> SceneBuilder {
     // var {a,b,c:int;}
     //     {h:^triStrip;}
     //     qs:^quadstrip;
@@ -38,10 +38,6 @@ pub fn init() -> AppContext {
     // begin
     //   tausgabe:=true;
 
-    let Auge = Vector3::new(30.0, 40.0, 50.0);
-    let BlickR = Auge.div3d(-10.0);
-    //   BlickR = Vector3::new(-3.0, -6.0, -12.0);
-
     // { tetraeder(0,0,0, -1,0,-2, 1,1,-2 ,1,-1,-2);
 
     //   cube(-4,2,-2, 3,0,0, 0,3,0, 0,0,3);
@@ -58,25 +54,17 @@ pub fn init() -> AppContext {
     let sw = 0.5;
     let mut xx = -ad;
 
-    let mut sceneBuilder = SceneBuilder::new();
+    let mut scene = SceneBuilder::new();
     while xx < ad {
-        let mut qs = QuadStrip::init(
-            sceneBuilder,
-            xx,
-            -ad,
-            fkt(xx, -ad),
-            xx + sw,
-            -ad,
-            fkt(xx + sw, -ad),
-        );
+        let mut qs = QuadStrip::init(scene, xx, -ad, f(xx, -ad), xx + sw, -ad, f(xx + sw, -ad));
 
         let mut yy = -ad + sw;
         while yy < ad {
-            qs.add(xx, yy, fkt(xx, yy), xx + sw, yy, fkt(xx + sw, yy));
+            qs.add(xx, yy, f(xx, yy), xx + sw, yy, f(xx + sw, yy));
             yy = yy + sw;
         }
         xx = xx + sw;
-        sceneBuilder = qs.build();
+        scene = qs.build();
     }
 
     // {  for a:=1 to 20 do begin
@@ -111,9 +99,16 @@ pub fn init() -> AppContext {
     //           kegel(a*xs,b*ys,c*zs-r1,      xs*r2*0.4,0,0,    0,ys*r2*0.4,0, 0,0,zs*(random+r1)*0.4, 8)
     //       end
     //   end}
+    scene
+}
+
+pub fn init() -> AppContext {
+    let Auge = Vector3::new(30.0, 40.0, 50.0);
+    let BlickR = Auge.div3d(-10.0);
+    //   BlickR = Vector3::new(-3.0, -6.0, -12.0);
 
     AppContext {
-        sceneBuilder,
+        sceneBuilder: init_scene(fkt),
         Auge,
         BlickR,
         iv: Vector3::new(1.0, 0.0, 0.0),

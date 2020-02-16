@@ -16,11 +16,39 @@
     width: 100%;
     height: 100%;
     background: #000;
+    z-index: -1;
+  }
+
+  #formulaForm {
+    display: inline-block;
+    background: #FFF;
+    margin: 5px;
+    padding: 5px;
+  }
+
+  #formula {
+    display: block;
+    white-space: pre;
+  }
+
+  #submitFormula {
+    width: 100%;
   }
 </style>
 
 <body>
-  <svg></svg>
+
+  <svg tabindex="0"></svg>
+
+  <form id="formulaForm">
+    <textarea id="formula">
+function(x,y) {
+  var h = Math.sqrt(x*x + y*y);
+  return 30 * Math.cos(h) / (2 + h);
+}
+    </textarea>
+    <input id="submitFormula" type="submit" value="update formula">
+  </form>
   <script src="index.js"></script>
 </body>
 
