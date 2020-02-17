@@ -138,10 +138,10 @@ pub fn darstellung(ctx: &mut dyn DrawContext, actx: &mut AppContext) {
     ctx.circle(-0.99, 0.99, 0.01, 1.0);
     ctx.circle(-0.99, -0.99, 0.01, 1.0);
 
-    polys.shuffle(&mut thread_rng());
     for poly in polys {
-        poly.drawpoly(ctx, actx)
+        poly.polygon.drawpoly(ctx, actx)
     }
+
     //   OutInt('höchste Tiefe Suchbaum:',mtf);
     //   if wurzel[1]<>nil then outstring('wurzel[1]');
     //   if wurzel[2]<>nil then outstring('wurzel[2]');

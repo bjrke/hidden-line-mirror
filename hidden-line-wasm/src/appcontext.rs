@@ -1,11 +1,13 @@
 use crate::dreidext::*;
 use crate::float::*;
+use crate::leftqueue::*;
 use crate::mat3::*;
 use crate::point::*;
 use crate::polygon::*;
 use crate::time::*;
 use crate::triangle::*;
 use crate::vec3::*;
+use std::collections::BinaryHeap;
 use std::rc::Rc;
 
 pub struct AppContext {
@@ -37,12 +39,12 @@ impl AppContext {
         self.jv = jv;
     }
 
-    pub fn rechnung(&mut self) -> Vec<polygon> {
+    pub fn rechnung(&mut self) -> BinaryHeap<LeftQueueEntry> {
         let mut scene = Scene::new(&self);
 
         let ED = self.BlickR.skalar(&self.Auge) + epsilon1;
 
-        let mut polys = Vec::new();
+        let mut polys = BinaryHeap::new();
 
         for j in scene.dreiecks.iter_mut() {
             // test if not behind view plane
@@ -55,7 +57,8 @@ impl AppContext {
             (j.delegate.p2.b.x - j.delegate.p1.b.x)))
             {
                 if j.delegate.flaechentest() {
-                    polys.push(polygon::newpoly(j.clone()));
+                    let polygon = polygon::newpoly(j.clone());
+                    polys.push(LeftQueueEntry { polygon });
                     //         polygon.push(h, 1, -2)
                 }
             }

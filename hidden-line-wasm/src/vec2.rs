@@ -1,6 +1,7 @@
 use crate::float::*;
+use std::cmp::Ordering;
 
-#[derive(Clone, Copy)]
+#[derive(Debug, Default, Clone, Copy, PartialEq, PartialOrd)]
 pub struct Vector2 {
   pub x: Float,
   pub y: Float,
@@ -35,6 +36,14 @@ impl Vector2 {
 
   pub fn betrag2d(&self) -> Float {
     self.sqrbetrag2d().sqrt()
+  }
+}
+
+impl Eq for Vector2 {}
+
+impl Ord for Vector2 {
+  fn cmp(&self, other: &Self) -> Ordering {
+    self.partial_cmp(other).unwrap()
   }
 }
 
