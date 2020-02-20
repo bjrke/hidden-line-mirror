@@ -1,11 +1,11 @@
 use crate::polygon::*;
 use std::cmp::Ordering;
 
-pub struct LeftQueueEntry {
+pub struct MinxQueueEntry {
     pub polygon: polygon,
 }
 
-impl Ord for LeftQueueEntry {
+impl Ord for MinxQueueEntry {
     #[inline]
     fn cmp(&self, other: &Self) -> Ordering {
         self.polygon
@@ -18,14 +18,14 @@ impl Ord for LeftQueueEntry {
     }
 }
 
-impl PartialOrd for LeftQueueEntry {
+impl PartialOrd for MinxQueueEntry {
     #[inline]
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
     }
 }
 
-impl PartialEq for LeftQueueEntry {
+impl PartialEq for MinxQueueEntry {
     #[inline]
     fn eq(&self, other: &Self) -> bool {
         match self.cmp(&other) {
@@ -35,4 +35,4 @@ impl PartialEq for LeftQueueEntry {
     }
 }
 
-impl Eq for LeftQueueEntry {}
+impl Eq for MinxQueueEntry {}

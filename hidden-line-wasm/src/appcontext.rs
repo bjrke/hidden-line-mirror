@@ -1,7 +1,7 @@
 use crate::dreidext::*;
 use crate::float::*;
-use crate::leftqueue::*;
 use crate::mat3::*;
+use crate::minxqueue::*;
 use crate::point::*;
 use crate::polygon::*;
 use crate::time::*;
@@ -39,7 +39,7 @@ impl AppContext {
         self.jv = jv;
     }
 
-    pub fn rechnung(&mut self) -> BinaryHeap<LeftQueueEntry> {
+    pub fn rechnung(&mut self) -> BinaryHeap<MinxQueueEntry> {
         let mut scene = Scene::new(&self);
 
         let ED = self.BlickR.skalar(&self.Auge) + epsilon1;
@@ -58,7 +58,7 @@ impl AppContext {
             {
                 if j.delegate.flaechentest() {
                     let polygon = polygon::newpoly(j.clone());
-                    polys.push(LeftQueueEntry { polygon });
+                    polys.push(MinxQueueEntry { polygon });
                     //         polygon.push(h, 1, -2)
                 }
             }
