@@ -1,8 +1,16 @@
 use crate::polygon::*;
 use std::cmp::Ordering;
+use std::rc::Rc;
 
 pub struct MaxxQueueEntry {
-    pub polygon: polygon,
+    pub polygon: Rc<polygon>,
+}
+
+impl MaxxQueueEntry {
+    fn raw_ptr_addr(&self) -> usize {
+        let ptr: *const polygon = &*self.polygon;
+        ptr as usize
+    }
 }
 
 impl Ord for MaxxQueueEntry {
@@ -13,8 +21,7 @@ impl Ord for MaxxQueueEntry {
             .p3
             .b
             .cmp(&other.polygon.delegate.p3.b)
-            .then_with(|| self.polygon.delegate.p2.b.cmp(&other.polygon.delegate.p2.b))
-            .then_with(|| self.polygon.delegate.p1.b.cmp(&other.polygon.delegate.p1.b))
+            .then_with(|| self.raw_ptr_addr().cmp(&other.raw_ptr_addr()))
     }
 }
 

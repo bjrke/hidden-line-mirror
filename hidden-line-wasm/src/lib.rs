@@ -1,10 +1,12 @@
 mod appcontext;
+mod calcctontext;
 mod drawcontext;
 mod dreidext;
 mod float;
 mod line;
 mod mat2;
 mod mat3;
+mod maxxqueue;
 mod minxqueue;
 mod plot;
 mod point;

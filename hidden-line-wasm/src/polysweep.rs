@@ -1,6 +1,11 @@
+#![feature(map_first_last)]
 use crate::appcontext::*;
+use crate::calcctontext::*;
+use crate::drawcontext::*;
 use crate::float::*;
 use crate::line::*;
+use crate::maxxqueue::*;
+use crate::minxqueue::*;
 use crate::point::*;
 use crate::polygon::*;
 use crate::triangle::*;
@@ -12,210 +17,210 @@ use std::collections::HashSet;
 //   mtf: longint;
 //   ausgabeInsert: boolean;
 
-pub fn abflachen() {
-    // type
-    //   fettesfeld = array[0..16382] of ppoly;
-    // var
-    //   pa: ^fettesfeld;
-    //   c: int;
-    //   p, q: ppoly;
-    //   maxtiefe: integer;
+// pub fn abflachen() {
+// type
+//   fettesfeld = array[0..16382] of ppoly;
+// var
+//   pa: ^fettesfeld;
+//   c: int;
+//   p, q: ppoly;
+//   maxtiefe: integer;
 
-    //   function newtree(a, e: int; tiefe: integer): ppoly;
-    //   var
-    //     h, h1, h2: ppoly;
-    //     x: int;
-    //   begin
-    //     if (tiefe > maxtiefe) then
-    //       maxtiefe := tiefe;
-    //     x := a + ((e - a) div 2);
-    //     h := pa^[x];
-    //     h^.so := nil;
-    //     h^.su := nil;
-    //     if a <= (x - 1) then
-    //       h1 := newtree(a, x - 1, tiefe + 1)
-    //     else
-    //       h1 := nil;
-    //     if (x + 1) <= e then
-    //       h2 := newtree(x + 1, e, tiefe + 1)
-    //     else
-    //       h2 := nil;
-    //     verbindeso(h, h1);
-    //     verbindesu(h, h2);
-    //     exit(h);
-    //   end;
+//   function newtree(a, e: int; tiefe: integer): ppoly;
+//   var
+//     h, h1, h2: ppoly;
+//     x: int;
+//   begin
+//     if (tiefe > maxtiefe) then
+//       maxtiefe := tiefe;
+//     x := a + ((e - a) div 2);
+//     h := pa^[x];
+//     h^.so := nil;
+//     h^.su := nil;
+//     if a <= (x - 1) then
+//       h1 := newtree(a, x - 1, tiefe + 1)
+//     else
+//       h1 := nil;
+//     if (x + 1) <= e then
+//       h2 := newtree(x + 1, e, tiefe + 1)
+//     else
+//       h2 := nil;
+//     verbindeso(h, h1);
+//     verbindesu(h, h2);
+//     exit(h);
+//   end;
 
-    // begin
-    //   maxtiefe := 0;
-    //   if swurzel <> nil then
-    //   begin
-    //     new(pa);
-    //     p := swurzel;
-    //     while p <> nil do
-    //     begin
-    //       q := p;
-    //       p := p^.so;
-    //     end;
-    //     c := 0;
-    //     while q <> nil do
-    //     begin
-    //       pa^[c] := q;
-    //       Inc(c);
-    //       q := q^.pu;
-    //     end;
-    //     swurzel := newtree(0, c - 1, 1);
-    //     swurzel^.ss := @swurzel;
-    //     dispose(pa);
-    //   end;
-    //   mtf := 2 * maxtiefe + 5;
-    // end;
-}
+// begin
+//   maxtiefe := 0;
+//   if swurzel <> nil then
+//   begin
+//     new(pa);
+//     p := swurzel;
+//     while p <> nil do
+//     begin
+//       q := p;
+//       p := p^.so;
+//     end;
+//     c := 0;
+//     while q <> nil do
+//     begin
+//       pa^[c] := q;
+//       Inc(c);
+//       q := q^.pu;
+//     end;
+//     swurzel := newtree(0, c - 1, 1);
+//     swurzel^.ss := @swurzel;
+//     dispose(pa);
+//   end;
+//   mtf := 2 * maxtiefe + 5;
+// end;
+// }
 
-pub fn drawtree(xscan: Float) {
-    // procedure drawtree(xscan: float);
+// pub fn drawtree(xscan: Float) {
+// procedure drawtree(xscan: float);
 
-    //   procedure dp(p: ppoly; dx, dy: integer; f: color);
-    //   begin
-    //     if (dy < bmy * 2) and (p <> nil) then
-    //     begin
-    //       p^.cols := f+1;
-    //       p^.drx := dx;
-    //       p^.dry := dy;
-    //       dp(p^.so, dx + bmx shr (dy div 10), dy + 10, f+1);
-    //       dp(p^.su, dx - bmx shr (dy div 10), dy + 10, f+1);
-    //     end;
-    //   end;
+//   procedure dp(p: ppoly; dx, dy: integer; f: color);
+//   begin
+//     if (dy < bmy * 2) and (p <> nil) then
+//     begin
+//       p^.cols := f+1;
+//       p^.drx := dx;
+//       p^.dry := dy;
+//       dp(p^.so, dx + bmx shr (dy div 10), dy + 10, f+1);
+//       dp(p^.su, dx - bmx shr (dy div 10), dy + 10, f+1);
+//     end;
+//   end;
 
-    //   procedure verbindung(s, z: ppoly; c: color);
-    //   begin
-    //     if (z <> nil) and (z^.dry < bmy * 2) then
-    //     begin
-    //       setcolor(c);
-    //       line(s^.drx, s^.dry, z^.drx, z^.dry);
-    //       line(bmx - 4 * s^.dry + round(xscan), bmy + round(s^.yscan(xscan)),
-    //         bmx - 4 * z^.dry + round(xscan), bmy + round(z^.yscan(xscan)));
-    //     end;
-    //   end;
+//   procedure verbindung(s, z: ppoly; c: color);
+//   begin
+//     if (z <> nil) and (z^.dry < bmy * 2) then
+//     begin
+//       setcolor(c);
+//       line(s^.drx, s^.dry, z^.drx, z^.dry);
+//       line(bmx - 4 * s^.dry + round(xscan), bmy + round(s^.yscan(xscan)),
+//         bmx - 4 * z^.dry + round(xscan), bmy + round(z^.yscan(xscan)));
+//     end;
+//   end;
 
-    //   procedure zeichne(p: ppoly);
-    //   var
-    //     s: string;
-    //     ys: int;
-    //   begin
-    //     if p <> nil then
-    //     begin
-    //       setcolor(p^.cols);
-    //       circle(p^.drx, p^.dry, 3);
-    //       verbindung(p, p^.so, 1);
-    //       verbindung(p, p^.su, 2);
-    //       verbindung(p, p^.pu, 4);
-    //       verbindung(p, p^.po, 4);
-    //       zeichne(p^.so);
-    //       zeichne(p^.su);
-    //       if p^.cols in zumalen then
-    //         p^.draw3(p^.cols)
-    //       else
-    //         setcolor(p^.cols);
-    //       ys := round(p^.yscan(xscan));
-    //       str(ys, s);
-    //       outtextxy(bmx - 4 * p^.dry + round(xscan) - 4 * length(s), bmy - ys, s);
-    //       outtextxy(p^.drx - 12, p^.dry, s);
-    //     end;
-    //   end;
+//   procedure zeichne(p: ppoly);
+//   var
+//     s: string;
+//     ys: int;
+//   begin
+//     if p <> nil then
+//     begin
+//       setcolor(p^.cols);
+//       circle(p^.drx, p^.dry, 3);
+//       verbindung(p, p^.so, 1);
+//       verbindung(p, p^.su, 2);
+//       verbindung(p, p^.pu, 4);
+//       verbindung(p, p^.po, 4);
+//       zeichne(p^.so);
+//       zeichne(p^.su);
+//       if p^.cols in zumalen then
+//         p^.draw3(p^.cols)
+//       else
+//         setcolor(p^.cols);
+//       ys := round(p^.yscan(xscan));
+//       str(ys, s);
+//       outtextxy(bmx - 4 * p^.dry + round(xscan) - 4 * length(s), bmy - ys, s);
+//       outtextxy(p^.drx - 12, p^.dry, s);
+//     end;
+//   end;
 
-    // begin
-    //   setcolor(white);
-    //   line(round(xscan + bmx), 0, round(xscan + bmx), 2 * bmy - 1);
-    //   dp(swurzel, bmx, 10, 1);
-    //   zeichne(swurzel);
-    // end;
-}
+// begin
+//   setcolor(white);
+//   line(round(xscan + bmx), 0, round(xscan + bmx), 2 * bmy - 1);
+//   dp(swurzel, bmx, 10, 1);
+//   zeichne(swurzel);
+// end;
+// }
 
-pub fn sdelete(xscan: Float, p: &polygon) /* -> &polygon */
-{
-    // var
-    //   h: ppoly;
-    // begin
-    //   if (p = nil) then
-    //   begin
-    //     outstring('sdelete(nil)');
-    //     exit(nil);
-    //   end;
+// pub fn sdelete(xscan: Float, p: &polygon) /* -> &polygon */
+// {
+// var
+//   h: ppoly;
+// begin
+//   if (p = nil) then
+//   begin
+//     outstring('sdelete(nil)');
+//     exit(nil);
+//   end;
 
-    //   zaehl.suchbaum.del;
+//   zaehl.suchbaum.del;
 
-    //   h := nil;
-    //   if p^.so = nil then
-    //     h := p^.su
-    //   else if p^.su = nil then
-    //     h := p^.so
-    //   else
-    //   begin
-    //     if p^.po = nil then
-    //     begin
-    //       drawtree(xscan);
-    //       outstring('p^.po=nil');
-    //     end;
-    //     if p^.pu = nil then
-    //     begin
-    //       drawtree(xscan);
-    //       outstring('p^.pu=nil');
-    //     end;
-    //     rand := not rand;
-    //     if rand then
-    //     begin
-    //       h := p^.pu;
-    //       if h^.so <> nil then
-    //         outstring('h^.so<>nil');
-    //       if h = p^.su then
-    //       begin
-    //         verbindeso(h, p^.so);
-    //       end
-    //       else
-    //       begin
-    //         h^.ss^ := h^.su;
-    //         if h^.su <> nil then
-    //         begin
-    //           h^.su^.ss := h^.ss;
-    //         end;
-    //         verbindeso(h, p^.so);
-    //         verbindesu(h, p^.su);
-    //       end;
-    //     end
-    //     else
-    //     begin
-    //       h := p^.po;
-    //       if h^.su <> nil then
-    //         outstring('h^.su<>nil');
-    //       if h = p^.so then
-    //       begin
-    //         verbindesu(h, p^.su);
-    //       end
-    //       else
-    //       begin
-    //         h^.ss^ := h^.so;
-    //         if h^.so <> nil then
-    //         begin
-    //           h^.so^.ss := h^.ss;
-    //         end;
-    //         verbindeso(h, p^.so);
-    //         verbindesu(h, p^.su);
-    //       end;
-    //     end;
-    //   end;
-    //   p^.ss^ := h;
-    //   if h <> nil then
-    //     h^.ss := p^.ss;
-    //   verbindepu(p^.po, p^.pu);
-    //   p^.ss := nil;
-    //   p^.po := nil;
-    //   p^.pu := nil;
-    //   p^.so := nil;
-    //   p^.su := nil;
+//   h := nil;
+//   if p^.so = nil then
+//     h := p^.su
+//   else if p^.su = nil then
+//     h := p^.so
+//   else
+//   begin
+//     if p^.po = nil then
+//     begin
+//       drawtree(xscan);
+//       outstring('p^.po=nil');
+//     end;
+//     if p^.pu = nil then
+//     begin
+//       drawtree(xscan);
+//       outstring('p^.pu=nil');
+//     end;
+//     rand := not rand;
+//     if rand then
+//     begin
+//       h := p^.pu;
+//       if h^.so <> nil then
+//         outstring('h^.so<>nil');
+//       if h = p^.su then
+//       begin
+//         verbindeso(h, p^.so);
+//       end
+//       else
+//       begin
+//         h^.ss^ := h^.su;
+//         if h^.su <> nil then
+//         begin
+//           h^.su^.ss := h^.ss;
+//         end;
+//         verbindeso(h, p^.so);
+//         verbindesu(h, p^.su);
+//       end;
+//     end
+//     else
+//     begin
+//       h := p^.po;
+//       if h^.su <> nil then
+//         outstring('h^.su<>nil');
+//       if h = p^.so then
+//       begin
+//         verbindesu(h, p^.su);
+//       end
+//       else
+//       begin
+//         h^.ss^ := h^.so;
+//         if h^.so <> nil then
+//         begin
+//           h^.so^.ss := h^.ss;
+//         end;
+//         verbindeso(h, p^.so);
+//         verbindesu(h, p^.su);
+//       end;
+//     end;
+//   end;
+//   p^.ss^ := h;
+//   if h <> nil then
+//     h^.ss := p^.ss;
+//   verbindepu(p^.po, p^.pu);
+//   p^.ss := nil;
+//   p^.po := nil;
+//   p^.pu := nil;
+//   p^.so := nil;
+//   p^.su := nil;
 
-    //   exit(p);
-    // end;
-}
+//   exit(p);
+// end;
+// }
 
 pub fn line_set_bit(i: u8) -> u8 {
     match i {
@@ -226,7 +231,7 @@ pub fn line_set_bit(i: u8) -> u8 {
     }
 }
 
-pub fn polypoly(actx: &AppContext, xscan: Float, p1: &dreieck, p2: &polygon) {
+pub fn polypoly(cctx: &mut CalcContext, actx: &AppContext, p1: &dreieck, p2: &polygon) {
     // var
     //   ll: array[1..20] of linie;
     //   am: array[1..20, 1..20] of boolean;
@@ -242,7 +247,7 @@ pub fn polypoly(actx: &AppContext, xscan: Float, p1: &dreieck, p2: &polygon) {
 
     let mut addpl = |p: &Vector2, ls: u8| {
         pl.push(point::new(p, ls));
-        if (actx.ausgabeInsert) {
+        if actx.ausgabeInsert {
             println!("addpl({}): {}", pl.len(), p);
         }
     };
@@ -252,7 +257,7 @@ pub fn polypoly(actx: &AppContext, xscan: Float, p1: &dreieck, p2: &polygon) {
             let p1lj = p1.delegate.l(j);
             let p2li = p2.delegate.l(i);
             let intersect = intersect(p1lj, p2li);
-            if (intersect.matched == 1) {
+            if intersect.matched == 1 {
                 let p1lja = p1lj.a.b;
                 let p1lje = p1lj.e.b;
                 let p2lia = p2li.a.b;
@@ -401,12 +406,12 @@ pub fn polypoly(actx: &AppContext, xscan: Float, p1: &dreieck, p2: &polygon) {
                         if ph.delegate.punkttest(&h, "addppl2", actx.ausgabeInsert) == 20
                             && ph.delegate.flaechentest()
                         {
-                            if (ph.delegate.p1.b.x >= xscan) {
+                            if ph.delegate.p1.b.x >= cctx.xscan {
                                 ph.delegate.cols = 2.0 / 16.0; //15
-                                                               // push(ph, 1, zaehl.Count);
+                                cctx.pushMinX(ph);
                             } else {
                                 ph.delegate.cols = 3.0 / 16.0; //4
-                                                               // push(ph, 2, zaehl.Count);
+                                cctx.pushQ2(ph);
                             }
                         }
                     }
@@ -416,85 +421,71 @@ pub fn polypoly(actx: &AppContext, xscan: Float, p1: &dreieck, p2: &polygon) {
     }
 }
 
-pub fn loesche(xscan: Float, p: &polygon) /* -> &polygon */
-{
-    // var
-    //   o, u, h: ppoly;
-    // begin
-    //   if (p = nil) then
-    //   begin
-    //     outstring('p ist nil');
-    //     exit(nil);
-    //   end;
+pub fn loesche(cctx: &mut CalcContext, actx: &AppContext, p: usize) -> polygon {
+    let polygon = cctx.sdelete(p);
+    let mut p = p;
+    while p > 0 && p < cctx.currentSweep.len() {
+        // var
+        //   o, u, h: ppoly;
+        // begin
+        //   if (p = nil) then
+        //   begin
+        //     outstring('p ist nil');
+        //     exit(nil);
+        //   end;
 
-    //   o := p^.po;
-    //   u := p^.pu;
-    //   sdelete(xscan, p);
-    //   del(p, 3);
-    //   while (o <> nil) and (u <> nil) do
-    //   begin
-    //     case polytest(xscan, o, u, True, False) of
-    //       1:
-    //       begin
-    //         h := o;
-    //         o := o^.po;
-    //         sdelete(xscan, h);
-    //         del(h, 3);
-    //         push(h, 2, h^.Count);
-    //       end;
-    //       2: exit(p);
-    //       4:
-    //       begin
-    //         h := o;
-    //         o := o^.po;
-    //         sdelete(xscan, h);
-    //         del(h, 3);
-    //         if h <> nil then
-    //         begin
-    //           polypoly(xscan, u^.originalTriangle, h);
-    //           dispose(h, done);
-    //         end
-    //         else
-    //           outstring('h is nil (falls3)');
-    //       end;
-    //       3:
-    //       begin
-    //         h := u;
-    //         u := u^.pu;
-    //         sdelete(xscan, h);
-    //         del(h, 3);
-    //         if h <> nil then
-    //         begin
-    //           polypoly(xscan, o^.originalTriangle, h);
-    //           dispose(h, done);
-    //         end
-    //         else
-    //           outstring('h is nil (falls4)');
-    //       end;
-    //       5:
-    //       begin
-    //         h := o;
-    //         o := o^.po;
-    //         sdelete(xscan, h);
-    //         del(h, 3);
-    //         outint('l5 ozähler ', h^.Count);
-    //         dispose(h, done);
+        //   o := p^.po;
+        //   u := p^.pu;
 
-    //         h := u;
-    //         u := u^.pu;
-    //         sdelete(xscan, h);
-    //         del(h, 3);
-    //         dispose(h, done);
-    //         outint('l5 uzähler', h^.Count);
-    //       end
-    //       else
-    //     end;
-    //   end;
-    //   exit(p);
-    // end;
+        match polytest(
+            actx,
+            &cctx.currentSweep[p - 1],
+            &cctx.currentSweep[p],
+            true,
+            false,
+        ) {
+            1 => {
+                let h = cctx.sdelete(p - 1);
+                p = p - 1;
+                cctx.pushQ2(h);
+            }
+            2 => {
+                return polygon;
+            }
+            3 => {
+                let h = cctx.sdelete(p);
+                let o = &cctx.currentSweep[p - 1].originalTriangle.clone();
+                polypoly(cctx, actx, o, &h)
+            }
+            4 => {
+                let h = cctx.sdelete(p - 1);
+                p = p - 1;
+                let u = &cctx.currentSweep[p].originalTriangle.clone();
+                polypoly(cctx, actx, u, &h)
+            }
+            5 => {
+                cctx.sdelete(p - 1);
+                p = p - 1;
+                cctx.sdelete(p);
+            }
+            _ => {}
+        }
+    }
+    polygon
 }
 
-pub fn insert(xscan: Float, p: &polygon, schnitttest: bool) {
+pub fn insert(
+    cctx: &mut CalcContext,
+    dctx: &mut dyn DrawContext,
+    actx: &AppContext,
+    p: polygon,
+    schnitttest: bool,
+) {
+    // schnitttest:=true;
+
+    if !p.delegate.flaechentest() {
+        return;
+    }
 
     // var
     //   h, o, u, a: ppoly;
@@ -504,79 +495,107 @@ pub fn insert(xscan: Float, p: &polygon, schnitttest: bool) {
     //   tf: int;
     // label
     //   ende;
-    // begin
-    //   {  schnitttest:=true;}
-    //   if p^.flaechentest then
-    //   begin
+
     //     Inc(zaehl.Count);
-    //     if drawmode = 6 then
-    //     begin
-    //       p^.draw_poly(15);
-    //       outint('zähler', zaehl.Count);
-    //       outstring(format('insert %p', [p]));
-    //     end;
-    //     tf := 0;
-    //     a := nil;
-    //     ak := @swurzel;
-    //     while ak^ <> nil do
-    //     begin
-    //       case polytest(xscan, ak^, p, schnitttest, ausgabeInsert) of
-    //         1:
-    //         begin
-    //           a := ak^;
-    //           ak := @ak^^.so;
-    //           typ := so;
-    //           Inc(tf);
-    //           if (ausgabeInsert) then
-    //             outstring('f1so');
-    //         end;
-    //         2:
-    //         begin
-    //           a := ak^;
-    //           ak := @ak^^.su;
-    //           typ := su;
-    //           Inc(tf);
-    //           if (ausgabeInsert) then
-    //             outstring('f2su');
-    //         end;
-    //         3:
-    //         begin
-    //           if p <> nil then
-    //           begin
-    //             polypoly(xscan, ak^^.originalTriangle, p);
-    //             dispose(p, done);
-    //             if (ausgabeInsert) then
-    //               outstring('f3u');
-    //           end
-    //           else
-    //             outstring('p is nil (fall3)');
-    //           goto ende;
-    //         end;
-    //         4:
-    //         begin
-    //           if (ausgabeInsert) then
-    //             outstring('f4o');
-    //           h := loesche(xscan, ak^);
-    //           if h <> nil then
-    //           begin
-    //             polypoly(xscan, p^.originalTriangle, h);
-    //             dispose(h, done);
-    //           end
-    //           else
-    //             outstring('h is nil (fall4)');
-    //         end;
-    //         5:
-    //         begin
-    //           outint('i5 pzähler', p^.Count);
-    //           dispose(p, done);
-    //           p := loesche(xscan, ak^);
-    //           outint('i5 akzähler', p^.Count);
-    //           dispose(p, done);
-    //           goto ende;
-    //         end
-    //         else
-    //       end;
-    //     end;
+    if actx.drawmode == 6 {
+        p.delegate.draw_poly(dctx, 255.0);
+        //       outint('zähler', zaehl.Count);
+        //       outstring(format('insert %p', [p]));
+    }
+
+    let mut a = cctx.currentSweep.len();
+    if a <= 0 {
+        cctx.pushSweep(p, 0);
+        return insertEnde();
+    }
+    let mut b = a / 2;
+    let mut ak = b;
+    let mut oben = false;
+
+    while a != ak {
+        //     tf := 0;
+        //     a := nil;
+        //     ak := @swurzel;
+
+        match polytest(
+            actx,
+            &cctx.currentSweep[ak],
+            &p,
+            schnitttest,
+            actx.ausgabeInsert,
+        ) {
+            1 => {
+                a = ak;
+                b = b / 2;
+                ak = ak - b;
+
+                oben = true;
+                //           Inc(tf);
+                //           if (ausgabeInsert) then
+                //             outstring('f1so');
+            }
+            2 => {
+                a = ak;
+                b = b / 2;
+                ak = ak + b;
+
+                oben = false;
+                //           Inc(tf);
+                //           if (ausgabeInsert) then
+                //             outstring('f2su');
+            }
+            3 => {
+                polypoly(
+                    cctx,
+                    actx,
+                    &cctx.currentSweep[ak].originalTriangle.clone(),
+                    &p,
+                );
+
+                //           if p <> nil then
+                //           begin
+                //             polypoly(xscan, ak^^.originalTriangle, p);
+                //             dispose(p, done);
+                //             if (ausgabeInsert) then
+                //               outstring('f3u');
+                //           end
+                //           else
+                //             outstring('p is nil (fall3)');
+                return insertEnde();
+            }
+            4 => {
+                //           if (ausgabeInsert) then
+                //             outstring('f4o');
+
+                let h = loesche(cctx, actx, ak);
+                polypoly(cctx, actx, &p.originalTriangle.clone(), &h);
+
+                //           if h <> nil then
+                //           begin
+                //             polypoly(xscan, p^.originalTriangle, h);
+                //             dispose(h, done);
+                //           end
+                //           else
+                //             outstring('h is nil (fall4)');
+            }
+            5 => {
+                //           outint('i5 pzähler', p^.Count);
+                //           dispose(p, done);
+                //           p := loesche(xscan, ak^);
+                loesche(cctx, actx, ak);
+                //           outint('i5 akzähler', p^.Count);
+                //           dispose(p, done);
+                //           goto ende;
+            }
+            _ => {}
+        }
+    }
+
+    if (oben) {
+        cctx.pushSweep(p, a);
+    } else {
+        cctx.pushSweep(p, a + 1);
+    }
     //     if a <> nil then
     //     begin
     //       if typ = so then
@@ -609,6 +628,11 @@ pub fn insert(xscan: Float, p: &polygon, schnitttest: bool) {
     //       push(swurzel, 3, p^.Count);
     //     end;
     //     zaehl.suchbaum.ins;
+
+    insertEnde()
+}
+
+fn insertEnde() {
     //     ende:
     //       if tf > mtf then
     //       begin
@@ -633,79 +657,99 @@ pub fn insert(xscan: Float, p: &polygon, schnitttest: bool) {
     //           drawmode := 1;
     //       until ch in [#32, #27];
     //       cls;
-    //     end;
-    //   end;
 }
 
-pub fn sweep() {
+fn handleAllQ2(cctx: &mut CalcContext, dctx: &mut dyn DrawContext, actx: &AppContext) {
+    loop {
+        match cctx.queue2.pop() {
+            Some(polygon) => {
+                insert(cctx, dctx, actx, polygon, false);
+            }
+            None => {
+                return;
+            }
+        }
+    }
+}
+
+pub fn sweep(cctx: &mut CalcContext, dctx: &mut dyn DrawContext, actx: &AppContext) {
     // var
     //   p: ppoly;
     //   ende: boolean;
     //   xscan: float;
-    // begin
+
     //   mtf := 0;
-    //   swurzel := polygon.pop(1);
-    //   zaehl.suchbaum.ins;
-    //   if swurzel <> nil then
-    //   begin
-    //     swurzel^.ss := @swurzel;
-    //     swurzel^.so := nil;
-    //     swurzel^.su := nil;
-    //     swurzel^.po := nil;
-    //     swurzel^.pu := nil;
-    //     push(swurzel, 3, swurzel^.Count);
-    //     xscan := swurzel^.p[1]^.b.x;
-    //   end;
-    //   ende := False;
-    //   while not ende do
-    //   begin
-    //     if First[1] = nil then
-    //     begin
-    //       if First[3] = nil then
-    //         ende := True
-    //       else
-    //       begin
-    //         p := loesche(xscan, First[3]);
-    //         p^.cols := 15; {5}
-    //         p^.drawpoly;
-    //         dispose(p, done);
-    //       end;
-    //     end
-    //     else
-    //     begin
-    //       p := polygon.pop(1);
-    //       xscan := p^.p[1]^.b.x;
-    //       insert(xscan, p, True);
 
-    //       if First[1] <> nil then
-    //         xscan := First[1]^.p[1]^.b.x;
+    loop {
+        match cctx.minxQueue.pop() {
+            Some(MinxQueueEntry { polygon }) => {
+                cctx.xscan = polygon.delegate.p1.b.x;
+                insert(cctx, dctx, actx, polygon, true);
 
-    //       while (First[3] <> nil) and (First[3]^.p[3]^.b.x <= xscan + epsilon1) do
-    //       begin
+                match cctx.minxQueue.peek() {
+                    Some(MinxQueueEntry { polygon }) => {
+                        cctx.xscan = polygon.delegate.p1.b.x;
+                    }
+                    None => {}
+                }
 
-    //         while First[2] <> nil do
-    //         begin
-    //           p := polygon.pop(2);
-    //           insert(xscan, p, False);
-    //         end;
-    //         p := loesche(xscan, First[3]);
-    //         p^.cols := 15; {6}
-    //         p^.drawpoly;
-    //         dispose(p, done);
-    //       end;
-    //     end;
-    //     if not ende then
-    //     begin
-    //       p := polygon.pop(2);
-    //       while p <> nil do
-    //       begin
-    //         insert(xscan, p, False);
-    //         p := polygon.pop(2);
-    //       end;
-    //     end;
-    //   end;
-    // end;
+                //       while (First[3] <> nil) and (First[3]^.p[3]^.b.x <= xscan + epsilon1) do
+                //       begin
+
+                handleAllQ2(cctx, dctx, actx);
+
+                //         p := loesche(xscan, First[3]);
+                //         p^.cols := 15; {6}
+                //         p^.drawpoly;
+                //         dispose(p, done);
+                //       end;
+
+                //   zaehl.suchbaum.ins;
+                //   if swurzel <> nil then
+                //   begin
+                //     swurzel^.ss := @swurzel;
+                //     swurzel^.so := nil;
+                //     swurzel^.su := nil;
+                //     swurzel^.po := nil;
+                //     swurzel^.pu := nil;
+                //     push(swurzel, 3, swurzel^.Count);
+                //     xscan := swurzel^.p[1]^.b.x;
+                //   end;
+                //   ende := False;
+                //   while not ende do
+                //   begin
+
+                //     if not ende then
+                //     begin
+
+                //     end;
+                //   end;
+            }
+            _ => {
+                // match cctx.maxxQueue.first() {
+                //     Some(MaxxQueueEntry { polygon }) => {
+                //         // loesche(cctx: &mut CalcContext, actx: &AppContext, p: usize)
+                //         //         p := loesche(xscan, First[3]);
+                //         //         p^.cols := 15; {5}
+                //         //         p^.drawpoly;
+                //         //         dispose(p, done);
+                //     }
+                //     None => {
+                //         return;
+                //     }
+                // }
+                //       if First[3] = nil then
+                //         ende := True
+                //       else
+                //       begin
+
+                //       end;
+            }
+        }
+        handleAllQ2(cctx, dctx, actx);
+    }
 }
+
 // begin
 //   ausgabeInsert := False;
 // end.

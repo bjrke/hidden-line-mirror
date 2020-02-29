@@ -1,4 +1,5 @@
 use crate::appcontext::*;
+use crate::calcctontext::*;
 use crate::drawcontext::*;
 use crate::float::*;
 use crate::line::*;
@@ -176,7 +177,7 @@ impl polygon {
         }
     }
 
-    fn draw5(&self, ctx: &mut dyn DrawContext, actx: &AppContext) {
+    fn draw5(&self, cctx: &mut CalcContext, dctx: &mut dyn DrawContext, actx: &AppContext) {
         //TODO use min and max to get my1, my2
         let p1 = self.delegate.p1;
         let p2 = self.delegate.p2;
@@ -207,18 +208,17 @@ impl polygon {
                     let my1 = 1.0 + 7.0 * self.yscan(wx as Float);
 
                     let col = calcColor(
-                        actx
-                            .tiefePerspektive
+                        cctx.tiefePerspektive
                             .relative(self.originalTriangle.tiefe(actx, &h)),
                     );
 
-                    ctx.putpixel(wx, wy, col);
+                    dctx.putpixel(wx, wy, col);
                 }
             }
         }
     }
 
-    pub fn drawpoly(&self, ctx: &mut DrawContext, actx: &AppContext) {
+    pub fn drawpoly(&self, cctx: &mut CalcContext, dctx: &mut dyn DrawContext, actx: &AppContext) {
         let cols = if actx.colmode {
             thread_rng().gen()
         } else {
@@ -227,22 +227,22 @@ impl polygon {
 
         match actx.drawmode {
             0 => {
-                self.delegate.draw_poly(ctx, 0.0);
-                self.delegate.draw_line_set(ctx, cols);
+                self.delegate.draw_poly(dctx, 0.0);
+                self.delegate.draw_line_set(dctx, cols);
             }
-            1 => self.delegate.draw_line_set(ctx, cols),
-            2 => self.delegate.draw_poly(ctx, cols),
-            3 => self.delegate.draw3(ctx, cols),
-            4 => self.draw4(ctx),
-            5 => self.draw5(ctx, actx),
-            6 => self.delegate.draw_line_set(ctx, cols),
+            1 => self.delegate.draw_line_set(dctx, cols),
+            2 => self.delegate.draw_poly(dctx, cols),
+            3 => self.delegate.draw3(dctx, cols),
+            4 => self.draw4(dctx),
+            5 => self.draw5(cctx, dctx, actx),
+            6 => self.delegate.draw_line_set(dctx, cols),
             7 => self
                 .delegate
-                .draw_poly(ctx, self.originalTriangle.delegate.cols),
-            8 => self.delegate.draw_line_set(ctx, self.farbe),
+                .draw_poly(dctx, self.originalTriangle.delegate.cols),
+            8 => self.delegate.draw_line_set(dctx, self.farbe),
             9 => self
                 .delegate
-                .draw_line_set(ctx, self.originalTriangle.delegate.cols),
+                .draw_line_set(dctx, self.originalTriangle.delegate.cols),
             _ => panic!("unexpected drawmode"),
         }
     }
@@ -250,7 +250,6 @@ impl polygon {
 
 pub fn polytest(
     ctx: &AppContext,
-    xscan: Float,
     p1: &polygon,
     p2: &polygon,
     schnitttest: bool,

@@ -19,7 +19,6 @@ pub struct AppContext {
     pub jv: Vector3,
     pub colmode: bool,
     pub drawmode: u8,
-    pub tiefePerspektive: minmax,
     pub ausgabeInsert: bool,
     pub sceneBuilder: SceneBuilder,
     pub backface: bool,
@@ -59,7 +58,6 @@ impl AppContext {
                 if j.delegate.flaechentest() {
                     let polygon = polygon::newpoly(j.clone());
                     polys.push(MinxQueueEntry { polygon });
-                    //         polygon.push(h, 1, -2)
                 }
             }
         }

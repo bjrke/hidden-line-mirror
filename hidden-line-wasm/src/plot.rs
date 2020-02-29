@@ -1,4 +1,5 @@
 use crate::appcontext::*;
+use crate::calcctontext::*;
 use crate::drawcontext::*;
 use crate::dreidext::*;
 use crate::float::*;
@@ -6,6 +7,7 @@ use crate::time::*;
 use crate::vec3::*;
 use rand::seq::SliceRandom;
 use rand::thread_rng;
+use std::collections::BinaryHeap;
 // use std::time::SystemTime;
 
 // program dreidplot;
@@ -113,11 +115,10 @@ pub fn init() -> AppContext {
         ausgabeInsert: false,
         colmode: false,
         zaehl: ctyp::init(),
-        tiefePerspektive: minmax::new(),
     }
 }
 
-pub fn darstellung(ctx: &mut dyn DrawContext, actx: &mut AppContext) {
+pub fn darstellung(dctx: &mut dyn DrawContext, actx: &mut AppContext) {
     actx.zaehl = ctyp::init();
     actx.neukamera();
     let mut polys = actx.rechnung();
@@ -133,14 +134,15 @@ pub fn darstellung(ctx: &mut dyn DrawContext, actx: &mut AppContext) {
     actx.zaehl.ausgabe();
     //TODO
 
-    ctx.circle(0.99, 0.99, 0.01, 1.0);
-    ctx.circle(0.99, -0.99, 0.01, 1.0);
-    ctx.circle(-0.99, 0.99, 0.01, 1.0);
-    ctx.circle(-0.99, -0.99, 0.01, 1.0);
+    dctx.circle(0.99, 0.99, 0.01, 1.0);
+    dctx.circle(0.99, -0.99, 0.01, 1.0);
+    dctx.circle(-0.99, 0.99, 0.01, 1.0);
+    dctx.circle(-0.99, -0.99, 0.01, 1.0);
 
-    for poly in polys {
-        poly.polygon.drawpoly(ctx, actx)
-    }
+    let mut ctx = CalcContext::new();
+    ctx.minxQueue = polys;
+
+    ctx.test(dctx, actx);
 
     //   OutInt('höchste Tiefe Suchbaum:',mtf);
     //   if wurzel[1]<>nil then outstring('wurzel[1]');
