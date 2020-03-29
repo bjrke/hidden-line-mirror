@@ -57,7 +57,7 @@ impl<T: PartialOrd + Copy> RangeSet<T> {
 
 #[cfg(test)]
 mod tests {
-    // Note this useful idiom: importing names from outer (for mod tests) scope.
+
     use super::*;
     use std::ops::Range;
 
@@ -81,34 +81,34 @@ mod tests {
 
     #[test]
     fn is_empty_should_return_true() {
-        assert_eq!(true, set0().is_empty());
+        assert!(set0().is_empty());
     }
 
     #[test]
     fn is_empty_should_return_false() {
-        assert_eq!(false, set1(1..2).is_empty());
+        assert!(!set1(1..2).is_empty());
     }
 
     #[test]
     fn contains_should_return_true() {
-        assert_eq!(true, set2(1.0..2.0, 3.5..4.5).contains(1.5));
+        assert!(set2(1.0..2.0, 3.5..4.5).contains(1.5));
     }
 
     #[test]
     fn contains_should_return_false() {
-        assert_eq!(false, set2(1.0..2.0, 3.5..4.5).contains(2.5));
+        assert!(!set2(1.0..2.0, 3.5..4.5).contains(2.5));
     }
 
     #[test]
     fn contains_should_return_false_for_empty() {
-        assert_eq!(false, set0().contains(1));
+        assert!(!set0().contains(1));
     }
 
     #[test]
     fn add_should_merge() {
         let mut set = set1(1..3);
         set.add(&(2..4));
-        assert_eq!(vec![(Bound::Included(1), Bound::Excluded(4))], set.0);
+        assert_eq!(set.0, vec![(Bound::Included(1), Bound::Excluded(4))]);
     }
 
     #[test]
@@ -116,11 +116,11 @@ mod tests {
         let mut set = set1(1..2);
         set.add(&(3..4));
         assert_eq!(
+            set.0,
             vec![
                 (Bound::Included(1), Bound::Excluded(2)),
                 (Bound::Included(3), Bound::Excluded(4))
-            ],
-            set.0
+            ]
         );
     }
 
@@ -132,13 +132,13 @@ mod tests {
         s1.merge(&s2);
 
         assert_eq!(
+            s1.0,
             vec![
                 (Bound::Included(1), Bound::Excluded(3)),
                 (Bound::Included(4), Bound::Excluded(5)),
                 (Bound::Included(6), Bound::Excluded(7)),
                 (Bound::Included(8), Bound::Excluded(9))
-            ],
-            s1.0
+            ]
         );
     }
 
@@ -148,11 +148,11 @@ mod tests {
         set.remove(&(2..6));
 
         assert_eq!(
+            set.0,
             vec![
                 (Bound::Included(1), Bound::Excluded(2)),
                 (Bound::Included(6), Bound::Included(8))
-            ],
-            set.0
+            ]
         );
     }
 
@@ -164,12 +164,12 @@ mod tests {
         s1.diff(&s2);
 
         assert_eq!(
+            s1.0,
             vec![
                 (Bound::Included(1), Bound::Excluded(2)),
                 (Bound::Excluded(6), Bound::Excluded(7)),
                 (Bound::Included(8), Bound::Included(12))
-            ],
-            s1.0
+            ]
         );
     }
 }

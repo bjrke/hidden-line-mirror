@@ -225,71 +225,71 @@ pub fn max<Idx: PartialOrd<Idx> + Copy>(
 
 #[cfg(test)]
 mod tests {
-    // Note this useful idiom: importing names from outer (for mod tests) scope.
+
     use super::*;
     use std::ops::Range;
 
     #[test]
     fn intersect_with_result() {
-        assert_eq!(Some((2..3).to_tuple()), (1..3).intersect(&(2..4)));
+        assert_eq!((1..3).intersect(&(2..4)), Some((2..3).to_tuple()));
     }
 
     #[test]
     fn intersect_without_result() {
-        assert_eq!(None, (1..2).intersect(&(3..4)));
+        assert_eq!((1..2).intersect(&(3..4)), None);
     }
 
     #[test]
     fn intersect_with_point_result() {
-        assert_eq!(Some((2..=2).to_tuple()), (1..=2).intersect(&(2..=3)));
+        assert_eq!((1..=2).intersect(&(2..=3)), Some((2..=2).to_tuple()));
     }
 
     #[test]
     fn intersect_unbound_left() {
-        assert_eq!(Some((1..2).to_tuple()), (..2).intersect(&(1..3)));
+        assert_eq!((..2).intersect(&(1..3)), Some((1..2).to_tuple()));
     }
 
     #[test]
     fn diff_left_only() {
-        assert_eq!(vec![(1..2).to_tuple()], (1..3).diff(&(2..4)));
+        assert_eq!((1..3).diff(&(2..4)), vec![(1..2).to_tuple()]);
     }
 
     #[test]
     fn not_right_unbound() {
         assert_eq!(
-            vec![(..2).to_tuple()],
-            (Bound::Included(2), Bound::Unbounded).not()
+            (Bound::Included(2), Bound::Unbounded).not(),
+            vec![(..2).to_tuple()]
         );
     }
 
     #[test]
     fn not_left_right() {
-        assert_eq!(vec![(..1).to_tuple(), (2..).to_tuple()], (1..2).not());
+        assert_eq!((1..2).not(), vec![(..1).to_tuple(), (2..).to_tuple()]);
     }
 
     #[test]
     fn diff_left_only_included() {
-        assert_eq!(vec![(1..2).to_tuple()], (1..3).diff(&(2..1000)));
+        assert_eq!((1..3).diff(&(2..1000)), vec![(1..2).to_tuple()]);
     }
 
     #[test]
     fn diff_left_only_excluded() {
         assert_eq!(
-            vec![(1..=2).to_tuple()],
-            (1..3).diff(&(Bound::Excluded(2), Bound::Unbounded))
+            (1..3).diff(&(Bound::Excluded(2), Bound::Unbounded)),
+            vec![(1..=2).to_tuple()]
         );
     }
 
     #[test]
     fn diff_right_only() {
-        assert_eq!(vec![(3..4).to_tuple()], (2..4).diff(&(1..3)));
+        assert_eq!((2..4).diff(&(1..3)), vec![(3..4).to_tuple()]);
     }
 
     #[test]
     fn diff_left_and_right() {
         assert_eq!(
-            vec![(1..2).to_tuple(), (3..4).to_tuple()],
-            (1..4).diff(&(2..3))
+            (1..4).diff(&(2..3)),
+            vec![(1..2).to_tuple(), (3..4).to_tuple()]
         );
     }
 }

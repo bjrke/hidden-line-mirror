@@ -15,8 +15,8 @@ pub struct QuadTree<T> {
 impl<T> QuadTree<T> {
     pub fn new(bounds: Rect) -> QuadTree<T> {
         let center = Vector2 {
-            x: (bounds.x.start + bounds.x.end) / 2.0,
-            y: (bounds.y.start + bounds.y.end) / 2.0,
+            x: (bounds.x.start() + bounds.x.end()) / 2.0,
+            y: (bounds.y.start() + bounds.y.end()) / 2.0,
         };
         QuadTree {
             content: Vec::with_capacity(MAX_ELEMENTS),

@@ -1,11 +1,12 @@
 use crate::float::*;
 use crate::range::*;
 use crate::vec2::*;
-use std::ops::Range;
+use std::ops::RangeInclusive;
+use std::ops::{Range, RangeBounds};
 
 pub struct Rect {
-    pub x: Range<Float>,
-    pub y: Range<Float>,
+    pub x: RangeInclusive<Float>,
+    pub y: RangeInclusive<Float>,
 }
 
 pub trait Shape {
@@ -29,10 +30,7 @@ pub trait Shape {
 impl Rect {
     #[inline]
     pub fn new(x: Float, y: Float) -> Rect {
-        Rect {
-            x: Range { start: x, end: x },
-            y: Range { start: y, end: y },
-        }
+        Rect { x: x..=x, y: y..=y }
     }
 
     #[inline]
@@ -43,14 +41,8 @@ impl Rect {
     #[inline]
     pub fn extend(&self, x: Float, y: Float) -> Rect {
         Rect {
-            x: Range {
-                start: self.x.start.min(x),
-                end: self.x.end.max(x),
-            },
-            y: Range {
-                start: self.y.start.min(y),
-                end: self.y.end.max(y),
-            },
+            x: self.x.start().min(x)..=self.x.end().max(x),
+            y: self.y.start().min(y)..=self.y.end().max(y),
         }
     }
 
@@ -61,22 +53,22 @@ impl Rect {
 
     #[inline]
     pub fn top_left(&self) -> Vector2 {
-        Vector2::new(self.x.start, self.y.start)
+        Vector2::new(*self.x.start(), *self.y.end())
     }
 
     #[inline]
     pub fn top_right(&self) -> Vector2 {
-        Vector2::new(self.x.start, self.y.end)
+        Vector2::new(*self.x.end(), *self.y.end())
     }
 
     #[inline]
     pub fn bottom_left(&self) -> Vector2 {
-        Vector2::new(self.x.end, self.y.start)
+        Vector2::new(*self.x.start(), *self.y.start())
     }
 
     #[inline]
     pub fn bottom_right(&self) -> Vector2 {
-        Vector2::new(self.x.end, self.y.end)
+        Vector2::new(*self.x.end(), *self.y.start())
     }
 }
 
@@ -118,7 +110,14 @@ fn lineIntersect(a1: Vector2, e1: Vector2, a2: Vector2, e2: Vector2) -> Vector2 
 }
 
 #[inline]
-fn lineRectBorder(x1: f32, y1: f32, x2: f32, y2: f32, x: f32, y_range: &Range<f32>) -> bool {
+fn lineRectBorder<R: RangeBounds<Float>>(
+    x1: Float,
+    y1: Float,
+    x2: Float,
+    y2: Float,
+    x: &Float,
+    y_range: &R,
+) -> bool {
     let divisor = x2 - x1;
     let s = x2 - x;
     if s == divisor {
@@ -135,22 +134,22 @@ fn lineRectBorder(x1: f32, y1: f32, x2: f32, y2: f32, x: f32, y_range: &Range<f3
 }
 
 #[inline]
-fn lineX(a: &Vector2, e: &Vector2, x: Float, y_range: &Range<Float>) -> bool {
+fn lineX<R: RangeBounds<Float>>(a: &Vector2, e: &Vector2, x: &Float, y_range: &R) -> bool {
     lineRectBorder(a.x, a.y, e.x, e.y, x, y_range)
 }
 
 #[inline]
-fn lineY(a: &Vector2, e: &Vector2, y: Float, x_range: &Range<Float>) -> bool {
+fn lineY<R: RangeBounds<Float>>(a: &Vector2, e: &Vector2, y: &Float, x_range: &R) -> bool {
     lineRectBorder(a.y, a.x, e.y, e.x, y, x_range)
 }
 
 /// warning this method should be used only after r.contains(a) and r.contains(e) check
 #[inline]
 fn lineRect(a: &Vector2, e: &Vector2, r: &&Rect) -> bool {
-    lineY(a, e, r.y.start, &r.x)
-        || lineY(a, e, r.y.end, &r.x)
-        || lineX(a, e, r.x.start, &r.y)
-        || lineX(a, e, r.x.end, &r.y)
+    lineY(a, e, r.y.start(), &r.x)
+        || lineY(a, e, r.y.end(), &r.x)
+        || lineX(a, e, r.x.start(), &r.y)
+        || lineX(a, e, r.x.end(), &r.y)
 }
 
 struct Line {
@@ -189,8 +188,8 @@ fn epsilon_range(r: &Range<Float>) -> Range<Float> {
 impl Shape for Line {
     fn contains(&self, v: &Vector2) -> bool {
         self.bounds_contains(v) && {
-            lineX(&self.a, &self.e, v.x, &epsilon_value(v.y))
-                || lineY(&self.a, &self.e, v.y, &epsilon_value(v.x))
+            lineX(&self.a, &self.e, &v.x, &epsilon_value(v.y))
+                || lineY(&self.a, &self.e, &v.y, &epsilon_value(v.x))
         }
     }
 
@@ -253,5 +252,64 @@ impl Shape for Triangle {
     #[inline]
     fn bounds(&self) -> &Rect {
         &self.bounds
+    }
+}
+
+#[cfg(test)]
+mod tests {
+
+    use super::*;
+
+    #[test]
+    fn rect_should_contain_vector() {
+        assert!(Rect::new(2.0, 3.0)
+            .extend(4.0, 6.0)
+            .contains(&Vector2::new(2.5, 5.0)));
+    }
+
+    #[test]
+    fn rect_should_contain_top_left() {
+        assert!(Rect::new(2.0, 3.0)
+            .extend(4.0, 6.0)
+            .contains(&Vector2::new(2.0, 3.0)));
+    }
+
+    #[test]
+    fn rect_should_contain_bottom_right() {
+        assert!(Rect::new(2.0, 3.0)
+            .extend(4.0, 6.0)
+            .contains(&Vector2::new(4.0, 6.0)));
+    }
+
+    #[test]
+    fn rect_top_left() {
+        assert_eq!(
+            Rect::new(2.0, 3.0).extend(4.0, 6.0).top_left(),
+            Vector2::new(2.0, 6.0)
+        );
+    }
+
+    #[test]
+    fn rect_top_right() {
+        assert_eq!(
+            Rect::new(2.0, 3.0).extend(4.0, 6.0).top_right(),
+            Vector2::new(4.0, 6.0)
+        );
+    }
+
+    #[test]
+    fn rect_bottom_left() {
+        assert_eq!(
+            Rect::new(2.0, 3.0).extend(4.0, 6.0).bottom_left(),
+            Vector2::new(2.0, 3.0)
+        );
+    }
+
+    #[test]
+    fn rect_bottom_right() {
+        assert_eq!(
+            Rect::new(2.0, 3.0).extend(4.0, 6.0).bottom_right(),
+            Vector2::new(4.0, 3.0)
+        );
     }
 }
