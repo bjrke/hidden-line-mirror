@@ -1,6 +1,21 @@
 image: "rust:latest"
 
-test:cargo:
+variables:
+  CARGO_HOME: $CI_PROJECT_DIR/cargo
+
+cache:
+  paths:
+    - hidden-line-wasm/node_modules/
+    - cargo
+
+all:
   script:
+    - curl -sSfL https://deb.nodesource.com/setup_13.x | bash -
+    - apt install -y nodejs
+    - curl -sSf https://rustwasm.github.io/wasm-pack/installer/init.sh | sh
     - rustc --version && cargo --version
     - cargo test --all --verbose
+    - cd hidden-line-wasm
+    - npm i
+    - npm run build
+    - npm run test
