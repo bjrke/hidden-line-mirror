@@ -1,21 +1,28 @@
-image: "rust:latest"
-
-variables:
-  CARGO_HOME: $CI_PROJECT_DIR/cargo
-
-cache:
-  paths:
-    - hidden-line-wasm/node_modules/
-    - cargo
-
-all:
+test_and_build:
+  image: "registry.gitlab.com/bjrke/hidden-line/rust_wasm_npm:latest"
+  variables:
+    CARGO_HOME: $CI_PROJECT_DIR/cargo
+  cache:
+    paths:
+      - hidden-line-wasm/node_modules
+      - cargo
   script:
-    - curl -sSfL https://deb.nodesource.com/setup_13.x | bash -
-    - apt install -y nodejs
-    - curl -sSf https://rustwasm.github.io/wasm-pack/installer/init.sh | sh
     - rustc --version && cargo --version
-    - cargo test --all --verbose
+    - cargo test --all
     - cd hidden-line-wasm
     - npm i
     - npm run build
     - npm run test
+
+docker_rust_wasm_npm:
+  image: docker:latest
+  services:
+    - docker:dind
+  stage: deploy
+  script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+    - docker build --pull -t "$CI_REGISTRY_IMAGE/rust_wasm_npm" .
+    - docker push "$CI_REGISTRY_IMAGE/rust_wasm_npm"
+  when: manual
+  only:
+    - master
