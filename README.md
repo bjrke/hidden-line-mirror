@@ -1,3 +1,7 @@
+## Hidden Line Elemination
+
+https://bjrke.gitlab.io/hidden-line
+
 ## How to install
 
 install rustup, you probably have to relogin

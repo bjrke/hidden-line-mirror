@@ -1,29 +1,48 @@
-test_and_build:
-  stage: build
+variables:
+  DOCKER_DRIVER: overlay2
+
+cargo:
+  stage: test
+  image: rust:slim
+  variables:
+    CARGO_HOME: $CI_PROJECT_DIR/.cargo
+  cache:
+    key: .cargo
+    paths:
+      - .cargo
+      - target
+  script:
+    - cargo test --all
+
+npm:
+  stage: test
   image: "registry.gitlab.com/bjrke/hidden-line/rust_wasm_npm:latest"
   variables:
-    CARGO_HOME: $CI_PROJECT_DIR/cargo
+    CARGO_HOME: $CI_PROJECT_DIR/.cargo
   cache:
+    key: npm
     paths:
       - hidden-line-wasm/node_modules
-      - cargo
+      - .cargo
+      - target
+      - hidden-line-wasm/.npm
   script:
-    - rustc --version && cargo --version
-    - cargo test --all
     - cd hidden-line-wasm
-    - npm i
-    - npm run build
+    - npm i --cache .npm --prefer-offline
     - npm run test
+    - npm run build
   artifacts:
+    expire_in: 1 week
     paths:
       - hidden-line-wasm/dist
 
 pages:
   stage: deploy
-  image: "registry.gitlab.com/bjrke/hidden-line/rust_wasm_npm:latest"
+  image: alpine:latest
   script:
-    - cp -av hidden-line-wasm/dist public
+    - mv hidden-line-wasm/dist public
   artifacts:
+    expire_in: 1 week
     paths:
       - public
   only:

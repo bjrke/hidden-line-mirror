@@ -20,7 +20,7 @@ lto = true
 
 [dependencies]
 wasm-bindgen = "0.2.58"
-wee_alloc = { version = "0.4.5", optional = true }
+#wee_alloc = { version = "0.4.5", optional = true }
 rand = { version="0.7.3", features = ['wasm-bindgen']}
 js-sys = "0.3.35"
 
@@ -37,6 +37,6 @@ console_error_panic_hook = "0.1.6"
 
 [dev-dependencies]
 wasm-bindgen-test = "0.3.8"
-futures = "0.3.1"
+#futures = "0.3.1"
 js-sys = "0.3.35"
-wasm-bindgen-futures = "0.4.8"
+#wasm-bindgen-futures = "0.4.8"

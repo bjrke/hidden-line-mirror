@@ -10,11 +10,11 @@
     "test": "cargo test && wasm-pack test --node"
   },
   "devDependencies": {
-    "@wasm-tool/wasm-pack-plugin": "1.1.0",
+    "@wasm-tool/wasm-pack-plugin": "1.2.0",
     "copy-webpack-plugin": "5.1.1",
-    "webpack": "4.41.5",
-    "webpack-cli": "3.3.10",
-    "webpack-dev-server": "3.10.2",
-    "rimraf": "3.0.1"
+    "webpack": "4.42.1",
+    "webpack-cli": "3.3.11",
+    "webpack-dev-server": "3.10.3",
+    "rimraf": "3.0.2"
   }
 }
