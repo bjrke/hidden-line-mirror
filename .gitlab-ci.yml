@@ -1,4 +1,5 @@
 test_and_build:
+  stage: build
   image: "registry.gitlab.com/bjrke/hidden-line/rust_wasm_npm:latest"
   variables:
     CARGO_HOME: $CI_PROJECT_DIR/cargo
@@ -13,12 +14,26 @@ test_and_build:
     - npm i
     - npm run build
     - npm run test
+  artifacts:
+    paths:
+      - hidden-line-wasm/dist
+
+pages:
+  stage: deploy
+  image: "registry.gitlab.com/bjrke/hidden-line/rust_wasm_npm:latest"
+  script:
+    - cp -av hidden-line-wasm/dist public
+  artifacts:
+    paths:
+      - public
+  only:
+    - master
 
 docker_rust_wasm_npm:
+  stage: deploy
   image: docker:latest
   services:
     - docker:dind
-  stage: deploy
   script:
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
     - docker build --pull -t "$CI_REGISTRY_IMAGE/rust_wasm_npm" .
