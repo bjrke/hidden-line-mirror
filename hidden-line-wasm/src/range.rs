@@ -1,5 +1,4 @@
 use std::cmp::Ordering;
-use std::fmt::Debug;
 use std::ops::Bound;
 use std::ops::RangeBounds;
 
@@ -227,7 +226,6 @@ pub fn max<Idx: PartialOrd<Idx> + Copy>(
 mod tests {
 
     use super::*;
-    use std::ops::Range;
 
     #[test]
     fn intersect_with_result() {

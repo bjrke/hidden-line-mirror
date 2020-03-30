@@ -5,10 +5,6 @@ use crate::dreidext::*;
 use crate::float::*;
 use crate::time::*;
 use crate::vec3::*;
-use rand::seq::SliceRandom;
-use rand::thread_rng;
-use std::collections::BinaryHeap;
-// use std::time::SystemTime;
 
 // program dreidplot;
 // uses ptccrt, ptcgraph, vector, dreidext, projekt, dreiecke, polyswee, polygon,
@@ -121,7 +117,7 @@ pub fn init() -> AppContext {
 pub fn darstellung(dctx: &mut dyn DrawContext, actx: &mut AppContext) {
     actx.zaehl = ctyp::init();
     actx.neukamera();
-    let mut polys = actx.rechnung();
+    let polys = actx.rechnung();
 
     println!("Anzahl Polygone: {}", actx.zaehl.q1.maximum);
     println!("Auge: {}", actx.Auge);

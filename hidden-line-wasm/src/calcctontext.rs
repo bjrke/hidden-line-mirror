@@ -1,16 +1,10 @@
 use crate::appcontext::*;
 use crate::drawcontext::*;
-use crate::dreidext::*;
 use crate::float::*;
-use crate::mat3::*;
 use crate::maxxqueue::*;
 use crate::minxqueue::*;
-use crate::minxqueue::*;
-use crate::point::*;
 use crate::polygon::*;
 use crate::time::*;
-use crate::triangle::*;
-use crate::vec3::*;
 use std::collections::BTreeSet;
 use std::collections::BinaryHeap;
 use std::rc::Rc;

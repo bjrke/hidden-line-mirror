@@ -17,7 +17,7 @@ pub trait Shape {
     fn bounds(&self) -> &Rect;
 
     #[inline]
-    fn bounds_intersect(&self, s: &Shape) -> bool {
+    fn bounds_intersect(&self, s: &dyn Shape) -> bool {
         self.bounds().intersects(s.bounds())
     }
 

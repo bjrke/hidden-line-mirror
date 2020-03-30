@@ -200,7 +200,7 @@ impl dreieck {
             .add3d(&ctx.iv.mul3d(k.x))
             .add3d(&ctx.jv.mul3d(k.y));
         let t = self.planeNorm.skalar(&bv);
-        if (t.abs() < epsilon2) {
+        if t.abs() < epsilon2 {
             100000000.0
         } else {
             (self.planeDist - self.planeNorm.skalar(&ctx.Auge)) / (t * bv.invBetrag3d())

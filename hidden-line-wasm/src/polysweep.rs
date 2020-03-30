@@ -2,9 +2,7 @@
 use crate::appcontext::*;
 use crate::calcctontext::*;
 use crate::drawcontext::*;
-use crate::float::*;
 use crate::line::*;
-use crate::maxxqueue::*;
 use crate::minxqueue::*;
 use crate::point::*;
 use crate::polygon::*;
@@ -591,7 +589,7 @@ pub fn insert(
         }
     }
 
-    if (oben) {
+    if oben {
         cctx.pushSweep(p, a);
     } else {
         cctx.pushSweep(p, a + 1);

@@ -1,5 +1,5 @@
 use crate::range::*;
-use std::ops::{Bound, Deref, RangeBounds};
+use std::ops::{Bound, RangeBounds};
 
 pub struct RangeSet<T>(pub Vec<(Bound<T>, Bound<T>)>);
 
@@ -59,15 +59,13 @@ impl<T: PartialOrd + Copy> RangeSet<T> {
 mod tests {
 
     use super::*;
-    use std::ops::Range;
 
     fn set0() -> RangeSet<i32> {
         RangeSet::new()
     }
 
     fn set1<T: PartialOrd + Copy, R: RangeBounds<T>>(r1: R) -> RangeSet<T> {
-        let mut set = RangeSet::from_range(&r1);
-        set
+        RangeSet::from_range(&r1)
     }
 
     fn set2<T: PartialOrd + Copy, R1: RangeBounds<T>, R2: RangeBounds<T>>(
@@ -127,7 +125,7 @@ mod tests {
     #[test]
     fn merge_should_work() {
         let mut s1 = set2(1..3, 4..5);
-        let mut s2 = set2(6..7, 8..9);
+        let s2 = set2(6..7, 8..9);
 
         s1.merge(&s2);
 

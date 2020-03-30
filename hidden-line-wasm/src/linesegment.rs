@@ -3,7 +3,7 @@ use crate::float::Float;
 use crate::point::*;
 use crate::range::*;
 use crate::rangeset::*;
-use std::ops::{Bound, Range, RangeBounds, RangeInclusive};
+use std::ops::RangeBounds;
 use std::rc::Rc;
 
 pub struct Line {

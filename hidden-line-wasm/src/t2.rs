@@ -1,4 +1,3 @@
-use crate::drawcontext::*;
 use crate::linesegment::*;
 use crate::point::*;
 use std::rc::Rc;

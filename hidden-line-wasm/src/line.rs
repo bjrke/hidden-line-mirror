@@ -17,7 +17,7 @@ impl Line {
         }
     }
 
-    pub fn draw(&self, ctx: &mut DrawContext, c: Color) {
+    pub fn draw(&self, ctx: &mut dyn DrawContext, c: Color) {
         ctx.line(self.a.b.x, self.a.b.y, self.e.b.x, self.e.b.y, c);
     }
 }

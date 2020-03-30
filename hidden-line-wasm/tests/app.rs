@@ -1,5 +1,4 @@
-use wasm_bindgen::JsValue;
-use wasm_bindgen_test::{wasm_bindgen_test, wasm_bindgen_test_configure};
+use wasm_bindgen_test::wasm_bindgen_test;
 
 #[test]
 fn rust_test() {

@@ -1,8 +1,4 @@
-use crate::appcontext::*;
 use crate::float::*;
-use crate::point::*;
-use crate::triangle::*;
-use crate::vec2::*;
 use crate::vec3::*;
 
 #[derive(Clone, Copy)]

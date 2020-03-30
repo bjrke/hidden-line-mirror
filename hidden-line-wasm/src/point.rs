@@ -5,53 +5,53 @@ use crate::vec3::*;
 
 #[derive(Clone, Copy)]
 pub struct point {
-  pub b: Vector2,
-  pub gz: u8,
+    pub b: Vector2,
+    pub gz: u8,
 }
 
 impl point {
-  pub fn new0() -> point {
-    point::new(&Vector2::new(0.0, 0.0), 0)
-  }
-  pub fn new(bv: &Vector2, ls: u8) -> point {
-    point { b: *bv, gz: ls }
-  }
-
-  pub fn done() {}
-
-  pub fn draw(&self, ctx: &mut dyn DrawContext, c: Color) {
-    ctx.circle(self.b.x, self.b.y, 2.0, c);
-  }
-
-  pub fn copy(&self) -> point {
-    point {
-      b: self.b,
-      gz: self.gz,
+    pub fn new0() -> point {
+        point::new(&Vector2::new(0.0, 0.0), 0)
     }
-  }
+    pub fn new(bv: &Vector2, ls: u8) -> point {
+        point { b: *bv, gz: ls }
+    }
+
+    pub fn done() {}
+
+    pub fn draw(&self, ctx: &mut dyn DrawContext, c: Color) {
+        ctx.circle(self.b.x, self.b.y, 2.0, c);
+    }
+
+    pub fn copy(&self) -> point {
+        point {
+            b: self.b,
+            gz: self.gz,
+        }
+    }
 }
 
 pub struct punkt3d {
-  pub b: point,
-  pub o: Vector3,
+    pub b: point,
+    pub o: Vector3,
 }
 
 impl punkt3d {
-  pub fn new(ax: Float, ay: Float, az: Float) -> punkt3d {
-    punkt3d::newV(&Vector3::new(ax, ay, az))
-  }
-
-  pub fn newV(o: &Vector3) -> punkt3d {
-    punkt3d {
-      o: *o,
-      b: point::new0(),
+    pub fn new(ax: Float, ay: Float, az: Float) -> punkt3d {
+        punkt3d::newV(&Vector3::new(ax, ay, az))
     }
-  }
+
+    pub fn newV(o: &Vector3) -> punkt3d {
+        punkt3d {
+            o: *o,
+            b: point::new0(),
+        }
+    }
 }
 
 pub fn gleicheseite(s: &point, p2: &point, p3: &point, p4: &point) -> Float {
-  (((p3.b.y - s.b.y) * (p2.b.x - s.b.x) - (p3.b.x - s.b.x) * (p2.b.y - s.b.y))
-    * ((p4.b.y - s.b.y) * (p2.b.x - s.b.x) - (p4.b.x - s.b.x) * (p2.b.y - s.b.y)))
+    ((p3.b.y - s.b.y) * (p2.b.x - s.b.x) - (p3.b.x - s.b.x) * (p2.b.y - s.b.y))
+        * ((p4.b.y - s.b.y) * (p2.b.x - s.b.x) - (p4.b.x - s.b.x) * (p2.b.y - s.b.y))
 }
 
 // type
