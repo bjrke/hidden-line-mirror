@@ -3,7 +3,7 @@ use crate::float::*;
 use crate::vec2::*;
 use crate::vec3::*;
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub struct point {
     pub b: Vector2,
     pub gz: u8,
@@ -31,6 +31,7 @@ impl point {
     }
 }
 
+#[derive(Debug)]
 pub struct punkt3d {
     pub b: point,
     pub o: Vector3,

@@ -9,6 +9,7 @@ use crate::vec2::*;
 use rand::{thread_rng, Rng};
 use std::rc::Rc;
 
+#[derive(Clone, Debug)]
 pub struct polygon {
     pub delegate: dreiecktyp,
     pub originalTriangle: Rc<dreieck>,

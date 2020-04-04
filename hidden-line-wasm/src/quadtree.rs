@@ -1,8 +1,11 @@
 use crate::shape::*;
 use crate::vec2::*;
 use std::collections::VecDeque;
+use std::fmt::Debug;
+use std::io;
+use std::io::Write;
 
-const MAX_ELEMENTS: usize = 3;
+const MAX_ELEMENTS: usize = 2;
 
 pub struct QuadTree<T> {
     content: Vec<T>,
@@ -12,6 +15,10 @@ pub struct QuadTree<T> {
     size: usize,
 }
 
+fn create_content_array<T>() -> Vec<T> {
+    Vec::with_capacity(MAX_ELEMENTS)
+}
+
 impl<T> QuadTree<T> {
     pub fn new(bounds: Rect) -> QuadTree<T> {
         let center = Vector2 {
@@ -19,16 +26,14 @@ impl<T> QuadTree<T> {
             y: (bounds.y.start() + bounds.y.end()) / 2.0,
         };
         QuadTree {
-            content: Vec::with_capacity(MAX_ELEMENTS),
+            content: create_content_array(),
             subtrees: Vec::with_capacity(4),
             bounds,
             center,
             size: 0,
         }
     }
-}
 
-impl<T> QuadTree<T> {
     pub fn element_contains<'a>(
         &'a self,
         v: &'a Vector2,
@@ -62,20 +67,62 @@ impl<T> QuadTree<T> {
             Box::new(std::iter::empty())
         }
     }
+
+    pub fn elements<'a>(&'a self) -> Box<dyn std::iter::Iterator<Item = &T> + 'a> {
+        Box::new(
+            self.content
+                .iter()
+                .chain(self.subtrees.iter().flat_map(move |t| t.elements())),
+        )
+    }
+
+    pub fn element_contains_mut<'a>(
+        &'a mut self,
+        v: &'a Vector2,
+    ) -> Box<dyn Iterator<Item = &mut T> + 'a> {
+        if self.bounds.contains(v) {
+            Box::new(
+                self.content.iter_mut().chain(
+                    self.subtrees
+                        .iter_mut()
+                        .flat_map(move |t| t.element_contains_mut(v)),
+                ),
+            )
+        } else {
+            Box::new(std::iter::empty())
+        }
+    }
+
+    pub fn elements_intersecting_mut<'a>(
+        &'a mut self,
+        r: &'a Rect,
+    ) -> Box<dyn Iterator<Item = &mut T> + 'a> {
+        if self.bounds.intersects(r) {
+            Box::new(
+                self.content.iter_mut().chain(
+                    self.subtrees
+                        .iter_mut()
+                        .flat_map(move |t| t.elements_intersecting_mut(r)),
+                ),
+            )
+        } else {
+            Box::new(std::iter::empty())
+        }
+    }
 }
 
-impl<S: Shape> QuadTree<S> {
+impl<S: Shape + Debug> QuadTree<S> {
     pub fn insert(&mut self, s: S) {
         self.size += 1;
-        if self.size >= MAX_ELEMENTS && self.subtrees.is_empty() {
+        if self.content.len() >= MAX_ELEMENTS && self.subtrees.is_empty() {
             self.create_subtree(&self.bounds.top_left());
             self.create_subtree(&self.bounds.top_right());
             self.create_subtree(&self.bounds.bottom_left());
             self.create_subtree(&self.bounds.bottom_right());
 
-            let mut old: Vec<S> = Vec::with_capacity(MAX_ELEMENTS);
+            let mut old: Vec<S> = create_content_array();
             std::mem::swap(&mut self.content, &mut old);
-            for t in old {
+            for (pos, t) in old.into_iter().enumerate() {
                 self.insert_internal(t);
             }
         }

@@ -1,6 +1,6 @@
 use crate::float::*;
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub struct Vector3 {
     pub x: Float,
     pub y: Float,

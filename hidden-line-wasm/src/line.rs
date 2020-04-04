@@ -3,6 +3,7 @@ use crate::float::*;
 use crate::mat2::*;
 use crate::point::*;
 
+#[derive(Clone, Debug)]
 pub struct Line {
     pub a: point,
     pub e: point,

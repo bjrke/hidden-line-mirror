@@ -290,4 +290,9 @@ mod tests {
             vec![(1..2).to_tuple(), (3..4).to_tuple()]
         );
     }
+
+    #[test]
+    fn range_should_not_overlap() {
+        assert!(!(2.0..3.0).range_overlap(&(1.0..=1.5)));
+    }
 }

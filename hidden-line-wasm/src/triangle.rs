@@ -8,6 +8,7 @@ use crate::vec2::*;
 use crate::vec3::*;
 use std::rc::Rc;
 
+#[derive(Clone, Debug)]
 pub struct dreiecktyp {
     pub p1: point,
     pub p2: point,
@@ -157,6 +158,7 @@ impl dreiecktyp {
     }
 }
 
+#[derive(Debug)]
 pub struct dreieck {
     pub delegate: dreiecktyp,
     pub origPoint1: Rc<punkt3d>,

@@ -1,10 +1,10 @@
 use crate::float::*;
 use crate::range::*;
 use crate::vec2::*;
-use std::ops::RangeInclusive;
+use std::ops::{Bound, RangeInclusive};
 use std::ops::{Range, RangeBounds};
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Rect {
     pub x: RangeInclusive<Float>,
     pub y: RangeInclusive<Float>,
@@ -43,15 +43,20 @@ impl Rect {
 
     #[inline]
     pub fn extend(&self, x: Float, y: Float) -> Rect {
+        self.extend_rect(&Rect::new(x, y))
+    }
+
+    #[inline]
+    pub fn extend_rect(&self, rect: &Rect) -> Rect {
         Rect {
-            x: self.x.start().min(x)..=self.x.end().max(x),
-            y: self.y.start().min(y)..=self.y.end().max(y),
+            x: self.x.start().min(*rect.x.start())..=self.x.end().max(*rect.x.end()),
+            y: self.y.start().min(*rect.y.start())..=self.y.end().max(*rect.y.end()),
         }
     }
 
     #[inline]
     pub fn extend_vector(&self, v: &Vector2) -> Rect {
-        self.extend(v.x, v.y)
+        self.extend_rect(&Rect::from_vector(v))
     }
 
     #[inline]
@@ -81,13 +86,13 @@ impl Rect {
 
 impl Shape for Rect {
     #[inline]
-    fn contains(&self, v: &Vector2) -> bool {
-        self.x.contains(&v.x) && self.y.contains(&v.y)
+    fn intersects(&self, r: &Rect) -> bool {
+        self.x.range_overlap(&r.x) && self.y.range_overlap(&r.y)
     }
 
     #[inline]
-    fn intersects(&self, r: &Rect) -> bool {
-        self.x.range_overlap(&r.x) || self.y.range_overlap(&r.y)
+    fn contains(&self, v: &Vector2) -> bool {
+        self.x.contains(&v.x) && self.y.contains(&v.y)
     }
 
     #[inline]
@@ -97,12 +102,12 @@ impl Shape for Rect {
 }
 
 impl Shape for Vector2 {
-    fn contains(&self, v: &Vector2) -> bool {
-        self.x == v.x && self.y == v.y
-    }
-
     fn intersects(&self, r: &Rect) -> bool {
         r.contains(self)
+    }
+
+    fn contains(&self, v: &Vector2) -> bool {
+        self.x == v.x && self.y == v.y
     }
 
     fn bounds(&self) -> Rect {
@@ -202,16 +207,16 @@ fn epsilon_range(r: &Range<Float>) -> Range<Float> {
 }
 
 impl Shape for Line {
+    fn intersects(&self, r: &Rect) -> bool {
+        self.bounds_intersect(r) && {
+            r.contains(&self.a) || r.contains(&self.e) || lineRect(&self.a, &self.e, &r)
+        }
+    }
+
     fn contains(&self, v: &Vector2) -> bool {
         self.bounds_contains(v) && {
             lineX(&self.a, &self.e, &v.x, &epsilon_value(v.y))
                 || lineY(&self.a, &self.e, &v.y, &epsilon_value(v.x))
-        }
-    }
-
-    fn intersects(&self, r: &Rect) -> bool {
-        self.bounds_intersect(r) && {
-            r.contains(&self.a) || r.contains(&self.e) || lineRect(&self.a, &self.e, &r)
         }
     }
 
@@ -221,7 +226,8 @@ impl Shape for Line {
     }
 }
 
-struct Triangle {
+#[derive(Debug)]
+pub struct Triangle {
     p1: Vector2,
     p2: Vector2,
     p3: Vector2,
@@ -244,14 +250,6 @@ impl Triangle {
 }
 
 impl Shape for Triangle {
-    #[inline]
-    fn contains(&self, v: &Vector2) -> bool {
-        self.bounds_contains(v) && {
-            let d1 = sign(v, &self.p1, &self.p2);
-            d1 == sign(v, &self.p2, &self.p3) && d1 == sign(v, &self.p3, &self.p1)
-        }
-    }
-
     fn intersects(&self, r: &Rect) -> bool {
         self.bounds_intersect(r) && {
             r.contains(&self.p1)
@@ -260,6 +258,14 @@ impl Shape for Triangle {
                 || lineRect(&self.p1, &self.p2, &r)
                 || lineRect(&self.p2, &self.p3, &r)
                 || lineRect(&self.p3, &self.p1, &r)
+        }
+    }
+
+    #[inline]
+    fn contains(&self, v: &Vector2) -> bool {
+        self.bounds_contains(v) && {
+            let d1 = sign(v, &self.p1, &self.p2);
+            d1 == sign(v, &self.p2, &self.p3) && d1 == sign(v, &self.p3, &self.p1)
         }
     }
 
@@ -327,5 +333,26 @@ mod tests {
             Rect::new(2.0, 3.0).extend(4.0, 6.0).bottom_right(),
             Vector2::new(4.0, 3.0)
         );
+    }
+
+    #[test]
+    fn rect_should_intersect() {
+        assert!(Rect::new(2.0, 3.5)
+            .extend(4.0, 6.0)
+            .intersects(&Rect::new(1.0, 2.5).extend(3.0, 4.0)));
+    }
+
+    #[test]
+    fn rect_should_not_intersect_y() {
+        assert!(!Rect::new(2.0, 3.5)
+            .extend(4.0, 6.0)
+            .intersects(&Rect::new(1.0, 2.5).extend(1.5, 4.0)));
+    }
+
+    #[test]
+    fn rect_should_not_intersect_x() {
+        assert!(!Rect::new(2.0, 3.5)
+            .extend(4.0, 6.0)
+            .intersects(&Rect::new(1.0, 2.5).extend(3.0, 3.0)));
     }
 }
