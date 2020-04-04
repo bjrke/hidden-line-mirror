@@ -26,7 +26,7 @@ pub trait Shape {
 
     #[inline]
     fn bounds_contains(&self, v: &Vector2) -> bool {
-        self.bounds().bounds_contains(v)
+        self.bounds().contains(v)
     }
 }
 
@@ -178,14 +178,14 @@ fn lineRect(a: &Vector2, e: &Vector2, r: &&Rect) -> bool {
         || lineX(a, e, r.x.end(), &r.y)
 }
 
-struct Line {
-    a: Vector2,
-    e: Vector2,
+pub struct Line {
+    pub a: Vector2,
+    pub e: Vector2,
 }
 
 impl Line {
     #[inline]
-    fn new(a: Vector2, e: Vector2) -> Line {
+    pub fn new(a: Vector2, e: Vector2) -> Line {
         Line { a, e }
     }
 }
@@ -228,9 +228,9 @@ impl Shape for Line {
 
 #[derive(Debug)]
 pub struct Triangle {
-    p1: Vector2,
-    p2: Vector2,
-    p3: Vector2,
+    pub p1: Vector2,
+    pub p2: Vector2,
+    pub p3: Vector2,
 }
 
 #[inline]
@@ -354,5 +354,42 @@ mod tests {
         assert!(!Rect::new(2.0, 3.5)
             .extend(4.0, 6.0)
             .intersects(&Rect::new(1.0, 2.5).extend(3.0, 3.0)));
+    }
+
+    #[test]
+    fn triangle_should_contain() {
+        let triangle = Triangle::new(
+            &Vector2::new(1.0, 1.0),
+            &Vector2::new(6.0, 2.0),
+            &Vector2::new(4.0, 4.0),
+        );
+
+        assert!(triangle.contains(&Vector2::new(3.0, 3.0)))
+    }
+
+    #[test]
+    fn triangle_should_contain_point_in_rect() {
+        let triangle = Triangle::new(
+            &Vector2::new(1.0, 1.0),
+            &Vector2::new(6.0, 2.0),
+            &Vector2::new(4.0, 4.0),
+        );
+
+        let v = Vector2::new(1.1, 3.9);
+        assert!(triangle.bounds_contains(&v));
+        assert!(!triangle.contains(&v))
+    }
+
+    #[test]
+    fn triangle_should_contain_out_of_rect() {
+        let triangle = Triangle::new(
+            &Vector2::new(1.0, 1.0),
+            &Vector2::new(6.0, 2.0),
+            &Vector2::new(4.0, 4.0),
+        );
+
+        let v = Vector2::new(-3.0, -3.0);
+        assert!(!triangle.bounds_contains(&v));
+        assert!(!triangle.contains(&v))
     }
 }

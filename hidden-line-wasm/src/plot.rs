@@ -53,7 +53,7 @@ pub fn init_scene<F: Fn(Float, Float) -> Float>(f: F) -> SceneBuilder {
         let mut qs = QuadStrip::init(scene, xx, -ad, f(xx, -ad), xx + sw, -ad, f(xx + sw, -ad));
 
         let mut yy = -ad + sw;
-        while yy < ad {
+        while yy <= ad {
             qs.add(xx, yy, f(xx, yy), xx + sw, yy, f(xx + sw, yy));
             yy = yy + sw;
         }
@@ -176,3 +176,60 @@ pub fn darstellung(dctx: &mut dyn DrawContext, actx: &mut AppContext) {
 //   until ch=#27;
 //   ende;
 // end.
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::float::*;
+    use crate::vec2::Vector2;
+
+    struct TestDrawContext {
+        lines: Vec<(Float, Float, Float, Float, Color)>,
+    }
+
+    impl DrawContext for TestDrawContext {
+        fn circle(&mut self, x: Float, y: Float, r: Float, c: Color) {}
+
+        fn line(&mut self, xa: Float, ya: Float, xe: Float, ye: Float, c: Color) {
+            self.lines.push((xa, ya, xe, ye, c));
+        }
+
+        fn poly(&mut self, coordinates: &[Vector2], c: Color) {}
+
+        fn putpixel(&mut self, x: i32, y: i32, c: Color) {}
+
+        fn cls(&mut self) {}
+    }
+
+    impl TestDrawContext {
+        fn new() -> TestDrawContext {
+            TestDrawContext { lines: vec![] }
+        }
+    }
+    #[test]
+    fn integration() {
+        let mut actx = init();
+
+        actx.sceneBuilder = init_scene(|x, y| {
+            let mut h = 0.0;
+            let step = PI / 36.0;
+            let mut a = 0.0;
+            while a < PI {
+                let c = a.cos();
+                let s = a.sin();
+                let xd = x * c - y * s;
+                let yd = x * s + y * c;
+                h += (a * (xd * xd * 25.0 + yd * yd * 100.0).sqrt()).cos() / (PI + a);
+                a += PI;
+            }
+            h / 10.0
+        });
+        actx.backface = false;
+
+        let mut dctx = TestDrawContext::new();
+        darstellung(&mut dctx, &mut actx);
+
+        println!("{:?}", dctx.lines);
+        println!("{:?}", dctx.lines.len());
+    }
+}

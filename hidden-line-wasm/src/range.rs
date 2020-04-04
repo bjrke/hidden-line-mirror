@@ -83,7 +83,7 @@ impl<Idx: PartialOrd<Idx> + Copy, T: RangeBounds<Idx>> RangeExtCopy<Idx> for T {
 
     #[inline]
     fn not(&self) -> Vec<(Bound<Idx>, Bound<Idx>)> {
-        match (self.start(), self.end()) {
+        match self.to_tuple() {
             (Bound::Unbounded, Bound::Unbounded) => vec![],
             (Bound::Unbounded, Bound::Included(e)) => vec![(Bound::Excluded(e), Bound::Unbounded)],
             (Bound::Unbounded, Bound::Excluded(e)) => vec![(Bound::Included(e), Bound::Unbounded)],

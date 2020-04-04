@@ -15,17 +15,20 @@ impl<T: PartialOrd + Copy> RangeSet<T> {
     }
 
     pub fn is_empty(&self) -> bool {
-        self.0.is_empty()
+        let RangeSet(ranges) = self;
+        ranges.is_empty()
     }
 
     pub fn contains(&self, idx: T) -> bool {
-        self.0.iter().any(|r| r.contains(&idx))
+        let RangeSet(ranges) = self;
+        ranges.iter().any(|r| r.contains(&idx))
     }
 
     pub fn add<R: RangeBounds<T>>(&mut self, new_range: &R) {
         let mut new_range: (Bound<T>, Bound<T>) = new_range.to_tuple();
+        let RangeSet(ranges) = self;
 
-        self.0.retain(|r| {
+        ranges.retain(|r| {
             let delete = new_range.range_overlap(r);
             if delete {
                 new_range = new_range.union_no_check(r);
@@ -33,7 +36,7 @@ impl<T: PartialOrd + Copy> RangeSet<T> {
             !delete
         });
 
-        self.0.push(new_range);
+        ranges.push(new_range);
     }
 
     pub fn merge(&mut self, rs: &Self) {
@@ -41,17 +44,19 @@ impl<T: PartialOrd + Copy> RangeSet<T> {
     }
 
     pub fn remove<R: RangeBounds<T>>(&mut self, r: &R) {
+        let RangeSet(ranges) = self;
         let mut n = vec![];
-        std::mem::swap(&mut n, &mut self.0);
+        std::mem::swap(&mut n, ranges);
         for t in n {
             for d in t.diff(r) {
-                self.0.push(d)
+                ranges.push(d)
             }
         }
     }
 
     pub fn diff(&mut self, rs: &Self) {
-        rs.0.iter().for_each(|r| self.remove(r));
+        let RangeSet(ranges) = rs;
+        ranges.iter().for_each(|r| self.remove(r));
     }
 }
 
@@ -167,5 +172,17 @@ mod tests {
                 (Bound::Included(8), Bound::Included(12))
             ]
         );
+    }
+
+    #[test]
+    fn removeTwice() {
+        let mut s = set1(0.0..=1.0);
+
+        for _ in 0..100 {
+            s.remove(&(0.0..=0.5));
+        }
+
+        let RangeSet(ranges) = s;
+        assert_eq!(ranges, vec![(Bound::Excluded(0.5), Bound::Included(1.0))])
     }
 }

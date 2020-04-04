@@ -19,7 +19,7 @@ impl Line {
             p_1: p_1.clone(),
             p_2: p_2.clone(),
             color,
-            ranges: RangeSet::from_range(&(0.0f32..1.0f32)),
+            ranges: RangeSet::from_range(&(0.0..1.0)),
         }
     }
 

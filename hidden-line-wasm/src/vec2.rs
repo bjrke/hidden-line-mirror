@@ -53,6 +53,11 @@ impl Vector2 {
         let s = 1.0 - t;
         self.mul2d(s).add2d(&other.mul2d(t))
     }
+
+    #[inline]
+    pub fn nearly_equals(&self, o: &Self) -> bool {
+        self.x.nearly_equals(&o.x) && self.y.nearly_equals(&o.y)
+    }
 }
 
 impl Eq for Vector2 {}

@@ -1,3 +1,27 @@
+#[cfg(target_arch = "wasm32")]
+#[macro_export]
+macro_rules! print {
+    ($($arg:tt)*) => (web_sys::console::log_1(&wasm_bindgen::JsValue::from_str(&format!($($arg)*))));
+}
+
+#[cfg(target_arch = "wasm32")]
+#[macro_export]
+macro_rules! println {
+    ($($arg:tt)*) => (web_sys::console::log_1(&wasm_bindgen::JsValue::from_str(&format!($($arg)*))));
+}
+
+#[cfg(target_arch = "wasm32")]
+#[macro_export]
+macro_rules! eprint {
+    ($($arg:tt)*) => (web_sys::console::warn_1(&wasm_bindgen::JsValue::from_str(&format!($($arg)*))));
+}
+
+#[cfg(target_arch = "wasm32")]
+#[macro_export]
+macro_rules! eprintln {
+    ($($arg:tt)*) => (web_sys::console::warn_1(&wasm_bindgen::JsValue::from_str(&format!($($arg)*))));
+}
+
 mod appcontext;
 mod calcctontext;
 mod drawcontext;
