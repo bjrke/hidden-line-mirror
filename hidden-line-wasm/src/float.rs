@@ -7,18 +7,18 @@ pub const epsilon1: Float = epsilon0 * epsilon0;
 pub const epsilon2: Float = epsilon1 * epsilon1;
 
 pub trait FloatExt {
-  fn sqr(&self) -> Float;
-  fn inv_sqrt(&self) -> Float;
+    fn sqr(&self) -> Float;
+    fn inv_sqrt(&self) -> Float;
 }
 
 impl FloatExt for Float {
-  fn sqr(&self) -> Float {
-    self * self
-  }
+    fn sqr(&self) -> Float {
+        self * self
+    }
 
-  fn inv_sqrt(&self) -> Float {
-    1.0 / self.sqrt()
-  }
+    fn inv_sqrt(&self) -> Float {
+        1.0 / self.sqrt()
+    }
 }
 
 /*

@@ -106,6 +106,7 @@ mod tests {
     fn add_should_merge() {
         let mut set = set1(1..3);
         set.add(&(2..4));
+
         assert_eq!(set.0, vec![(Bound::Included(1), Bound::Excluded(4))]);
     }
 
@@ -113,6 +114,7 @@ mod tests {
     fn add_should_not_merge() {
         let mut set = set1(1..2);
         set.add(&(3..4));
+
         assert_eq!(
             set.0,
             vec![
@@ -125,9 +127,7 @@ mod tests {
     #[test]
     fn merge_should_work() {
         let mut s1 = set2(1..3, 4..5);
-        let s2 = set2(6..7, 8..9);
-
-        s1.merge(&s2);
+        s1.merge(&set2(6..7, 8..9));
 
         assert_eq!(
             s1.0,
@@ -157,9 +157,7 @@ mod tests {
     #[test]
     fn diff_should_work() {
         let mut s1 = set2(1..=3, 4..=12);
-        let s2 = set2(2..=6, 7..8);
-
-        s1.diff(&s2);
+        s1.diff(&set2(2..=6, 7..8));
 
         assert_eq!(
             s1.0,

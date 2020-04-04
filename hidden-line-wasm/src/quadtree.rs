@@ -1,5 +1,6 @@
 use crate::shape::*;
 use crate::vec2::*;
+use std::collections::VecDeque;
 
 const MAX_ELEMENTS: usize = 3;
 
@@ -83,7 +84,7 @@ impl<S: Shape> QuadTree<S> {
 
     fn insert_internal(&mut self, s: S) {
         for st in self.subtrees.iter_mut() {
-            if st.bounds.intersects(s.bounds()) {
+            if st.bounds.intersects(&s.bounds()) {
                 st.insert(s);
                 return;
             }
@@ -95,5 +96,82 @@ impl<S: Shape> QuadTree<S> {
         self.subtrees.push(QuadTree::new(
             Rect::from_vector(v).extend_vector(&self.center),
         ));
+    }
+
+    fn entries<P>(&self, p: P) -> QuadTreeIterator<S, P>
+    where
+        P: FnMut(&dyn Shape) -> bool,
+    {
+        QuadTreeIterator {
+            element_stack: VecDeque::new(),
+            tree_stack: VecDeque::new(),
+            p,
+        }
+    }
+}
+
+struct QuadTreeIterator<'a, T, P> {
+    element_stack: VecDeque<&'a T>,
+    tree_stack: VecDeque<&'a QuadTree<T>>,
+    p: P,
+}
+
+impl<'a, T: Shape, P: FnMut(&dyn Shape) -> bool> Iterator for QuadTreeIterator<'a, T, P> {
+    type Item = &'a T;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        loop {
+            if let Some(element) = self.element_stack.pop_back() {
+                return Some(element);
+            } else if let Some(tree) = self.tree_stack.pop_back() {
+                for subtree in tree.subtrees.iter() {
+                    if (self.p)(&subtree.bounds) {
+                        self.tree_stack.push_back(subtree);
+                    }
+                }
+                for element in tree.content.iter() {
+                    if (self.p)(element) {
+                        self.element_stack.push_back(element);
+                    }
+                }
+            } else {
+                return None;
+            }
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::float::FloatExt;
+    use wasm_bindgen::__rt::std::collections::HashSet;
+
+    #[test]
+    fn tree() {
+        let mut tree = QuadTree::new(Rect::new(-1000.0, -1000.0).extend(1000.0, 1000.0));
+
+        let expected1 = Vector2::new(100.0, 100.0);
+        tree.insert(expected1);
+
+        tree.insert(Vector2::new(-100.0, 100.0));
+        tree.insert(Vector2::new(-200.0, 200.0));
+        tree.insert(Vector2::new(100.0, -100.0));
+        tree.insert(Vector2::new(200.0, -200.0));
+        tree.insert(Vector2::new(-100.0, -100.0));
+        tree.insert(Vector2::new(-200.0, -200.0));
+
+        let expected2 = Vector2::new(200.0, 200.0);
+        tree.insert(expected2);
+
+        let rect = Rect::new(90.0, 90.0).extend(210.0, 210.0);
+        let elements: Vec<&Vector2> = tree.elements_intersecting(&rect).collect();
+
+        assert!(elements.contains(&&expected1));
+        assert!(elements.contains(&&expected2));
+        // let mut expected = HashSet::new();
+        // expected.insert(Vector2::new(100.0, 100.0));
+        // expected.insert(Vector2::new(200.0, 200.0));
+        // assert_eq!(expected, tree);
     }
 }

@@ -4,21 +4,24 @@ use crate::vec2::*;
 use std::ops::RangeInclusive;
 use std::ops::{Range, RangeBounds};
 
+#[derive(Clone)]
 pub struct Rect {
     pub x: RangeInclusive<Float>,
     pub y: RangeInclusive<Float>,
 }
 
 pub trait Shape {
-    fn contains(&self, v: &Vector2) -> bool;
-
     fn intersects(&self, r: &Rect) -> bool;
 
-    fn bounds(&self) -> &Rect;
+    fn contains(&self, v: &Vector2) -> bool {
+        self.intersects(&Rect::from_vector(v))
+    }
+
+    fn bounds(&self) -> Rect;
 
     #[inline]
     fn bounds_intersect(&self, s: &dyn Shape) -> bool {
-        self.bounds().intersects(s.bounds())
+        self.bounds().intersects(&s.bounds())
     }
 
     #[inline]
@@ -70,6 +73,10 @@ impl Rect {
     pub fn bottom_right(&self) -> Vector2 {
         Vector2::new(*self.x.end(), *self.y.start())
     }
+
+    pub fn is_empty(&self) -> bool {
+        self.x.start() > self.x.end() || self.y.start() > self.y.end()
+    }
 }
 
 impl Shape for Rect {
@@ -84,8 +91,22 @@ impl Shape for Rect {
     }
 
     #[inline]
-    fn bounds(&self) -> &Rect {
-        &self
+    fn bounds(&self) -> Rect {
+        self.clone()
+    }
+}
+
+impl Shape for Vector2 {
+    fn contains(&self, v: &Vector2) -> bool {
+        self.x == v.x && self.y == v.y
+    }
+
+    fn intersects(&self, r: &Rect) -> bool {
+        r.contains(self)
+    }
+
+    fn bounds(&self) -> Rect {
+        Rect::from_vector(self)
     }
 }
 
@@ -155,17 +176,12 @@ fn lineRect(a: &Vector2, e: &Vector2, r: &&Rect) -> bool {
 struct Line {
     a: Vector2,
     e: Vector2,
-    bounds: Rect,
 }
 
 impl Line {
     #[inline]
     fn new(a: Vector2, e: Vector2) -> Line {
-        Line {
-            a,
-            e,
-            bounds: Rect::from_vector(&a).extend_vector(&e),
-        }
+        Line { a, e }
     }
 }
 
@@ -200,8 +216,8 @@ impl Shape for Line {
     }
 
     #[inline]
-    fn bounds(&self) -> &Rect {
-        &self.bounds
+    fn bounds(&self) -> Rect {
+        Rect::from_vector(&self.a).extend_vector(&self.e)
     }
 }
 
@@ -209,7 +225,6 @@ struct Triangle {
     p1: Vector2,
     p2: Vector2,
     p3: Vector2,
-    bounds: Rect,
 }
 
 #[inline]
@@ -224,7 +239,6 @@ impl Triangle {
             p1: *p1,
             p2: *p2,
             p3: *p3,
-            bounds: Rect::from_vector(p1).extend_vector(p2).extend_vector(p3),
         }
     }
 }
@@ -250,8 +264,10 @@ impl Shape for Triangle {
     }
 
     #[inline]
-    fn bounds(&self) -> &Rect {
-        &self.bounds
+    fn bounds(&self) -> Rect {
+        Rect::from_vector(&self.p1)
+            .extend_vector(&self.p2)
+            .extend_vector(&self.p3)
     }
 }
 
