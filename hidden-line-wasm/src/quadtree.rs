@@ -1,3 +1,4 @@
+use crate::range::RangeExtCopy;
 use crate::shape::*;
 use crate::vec2::*;
 use std::collections::VecDeque;
@@ -62,6 +63,26 @@ impl<S: Shape + Debug> QuadTree<S> {
                         .iter()
                         .flat_map(move |t| t.elements_intersecting(r)),
                 ),
+            )
+        } else {
+            Box::new(std::iter::empty())
+        }
+    }
+
+    pub fn elements_intersecting2<'a, X: Shape>(
+        &'a self,
+        r: &'a X,
+    ) -> Box<dyn std::iter::Iterator<Item = &S> + 'a> {
+        if r.intersects(&self.bounds) {
+            Box::new(
+                self.content
+                    .iter()
+                    .filter(move |c| r.intersects(&c.bounds()))
+                    .chain(
+                        self.subtrees
+                            .iter()
+                            .flat_map(move |t| t.elements_intersecting2(r)),
+                    ),
             )
         } else {
             Box::new(std::iter::empty())
@@ -134,8 +155,9 @@ impl<S: Shape + Debug> QuadTree<S> {
     }
 
     fn insert_internal(&mut self, s: S) {
+        let s_bounds = s.bounds();
         for st in self.subtrees.iter_mut() {
-            if st.bounds.intersects(&s.bounds()) {
+            if st.bounds.contains_rect(&s_bounds) {
                 st.insert(s);
                 return;
             }

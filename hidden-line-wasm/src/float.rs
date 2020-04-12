@@ -1,3 +1,4 @@
+use std::ops::Mul;
 pub type Float = f32;
 pub const PI: Float = std::f32::consts::PI;
 pub const MAX: Float = std::f32::MAX;

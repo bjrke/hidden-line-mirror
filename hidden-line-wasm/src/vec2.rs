@@ -1,7 +1,8 @@
 use crate::float::*;
 use std::cmp::*;
+use std::ops::{Add, Div, Mul, Sub};
 
-#[derive(Debug, Default, Clone, Copy, PartialEq, PartialOrd)]
+#[derive(Default, Clone, Copy, PartialEq, PartialOrd)]
 pub struct Vector2 {
     pub x: Float,
     pub y: Float,
@@ -25,7 +26,7 @@ impl Vector2 {
 
     #[inline]
     pub fn sub2d(&self, v: &Vector2) -> Vector2 {
-        Vector2::new(self.x - v.x, self.y - v.y)
+        *self - *v
     }
 
     #[inline]
@@ -51,12 +52,63 @@ impl Vector2 {
     #[inline]
     pub fn mix(&self, other: &Vector2, t: Float) -> Vector2 {
         let s = 1.0 - t;
-        self.mul2d(s).add2d(&other.mul2d(t))
+        self.mul2d(t).add2d(&other.mul2d(s))
     }
 
     #[inline]
     pub fn nearly_equals(&self, o: &Self) -> bool {
         self.x.nearly_equals(&o.x) && self.y.nearly_equals(&o.y)
+    }
+}
+
+impl std::fmt::Debug for Vector2 {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_tuple("").field(&self.x).field(&self.y).finish()
+    }
+}
+
+impl Add for Vector2 {
+    type Output = Vector2;
+
+    #[inline]
+    fn add(self, rhs: Self) -> Self::Output {
+        Vector2::new(self.x + rhs.x, self.y + rhs.y)
+    }
+}
+
+impl Sub for Vector2 {
+    type Output = Vector2;
+
+    #[inline]
+    fn sub(self, rhs: Self) -> Self::Output {
+        Vector2::new(self.x - rhs.x, self.y - rhs.y)
+    }
+}
+
+impl Mul<Vector2> for Vector2 {
+    type Output = Float;
+
+    #[inline]
+    fn mul(self, rhs: Vector2) -> Self::Output {
+        self.x * rhs.x + self.y * rhs.y
+    }
+}
+
+impl Mul<Float> for Vector2 {
+    type Output = Vector2;
+
+    #[inline]
+    fn mul(self, rhs: Float) -> Self::Output {
+        Vector2::new(self.x * rhs, self.y * rhs)
+    }
+}
+
+impl Div<Float> for Vector2 {
+    type Output = Vector2;
+
+    #[inline]
+    fn div(self, rhs: Float) -> Self::Output {
+        Vector2::new(self.x / rhs, self.y / rhs)
     }
 }
 

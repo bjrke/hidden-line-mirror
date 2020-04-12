@@ -4,7 +4,7 @@ use crate::vec2::*;
 use std::ops::{Bound, RangeInclusive};
 use std::ops::{Range, RangeBounds};
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct Rect {
     pub x: RangeInclusive<Float>,
     pub y: RangeInclusive<Float>,
@@ -79,8 +79,14 @@ impl Rect {
         Vector2::new(*self.x.end(), *self.y.start())
     }
 
+    #[inline]
     pub fn is_empty(&self) -> bool {
-        self.x.start() > self.x.end() || self.y.start() > self.y.end()
+        self.x.is_empty() || self.y.is_empty()
+    }
+
+    #[inline]
+    pub fn contains_rect(&self, r: &Rect) -> bool {
+        self.x.contains_range(&r.x) && self.y.contains_range(&r.y)
     }
 }
 
@@ -178,6 +184,7 @@ fn lineRect(a: &Vector2, e: &Vector2, r: &&Rect) -> bool {
         || lineX(a, e, r.x.end(), &r.y)
 }
 
+#[derive(Clone, Debug)]
 pub struct Line {
     pub a: Vector2,
     pub e: Vector2,
@@ -226,7 +233,7 @@ impl Shape for Line {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 pub struct Triangle {
     pub p1: Vector2,
     pub p2: Vector2,
@@ -391,5 +398,34 @@ mod tests {
         let v = Vector2::new(-3.0, -3.0);
         assert!(!triangle.bounds_contains(&v));
         assert!(!triangle.contains(&v))
+    }
+
+    #[test]
+    fn triangle_should_have_correct_bound() {
+        let triangle = Triangle::new(
+            &Vector2::new(1.0, 1.0),
+            &Vector2::new(6.0, 2.0),
+            &Vector2::new(4.0, 4.0),
+        );
+
+        assert_eq!(
+            triangle.bounds(),
+            Rect {
+                x: 1.0..=6.0,
+                y: 1.0..=4.0
+            }
+        )
+    }
+
+    #[test]
+    fn line_should_have_correct_bounds() {
+        let line = Line::new(Vector2::new(1.0, 1.0), Vector2::new(6.0, 2.0));
+        assert_eq!(
+            line.bounds(),
+            Rect {
+                x: 1.0..=6.0,
+                y: 1.0..=2.0
+            }
+        )
     }
 }

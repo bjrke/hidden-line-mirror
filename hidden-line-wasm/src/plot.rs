@@ -106,7 +106,7 @@ pub fn init() -> AppContext {
         BlickR,
         iv: Vector3::new(1.0, 0.0, 0.0),
         jv: Vector3::new(0.0, 0.0, 1.0),
-        backface: true,
+        backface: false,
         drawmode: 0,
         ausgabeInsert: false,
         colmode: false,

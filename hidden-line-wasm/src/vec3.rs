@@ -1,6 +1,8 @@
 use crate::float::*;
+use std::fmt::Debug;
+use std::ops::{Add, Div, Mul, Sub};
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy)]
 pub struct Vector3 {
     pub x: Float,
     pub y: Float,
@@ -60,7 +62,62 @@ impl Vector3 {
     }
 
     pub fn normalize(&self) -> Vector3 {
-        self.mul3d(self.invBetrag3d())
+        *self * self.invBetrag3d()
+    }
+}
+
+impl std::fmt::Debug for Vector3 {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_tuple("")
+            .field(&self.x)
+            .field(&self.y)
+            .field(&self.z)
+            .finish()
+    }
+}
+
+impl Add for Vector3 {
+    type Output = Vector3;
+
+    #[inline]
+    fn add(self, rhs: Self) -> Self::Output {
+        Vector3::new(self.x + rhs.x, self.y + rhs.y, self.z + rhs.z)
+    }
+}
+
+impl Sub for Vector3 {
+    type Output = Vector3;
+
+    #[inline]
+    fn sub(self, rhs: Self) -> Self::Output {
+        Vector3::new(self.x - rhs.x, self.y - rhs.y, self.z - rhs.z)
+    }
+}
+
+impl Mul<Vector3> for Vector3 {
+    type Output = Float;
+
+    #[inline]
+    fn mul(self, rhs: Vector3) -> Self::Output {
+        self.x * rhs.x + self.y * rhs.y + self.z * rhs.z
+    }
+}
+
+impl Mul<Float> for Vector3 {
+    type Output = Vector3;
+
+    #[inline]
+    fn mul(self, rhs: Float) -> Self::Output {
+        Vector3::new(self.x * rhs, self.y * rhs, self.z * rhs)
+    }
+}
+
+impl Div<Float> for Vector3 {
+    type Output = Vector3;
+
+    #[inline]
+    fn div(self, rhs: Float) -> Self::Output {
+        Vector3::new(self.x / rhs, self.y / rhs, self.y / rhs)
     }
 }
 

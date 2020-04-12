@@ -105,6 +105,9 @@ impl DrawContext for SvgContext {
 }
 
 fn html_color(c: Color) -> String {
+    if c == -MAX {
+        return "red".to_string();
+    }
     let x = if c >= 1.0 {
         255
     } else if c <= 0.0 {

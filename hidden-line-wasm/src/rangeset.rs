@@ -1,6 +1,7 @@
 use crate::range::*;
 use std::ops::{Bound, RangeBounds};
 
+#[derive(Debug)]
 pub struct RangeSet<T>(pub Vec<(Bound<T>, Bound<T>)>);
 
 impl<T: PartialOrd + Copy> RangeSet<T> {
