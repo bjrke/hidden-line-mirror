@@ -1,5 +1,5 @@
 use crate::float::*;
-use std::ops::{Add, Div, Mul, Neg, Sub};
+use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 
 #[derive(Clone, Copy)]
 pub struct Vector3 {
@@ -94,6 +94,15 @@ impl Add for &Vector3 {
     }
 }
 
+impl AddAssign for Vector3 {
+    #[inline]
+    fn add_assign(&mut self, rhs: Self) {
+        self.x += rhs.x;
+        self.y += rhs.y;
+        self.z += rhs.z;
+    }
+}
+
 impl Sub for Vector3 {
     type Output = Self;
 
@@ -109,6 +118,15 @@ impl Sub for &Vector3 {
     #[inline]
     fn sub(self, rhs: Self) -> Self::Output {
         Self::Output::new(self.x - rhs.x, self.y - rhs.y, self.z - rhs.z)
+    }
+}
+
+impl SubAssign for Vector3 {
+    #[inline]
+    fn sub_assign(&mut self, rhs: Self) {
+        self.x -= rhs.x;
+        self.y -= rhs.y;
+        self.z -= rhs.z;
     }
 }
 
@@ -148,6 +166,15 @@ impl Mul<Float> for &Vector3 {
     }
 }
 
+impl MulAssign<Float> for Vector3 {
+    #[inline]
+    fn mul_assign(&mut self, rhs: Float) {
+        self.x *= rhs;
+        self.y *= rhs;
+        self.z *= rhs;
+    }
+}
+
 impl Div<Float> for Vector3 {
     type Output = Self;
 
@@ -163,6 +190,15 @@ impl Div<Float> for &Vector3 {
     #[inline]
     fn div(self, rhs: Float) -> Self::Output {
         Self::Output::new(self.x / rhs, self.y / rhs, self.y / rhs)
+    }
+}
+
+impl DivAssign<Float> for Vector3 {
+    #[inline]
+    fn div_assign(&mut self, rhs: Float) {
+        self.x /= rhs;
+        self.y /= rhs;
+        self.z /= rhs;
     }
 }
 

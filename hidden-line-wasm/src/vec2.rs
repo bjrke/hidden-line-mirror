@@ -1,6 +1,6 @@
 use crate::float::*;
 use std::cmp::*;
-use std::ops::{Add, Div, Mul, Neg, Sub};
+use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 
 #[derive(Default, Clone, Copy, PartialEq, PartialOrd)]
 pub struct Vector2 {
@@ -79,6 +79,14 @@ impl Add for &Vector2 {
     }
 }
 
+impl AddAssign for Vector2 {
+    #[inline]
+    fn add_assign(&mut self, rhs: Self) {
+        self.x += rhs.x;
+        self.y += rhs.y;
+    }
+}
+
 impl Sub for Vector2 {
     type Output = Vector2;
 
@@ -94,6 +102,14 @@ impl Sub for &Vector2 {
     #[inline]
     fn sub(self, rhs: Self) -> Self::Output {
         Self::Output::new(self.x - rhs.x, self.y - rhs.y)
+    }
+}
+
+impl SubAssign for Vector2 {
+    #[inline]
+    fn sub_assign(&mut self, rhs: Self) {
+        self.x -= rhs.x;
+        self.y -= rhs.y;
     }
 }
 
@@ -133,6 +149,14 @@ impl Mul<Float> for &Vector2 {
     }
 }
 
+impl MulAssign<Float> for Vector2 {
+    #[inline]
+    fn mul_assign(&mut self, rhs: Float) {
+        self.x *= rhs;
+        self.y *= rhs;
+    }
+}
+
 impl Div<Float> for Vector2 {
     type Output = Vector2;
 
@@ -148,6 +172,14 @@ impl Div<Float> for &Vector2 {
     #[inline]
     fn div(self, rhs: Float) -> Self::Output {
         Self::Output::new(self.x / rhs, self.y / rhs)
+    }
+}
+
+impl DivAssign<Float> for Vector2 {
+    #[inline]
+    fn div_assign(&mut self, rhs: Float) {
+        self.x /= rhs;
+        self.y /= rhs;
     }
 }
 
