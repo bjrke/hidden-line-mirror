@@ -43,7 +43,9 @@ import("../pkg/index.js").then(
 
         const svg = document.getElementsByTagName("svg").item(0);
         const hiddenLine = wasm.lets_go(svg);
+        const start = performance.now();
         hiddenLine.set_function(getF());
+        console.log("finished in " + (performance.now() - start) + " ms", new Date());
 
         let h = false;
         svg.addEventListener("keydown", e => {
