@@ -12,8 +12,6 @@ pub struct AppContext {
     pub view: Vector3,
     pub iv: Vector3,
     pub jv: Vector3,
-    pub colmode: bool,
-    pub drawmode: u8,
     pub scene_builder: SceneBuilder,
     pub backface: bool,
 }
@@ -77,27 +75,7 @@ impl AppContext {
 
             'i' => rot_vec(&mut self.iv, &mut self.jv, 1.0),
             'I' => rot_vec(&mut self.iv, &mut self.jv, 10.0),
-            'f' | 'F' => self.colmode = !self.colmode,
-            // 't' | 'T' => self.tausgabe = !self.tausgabe,
             'b' | 'B' => self.backface = !self.backface,
-            //       'p':begin
-            //         palettePos := (palettePos + 1) MOD Length(palette);
-            //         SetAllPalette(palette[palettePos]);
-            //       end;
-            //       'P':begin
-            //         palettePos := (palettePos + Length(palette) - 1) MOD Length(palette);
-            //         SetAllPalette(palette[palettePos]);
-            //       end;
-            '0' => self.drawmode = 0,
-            '1' => self.drawmode = 1,
-            '2' => self.drawmode = 2,
-            '3' => self.drawmode = 3,
-            '4' => self.drawmode = 4,
-            '5' => self.drawmode = 5,
-            //       '6':begin drawmode=6;zumalen=[0..255];tausgabe=true;end;
-            '7' => self.drawmode = 7,
-            '8' => self.drawmode = 8,
-            '9' => self.drawmode = 9,
             _ => return false,
         }
         true
@@ -189,51 +167,3 @@ impl Scene {
         result
     }
 }
-
-//   dliste = object
-//   public
-//     function First: pdreieck;
-//     function Next: pdreieck;
-//     constructor init;
-//   private
-//     Anker, aktuell, Last: pdreieck;
-//   end;
-
-// constructor dliste.init;
-// begin
-//   Anker := nil;
-//   Last := nil;
-// end;
-
-// function dliste.add;
-// var
-//   h: pdreieck;
-// begin
-//   New(h, init(p1, p2, p3, ls));
-//   if anker = nil then
-//     anker := h;
-//   if last = nil then
-//     last := h
-//   else
-//   begin
-//     last^.Next := h;
-//     last := h;
-//   end;
-//   exit(h);
-// end;
-
-// function dliste.First;
-// begin
-//   aktuell := anker;
-//   exit(aktuell);
-// end;
-
-// function dliste.Next;
-// begin
-//   if aktuell <> nil then
-//     aktuell := aktuell^.Next;
-//   exit(aktuell);
-// end;
-
-// begin
-// end.

@@ -110,8 +110,6 @@ pub fn init() -> AppContext {
         iv: Vector3(1.0, 0.0, 0.0),
         jv: Vector3(0.0, 0.0, 1.0),
         backface: false,
-        drawmode: 0,
-        colmode: false,
     }
 }
 
