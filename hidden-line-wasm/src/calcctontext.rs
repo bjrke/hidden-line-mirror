@@ -47,30 +47,30 @@ impl TheTriangle {
         TheTriangle { poly, shape }
     }
 
-    fn lines(&self) -> Vec<TheLine> {
+    fn lines(&self, all: bool) -> Vec<TheLine> {
         let mut result = vec![];
 
-        // if DEBUG || self.poly.originalTriangle.delegate.gl & 4 == 4 {
-        result.push(TheLine::new(
-            self.poly.originalTriangle.origPoint1.clone(),
-            self.poly.originalTriangle.origPoint2.clone(),
-            self.poly.delegate.cols,
-        ));
-        // }
-        // if DEBUG || self.poly.originalTriangle.delegate.gl & 1 == 1 {
-        result.push(TheLine::new(
-            self.poly.originalTriangle.origPoint2.clone(),
-            self.poly.originalTriangle.origPoint3.clone(),
-            self.poly.delegate.cols,
-        ));
-        // }
-        // if DEBUG || self.poly.originalTriangle.delegate.gl & 2 == 2 {
-        result.push(TheLine::new(
-            self.poly.originalTriangle.origPoint3.clone(),
-            self.poly.originalTriangle.origPoint1.clone(),
-            self.poly.delegate.cols,
-        ));
-        // }
+        if all || DEBUG || self.poly.originalTriangle.delegate.gl & 4 == 4 {
+            result.push(TheLine::new(
+                self.poly.originalTriangle.origPoint1.clone(),
+                self.poly.originalTriangle.origPoint2.clone(),
+                self.poly.delegate.cols,
+            ));
+        }
+        if all || DEBUG || self.poly.originalTriangle.delegate.gl & 1 == 1 {
+            result.push(TheLine::new(
+                self.poly.originalTriangle.origPoint2.clone(),
+                self.poly.originalTriangle.origPoint3.clone(),
+                self.poly.delegate.cols,
+            ));
+        }
+        if all || DEBUG || self.poly.originalTriangle.delegate.gl & 2 == 2 {
+            result.push(TheLine::new(
+                self.poly.originalTriangle.origPoint3.clone(),
+                self.poly.originalTriangle.origPoint1.clone(),
+                self.poly.delegate.cols,
+            ));
+        }
 
         result
     }
@@ -188,7 +188,7 @@ impl CalcContext {
             }
 
             for t in tree.elements() {
-                for l in t.lines() {
+                for l in t.lines(false).iter() {
                     let bounds = l.shape.bounds();
                     let mut r: RangeSet<Float> = RangeSet::from_range(&(0.0..=1.0));
                     let mut candidates = tree.elements_intersecting(&bounds);
@@ -390,7 +390,7 @@ impl CalcContext {
 
         let d21 = p2 - p1;
         let mut other_range = None;
-        for triLine in triangle.lines().iter() {
+        for triLine in triangle.lines(true).iter() {
             //https://quickmath.com/webMathematica3/quickmath/equations/solve/advanced.jsp#c=solve_advancedsolveequations&v1=lx_1%2Bmx_2%253Dp%250Aly_1%2Bmy_2%253Dq%250Al%2Bm%253D1%250Anx_3%2Box_4%253Dp%250Any_3%2Boy_4%253Dq%250An%2Bo%253D1%250A&v2=l%250Am%250An%250Ao%250Ap%250Aq%250A&v5=1
             let p3 = triLine.shape.a;
             let p4 = triLine.shape.e;
