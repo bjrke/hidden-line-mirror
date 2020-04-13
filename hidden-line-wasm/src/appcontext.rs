@@ -39,11 +39,11 @@ impl AppContext {
                self.BlickR * j.p2.o > ED &&
                self.BlickR * j.p3.o > ED &&
                // evtl kann man das mit der Lichtberechnung beim Initialisieren des Polygons kombinieren
-               (!self.backface || ((j.delegate.p3.x - j.delegate.p1.x) *
-            (j.delegate.p2.y - j.delegate.p1.y) + epsilon1 < (j.delegate.p3.y - j.delegate.p1.y) *
-            (j.delegate.p2.x - j.delegate.p1.x)))
+               (!self.backface || ((j.p3.b.x - j.p1.b.x) *
+            (j.p2.b.y - j.p1.b.y) + epsilon1 < (j.p3.b.y - j.p1.b.y) *
+            (j.p2.b.x - j.p1.b.x)))
             {
-                if j.delegate.flaechentest() {
+                if j.flaechentest() {
                     polys.push(j.clone());
                 }
             }

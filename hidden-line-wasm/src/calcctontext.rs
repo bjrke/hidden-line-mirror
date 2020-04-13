@@ -39,23 +39,23 @@ impl TheTriangle {
     fn lines(&self, all: bool) -> Vec<TheLine> {
         let mut result = vec![];
 
-        let color = self.poly.delegate.cols;
+        let color = self.poly.cols;
 
-        if all || DEBUG || self.poly.delegate.gl & 4 == 4 {
+        if all || DEBUG || self.poly.gl & 4 == 4 {
             result.push(TheLine::new(
                 self.poly.p1.clone(),
                 self.poly.p2.clone(),
                 color,
             ));
         }
-        if all || DEBUG || self.poly.delegate.gl & 1 == 1 {
+        if all || DEBUG || self.poly.gl & 1 == 1 {
             result.push(TheLine::new(
                 self.poly.p2.clone(),
                 self.poly.p3.clone(),
                 color,
             ));
         }
-        if all || DEBUG || self.poly.delegate.gl & 2 == 2 {
+        if all || DEBUG || self.poly.gl & 2 == 2 {
             result.push(TheLine::new(
                 self.poly.p3.clone(),
                 self.poly.p1.clone(),
