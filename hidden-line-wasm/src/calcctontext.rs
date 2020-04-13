@@ -15,14 +15,13 @@ use crate::quadtree::QuadTree;
 use crate::range::RangeExtCopy;
 use crate::rangeset::RangeSet;
 use crate::shape::{Line, Rect, Shape, Triangle};
-use crate::time::*;
+
 use crate::vec2::Vector2;
 use crate::vec3::Vector3;
 
 const DEBUG: bool = false;
 
 pub struct CalcContext {
-    pub tiefePerspektive: minmax,
     pub minxQueue: BinaryHeap<MinxQueueEntry>,
     pub queue2: Vec<polygon>,
     pub maxxQueue: BTreeSet<MaxxQueueEntry>,
@@ -157,7 +156,6 @@ impl Shape for TheLine {
 impl CalcContext {
     pub fn new() -> CalcContext {
         CalcContext {
-            tiefePerspektive: minmax::new(),
             minxQueue: BinaryHeap::new(),
             queue2: Vec::new(),
             maxxQueue: BTreeSet::new(),

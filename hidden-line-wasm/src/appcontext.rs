@@ -4,15 +4,13 @@ use crate::mat3::*;
 use crate::minxqueue::*;
 use crate::point::*;
 use crate::polygon::*;
-use crate::time::*;
+
 use crate::triangle::*;
 use crate::vec3::*;
 use std::collections::BinaryHeap;
 use std::rc::Rc;
 
 pub struct AppContext {
-    pub zaehl: ctyp,
-
     pub Auge: Vector3,
     pub BlickR: Vector3,
     pub iv: Vector3,

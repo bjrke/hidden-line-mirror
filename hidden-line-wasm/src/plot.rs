@@ -3,7 +3,7 @@ use crate::calcctontext::*;
 use crate::drawcontext::*;
 use crate::dreidext::*;
 use crate::float::*;
-use crate::time::*;
+
 use crate::vec3::*;
 
 // program dreidplot;
@@ -110,25 +110,17 @@ pub fn init() -> AppContext {
         drawmode: 0,
         ausgabeInsert: false,
         colmode: false,
-        zaehl: ctyp::init(),
     }
 }
 
 pub fn darstellung(dctx: &mut dyn DrawContext, actx: &mut AppContext) {
-    actx.zaehl = ctyp::init();
     actx.neukamera();
     let polys = actx.rechnung();
 
-    println!("Anzahl Polygone: {}", actx.zaehl.q1.maximum);
+    println!("Anzahl Polygone: {}", polys.len());
     println!("Auge: {}", actx.Auge);
     println!("BlickR: {}", actx.BlickR);
     println!("Oben x 10000: {}", actx.jv * 10000.0);
-
-    // let start = SystemTime::now();
-    //   sweep;
-    // println!("Zeit: {}", start.elapsed().unwrap().as_secs());
-    actx.zaehl.ausgabe();
-    //TODO
 
     dctx.circle(0.99, 0.99, 0.01, 1.0);
     dctx.circle(0.99, -0.99, 0.01, 1.0);
@@ -139,43 +131,7 @@ pub fn darstellung(dctx: &mut dyn DrawContext, actx: &mut AppContext) {
     ctx.minxQueue = polys;
 
     ctx.test(dctx, actx);
-
-    //   OutInt('höchste Tiefe Suchbaum:',mtf);
-    //   if wurzel[1]<>nil then outstring('wurzel[1]');
-    //   if wurzel[2]<>nil then outstring('wurzel[2]');
-    //   if wurzel[3]<>nil then outstring('wurzel[3]');
-    //   if first[1]<>nil then outstring('first[1]');
-    //   if first[2]<>nil then outstring('first[2]');
-    //   if first[3]<>nil then outstring('first[3]');
-    //   while first[1]<>nil do begin
-    //     p:=pop(1);
-    //     p^.drawpoly;
-    //     dispose(p, done);
-    //     outstring('f1');
-    //   end;
-    //   while first[2]<>nil do begin
-    //     p:=pop(2);
-    //     p^.drawpoly;
-    //     dispose(p, done);
-    //     outstring('f2');
-    //   end;
-    //   while first[3]<>nil do begin
-    //     p:=pop(3);
-    //     p^.drawpoly;
-    //     dispose(p, done);
-    //     outstring('f3');
-    //   end;
-    // end;
 }
-
-// begin
-//   init;
-//   repeat
-//     darstellung;
-//     tastatur;
-//   until ch=#27;
-//   ende;
-// end.
 
 #[cfg(test)]
 mod tests {
