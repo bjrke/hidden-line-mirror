@@ -17,16 +17,6 @@ impl Vector3 {
     }
 
     #[inline]
-    pub fn mul3d(&self, f: Float) -> Self {
-        self * f
-    }
-
-    #[inline]
-    pub fn div3d(&self, d: Float) -> Self {
-        self / d
-    }
-
-    #[inline]
     pub fn cross(&self, v: &Self) -> Self {
         Vector3::new(
             self.y * v.z - self.z * v.y,
@@ -57,12 +47,12 @@ impl Vector3 {
 
     #[inline]
     pub fn move3d(&self, direction: &Self, polarisation: Float) -> Self {
-        self + &(direction * (polarisation * MOVE_SPEED * direction.invBetrag3d()))
+        self + &(direction.normalize() * (polarisation * MOVE_SPEED))
     }
 
     #[inline]
     pub fn normalize(&self) -> Self {
-        self * self.invBetrag3d()
+        self / self.len()
     }
 }
 
@@ -180,7 +170,7 @@ impl Div<Float> for Vector3 {
 
     #[inline]
     fn div(self, rhs: Float) -> Self::Output {
-        Self::Output::new(self.x / rhs, self.y / rhs, self.y / rhs)
+        Self::Output::new(self.x / rhs, self.y / rhs, self.z / rhs)
     }
 }
 
@@ -189,7 +179,7 @@ impl Div<Float> for &Vector3 {
 
     #[inline]
     fn div(self, rhs: Float) -> Self::Output {
-        Self::Output::new(self.x / rhs, self.y / rhs, self.y / rhs)
+        Self::Output::new(self.x / rhs, self.y / rhs, self.z / rhs)
     }
 }
 

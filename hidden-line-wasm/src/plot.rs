@@ -98,7 +98,7 @@ pub fn init_scene<F: Fn(Float, Float) -> Float>(f: F) -> SceneBuilder {
 
 pub fn init() -> AppContext {
     let Auge = Vector3::new(1.5, 2.0, 2.5);
-    let BlickR = Auge.div3d(-2.0);
+    let BlickR = Auge / -2.0;
 
     AppContext {
         sceneBuilder: SceneBuilder::new(),
@@ -122,7 +122,7 @@ pub fn darstellung(dctx: &mut dyn DrawContext, actx: &mut AppContext) {
     println!("Anzahl Polygone: {}", actx.zaehl.q1.maximum);
     println!("Auge: {}", actx.Auge);
     println!("BlickR: {}", actx.BlickR);
-    println!("Oben x 10000: {}", actx.jv.mul3d(10000.0));
+    println!("Oben x 10000: {}", actx.jv * 10000.0);
 
     // let start = SystemTime::now();
     //   sweep;

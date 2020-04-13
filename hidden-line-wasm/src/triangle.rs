@@ -40,7 +40,7 @@ impl dreieck {
         let dp2 = p2.b;
         let dp3 = p3.b;
 
-        let planeDist = planeNorm.skalar(&p1.o);
+        let planeDist = planeNorm * p1.o;
         dreieck {
             origPoint1: p1,
             origPoint2: p2,
