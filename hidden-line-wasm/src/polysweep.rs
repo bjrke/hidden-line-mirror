@@ -1,4 +1,3 @@
-#![feature(map_first_last)]
 use crate::appcontext::*;
 use crate::calcctontext::*;
 use crate::drawcontext::*;

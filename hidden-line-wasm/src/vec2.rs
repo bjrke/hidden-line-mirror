@@ -16,12 +16,12 @@ impl Vector2 {
 
     #[inline]
     pub fn mul2d(&self, f: Float) -> Vector2 {
-        Vector2::new(self.x * f, self.y * f)
+        *self * f
     }
 
     #[inline]
     pub fn div2d(&self, d: Float) -> Vector2 {
-        Vector2::new(self.x / d, self.y / d)
+        *self / d
     }
 
     #[inline]
@@ -31,12 +31,12 @@ impl Vector2 {
 
     #[inline]
     pub fn add2d(&self, v: &Vector2) -> Vector2 {
-        Vector2::new(self.x + v.x, self.y + v.y)
+        *self + *v
     }
 
     #[inline]
     pub fn sqrbetrag2d(&self) -> Float {
-        self.x.sqr() + self.y.sqr()
+        *self * *self
     }
 
     #[inline]
@@ -51,13 +51,7 @@ impl Vector2 {
 
     #[inline]
     pub fn mix(&self, other: &Vector2, t: Float) -> Vector2 {
-        let s = 1.0 - t;
-        self.mul2d(t).add2d(&other.mul2d(s))
-    }
-
-    #[inline]
-    pub fn nearly_equals(&self, o: &Self) -> bool {
-        self.x.nearly_equals(&o.x) && self.y.nearly_equals(&o.y)
+        (*self * t) + (*other * (1.0 - t))
     }
 }
 

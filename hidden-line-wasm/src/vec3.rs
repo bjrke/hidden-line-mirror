@@ -1,5 +1,4 @@
 use crate::float::*;
-use std::fmt::Debug;
 use std::ops::{Add, Div, Mul, Sub};
 
 #[derive(Clone, Copy)]
@@ -11,36 +10,37 @@ pub struct Vector3 {
 
 const MOVE_SPEED: Float = 1.0;
 
-pub type vector3d = Vector3;
-
 impl Vector3 {
     pub fn new(x: Float, y: Float, z: Float) -> Vector3 {
         Vector3 { x, y, z }
     }
 
+    #[inline]
     pub fn sub3d(&self, v: &Vector3) -> Vector3 {
-        Vector3::new(self.x - v.x, self.y - v.y, self.z - v.z)
+        *self - *v
     }
 
+    #[inline]
     pub fn add3d(&self, v: &Vector3) -> Vector3 {
-        Vector3::new(self.x + v.x, self.y + v.y, self.z + v.z)
+        *self + *v
     }
 
+    #[inline]
     pub fn mul3d(&self, f: Float) -> Vector3 {
-        Vector3::new(self.x * f, self.y * f, self.z * f)
+        *self * f
     }
 
+    #[inline]
     pub fn div3d(&self, d: Float) -> Vector3 {
-        if d == 0.0 {
-            println!("d=0");
-        }
-        Vector3::new(self.x / d, self.y / d, self.z / d)
+        *self / d
     }
 
+    #[inline]
     pub fn neg3d(&self) -> Vector3 {
         Vector3::new(-self.x, -self.y, -self.z)
     }
 
+    #[inline]
     pub fn kreuz(&self, v: &Vector3) -> Vector3 {
         Vector3::new(
             self.y * v.z - self.z * v.y,
@@ -49,18 +49,22 @@ impl Vector3 {
         )
     }
 
+    #[inline]
     pub fn skalar(&self, v: &Vector3) -> Float {
-        self.x * v.x + self.y * v.y + self.z * v.z
+        *self * *v
     }
 
+    #[inline]
     pub fn invBetrag3d(&self) -> Float {
-        (self.x.sqr() + self.y.sqr() + self.z.sqr()).inv_sqrt()
+        (*self * *self).inv_sqrt()
     }
 
+    #[inline]
     pub fn move3d(&self, direction: &Vector3, polarisation: Float) -> Vector3 {
-        self.add3d(&direction.mul3d(polarisation * MOVE_SPEED * direction.invBetrag3d()))
+        *self + (*direction * (polarisation * MOVE_SPEED * direction.invBetrag3d()))
     }
 
+    #[inline]
     pub fn normalize(&self) -> Vector3 {
         *self * self.invBetrag3d()
     }

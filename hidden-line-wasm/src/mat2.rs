@@ -29,5 +29,3 @@ impl std::fmt::Display for Matrix2 {
         write!(f, "({}, {})", self.x, self.y)
     }
 }
-
-type matrix2d = Matrix2;

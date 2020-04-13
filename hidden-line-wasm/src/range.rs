@@ -161,12 +161,12 @@ impl<Idx: PartialOrd<Idx> + Copy, T: RangeBounds<Idx>> RangeExtCopy<Idx> for T {
 
     #[inline]
     fn start(&self) -> Bound<Idx> {
-        deRefIdx(self.start_bound())
+        de_ref_idx(self.start_bound())
     }
 
     #[inline]
     fn end(&self) -> Bound<Idx> {
-        deRefIdx(self.end_bound())
+        de_ref_idx(self.end_bound())
     }
 
     #[inline]
@@ -176,7 +176,7 @@ impl<Idx: PartialOrd<Idx> + Copy, T: RangeBounds<Idx>> RangeExtCopy<Idx> for T {
 }
 
 #[inline]
-fn deRefIdx<Idx: Copy>(b: Bound<&Idx>) -> Bound<Idx> {
+fn de_ref_idx<Idx: Copy>(b: Bound<&Idx>) -> Bound<Idx> {
     match b {
         Bound::Unbounded => Bound::Unbounded,
         Bound::Included(&i) => Bound::Included(i),

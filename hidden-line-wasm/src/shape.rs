@@ -1,7 +1,7 @@
 use crate::float::*;
 use crate::range::*;
 use crate::vec2::*;
-use std::ops::{Bound, RangeInclusive};
+use std::ops::RangeInclusive;
 use std::ops::{Range, RangeBounds};
 
 #[derive(Clone, Debug, PartialEq)]

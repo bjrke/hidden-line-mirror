@@ -1,4 +1,3 @@
-use std::ops::Mul;
 pub type Float = f32;
 pub const PI: Float = std::f32::consts::PI;
 pub const MAX: Float = std::f32::MAX;
@@ -10,7 +9,6 @@ pub const epsilon2: Float = epsilon1 * epsilon1;
 pub trait FloatExt {
     fn sqr(&self) -> Self;
     fn inv_sqrt(&self) -> Self;
-    fn nearly_equals(&self, o: &Self) -> bool;
 }
 
 impl FloatExt for Float {
@@ -22,11 +20,6 @@ impl FloatExt for Float {
     #[inline]
     fn inv_sqrt(&self) -> Self {
         1.0 / self.sqrt()
-    }
-
-    #[inline]
-    fn nearly_equals(&self, o: &Self) -> bool {
-        self == o
     }
 }
 

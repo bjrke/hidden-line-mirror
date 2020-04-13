@@ -1,10 +1,7 @@
-use crate::range::RangeExtCopy;
 use crate::shape::*;
 use crate::vec2::*;
 use std::collections::VecDeque;
 use std::fmt::Debug;
-use std::io;
-use std::io::Write;
 
 const MAX_ELEMENTS: usize = 3;
 
@@ -69,72 +66,12 @@ impl<S: Shape + Debug> QuadTree<S> {
         }
     }
 
-    pub fn elements_intersecting2<'a, X: Shape>(
-        &'a self,
-        r: &'a X,
-    ) -> Box<dyn std::iter::Iterator<Item = &S> + 'a> {
-        if r.intersects(&self.bounds) {
-            Box::new(
-                self.content
-                    .iter()
-                    .filter(move |c| r.intersects(&c.bounds()))
-                    .chain(
-                        self.subtrees
-                            .iter()
-                            .flat_map(move |t| t.elements_intersecting2(r)),
-                    ),
-            )
-        } else {
-            Box::new(std::iter::empty())
-        }
-    }
-
     pub fn elements<'a>(&'a self) -> Box<dyn std::iter::Iterator<Item = &S> + 'a> {
         Box::new(
             self.content
                 .iter()
                 .chain(self.subtrees.iter().flat_map(move |t| t.elements())),
         )
-    }
-
-    pub fn element_contains_mut<'a>(
-        &'a mut self,
-        v: &'a Vector2,
-    ) -> Box<dyn Iterator<Item = &mut S> + 'a> {
-        if self.bounds.contains(v) {
-            Box::new(
-                self.content
-                    .iter_mut()
-                    .filter(move |c| c.contains(v))
-                    .chain(
-                        self.subtrees
-                            .iter_mut()
-                            .flat_map(move |t| t.element_contains_mut(v)),
-                    ),
-            )
-        } else {
-            Box::new(std::iter::empty())
-        }
-    }
-
-    pub fn elements_intersecting_mut<'a>(
-        &'a mut self,
-        r: &'a Rect,
-    ) -> Box<dyn Iterator<Item = &mut S> + 'a> {
-        if self.bounds.intersects(r) {
-            Box::new(
-                self.content
-                    .iter_mut()
-                    .filter(move |c| c.intersects(r))
-                    .chain(
-                        self.subtrees
-                            .iter_mut()
-                            .flat_map(move |t| t.elements_intersecting_mut(r)),
-                    ),
-            )
-        } else {
-            Box::new(std::iter::empty())
-        }
     }
 
     pub fn insert(&mut self, s: S) {
@@ -217,8 +154,6 @@ impl<'a, T: Shape, P: FnMut(&dyn Shape) -> bool> Iterator for QuadTreeIterator<'
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::float::FloatExt;
-    use wasm_bindgen::__rt::std::collections::HashSet;
 
     #[test]
     fn tree() {

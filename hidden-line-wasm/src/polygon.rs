@@ -206,7 +206,7 @@ impl polygon {
             for wy in ym1..ym2 {
                 let h = Vector2::new(wx as Float, wy as Float);
                 if self.delegate.punkttest(&h, "draw2", false) == 0 {
-                    let my1 = 1.0 + 7.0 * self.yscan(wx as Float);
+                    // let my1 = 1.0 + 7.0 * self.yscan(wx as Float);
 
                     let col = calcColor(
                         cctx.tiefePerspektive

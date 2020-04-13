@@ -188,7 +188,7 @@ impl CalcContext {
             }
 
             for t in tree.elements() {
-                for mut l in t.lines() {
+                for l in t.lines() {
                     let bounds = l.shape.bounds();
                     let mut r: RangeSet<Float> = RangeSet::from_range(&(0.0..=1.0));
                     let mut candidates = tree.elements_intersecting(&bounds);

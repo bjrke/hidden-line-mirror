@@ -180,7 +180,6 @@ pub fn darstellung(dctx: &mut dyn DrawContext, actx: &mut AppContext) {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::float::*;
     use crate::vec2::Vector2;
 
     struct TestDrawContext {
@@ -188,15 +187,15 @@ mod tests {
     }
 
     impl DrawContext for TestDrawContext {
-        fn circle(&mut self, x: Float, y: Float, r: Float, c: Color) {}
+        fn circle(&mut self, _x: Float, _y: Float, _r: Float, _c: Color) {}
 
         fn line(&mut self, xa: Float, ya: Float, xe: Float, ye: Float, c: Color) {
             self.lines.push((xa, ya, xe, ye, c));
         }
 
-        fn poly(&mut self, coordinates: &[Vector2], c: Color) {}
+        fn poly(&mut self, _coordinates: &[Vector2], _c: Color) {}
 
-        fn putpixel(&mut self, x: i32, y: i32, c: Color) {}
+        fn putpixel(&mut self, _x: i32, _y: i32, _c: Color) {}
 
         fn cls(&mut self) {}
     }
@@ -220,7 +219,7 @@ mod tests {
                 let xd = x * c - y * s;
                 let yd = x * s + y * c;
                 h += (a * (xd * xd * 25.0 + yd * yd * 100.0).sqrt()).cos() / (PI + a);
-                a += PI;
+                a += step;
             }
             h / 10.0
         });
