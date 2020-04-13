@@ -33,15 +33,15 @@ impl AppContext {
     pub fn rechnung(&mut self) -> BinaryHeap<MinxQueueEntry> {
         let mut scene = Scene::new(&self);
 
-        let ED = self.BlickR.skalar(&self.Auge) + epsilon1;
+        let ED = self.BlickR * self.Auge + epsilon1;
 
         let mut polys = BinaryHeap::new();
 
         for j in scene.dreiecks.iter_mut() {
             // test if not behind view plane
-            if self.BlickR.skalar(&j.origPoint1.o) > ED &&
-               self.BlickR.skalar(&j.origPoint2.o) > ED &&
-               self.BlickR.skalar(&j.origPoint3.o) > ED &&
+            if self.BlickR * j.origPoint1.o > ED &&
+               self.BlickR * j.origPoint2.o > ED &&
+               self.BlickR * j.origPoint3.o > ED &&
                // evtl kann man das mit der Lichtberechnung beim Initialisieren des Polygons kombinieren
                (!self.backface || ((j.delegate.p3.b.x - j.delegate.p1.b.x) *
             (j.delegate.p2.b.y - j.delegate.p1.b.y) + epsilon1 < (j.delegate.p3.b.y - j.delegate.p1.b.y) *
@@ -60,18 +60,18 @@ impl AppContext {
 
     pub fn on_key(&mut self, ch: char) -> bool {
         match ch {
-            'a' => self.Auge = self.Auge.move3d(&self.BlickR, 1.0),
-            'A' => self.Auge = self.Auge.move3d(&self.BlickR, 10.0),
-            'y' | 'z' => self.Auge = self.Auge.move3d(&self.BlickR, -1.0),
-            'Y' | 'Z' => self.Auge = self.Auge.move3d(&self.BlickR, -10.0),
-            'k' => self.Auge = self.Auge.move3d(&self.iv, -1.0),
-            'K' => self.Auge = self.Auge.move3d(&self.iv, -10.0),
-            'l' => self.Auge = self.Auge.move3d(&self.iv, 1.0),
-            'L' => self.Auge = self.Auge.move3d(&self.iv, 10.0),
-            's' => self.Auge = self.Auge.move3d(&self.jv, -1.0),
-            'S' => self.Auge = self.Auge.move3d(&self.jv, -10.0),
-            'x' => self.Auge = self.Auge.move3d(&self.jv, 1.0),
-            'X' => self.Auge = self.Auge.move3d(&self.jv, 10.0),
+            'a' => self.Auge += self.BlickR.normalize(),
+            'A' => self.Auge += self.BlickR.normalize() * 10.0,
+            'y' | 'z' => self.Auge -= self.BlickR.normalize(),
+            'Y' | 'Z' => self.Auge -= self.BlickR.normalize() * 10.0,
+            'k' => self.Auge -= self.iv.normalize(),
+            'K' => self.Auge -= self.iv.normalize() * 10.0,
+            'l' => self.Auge += self.iv.normalize(),
+            'L' => self.Auge += self.iv.normalize() * 10.0,
+            's' => self.Auge -= self.jv.normalize(),
+            'S' => self.Auge -= self.jv.normalize() * 10.0,
+            'x' => self.Auge += self.jv.normalize(),
+            'X' => self.Auge += self.jv.normalize() * 10.0,
             'd' => rot_vec(&mut self.BlickR, &mut self.jv, 1.0),
             'D' => rot_vec(&mut self.BlickR, &mut self.jv, 10.0),
             'c' => rot_vec(&mut self.jv, &mut self.BlickR, 1.0),
@@ -110,6 +110,37 @@ impl AppContext {
         }
         true
     }
+}
+
+fn rot_vec(to_rot1: &mut Vector3, to_rot2: &mut Vector3, t: Float) {
+    let rad = t * PI / 180.0;
+    let rot_inc = rad.cos() / rad.sin();
+    let rot_len = (rot_inc.sqr() + 1.0).sqrt();
+    let rot_inc = (rot_inc / rot_len);
+
+    let copy1 = *to_rot1;
+    let copy2 = *to_rot2;
+
+    let len1 = to_rot1.len();
+    let len2 = to_rot2.len();
+
+    if len1 == 0.0 {
+        println!("len1 = 0");
+    }
+    if len2 == 0.0 {
+        println!("len2 = 0");
+    }
+
+    let f1 = len1 / (len2 * rot_len);
+    let f2 = -len2 / (len1 * rot_len);
+
+    to_rot1.x = rot_inc * copy1.x + copy2.x * f1;
+    to_rot1.y = rot_inc * copy1.y + copy2.y * f1;
+    to_rot1.z = rot_inc * copy1.z + copy2.z * f1;
+
+    to_rot2.x = f2 * copy1.x + rot_inc * copy2.x;
+    to_rot2.y = f2 * copy1.y + rot_inc * copy2.y;
+    to_rot2.z = f2 * copy1.z + rot_inc * copy2.z;
 }
 
 pub struct Scene {
@@ -160,8 +191,7 @@ impl Scene {
             let p3 = &result.points[t.p3];
 
             let c = (p1.o - p2.o).cross(&(p3.o - p2.o));
-            let faktor = actx.BlickR.invBetrag3d() * c.invBetrag3d();
-            let cols = (actx.BlickR.skalar(&c) * faktor).abs();
+            let cols = (actx.BlickR.normalize() * c.normalize()).abs();
 
             result.dreiecks.push(Rc::new(dreieck::new(
                 p1.clone(),
