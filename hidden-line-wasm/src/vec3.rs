@@ -17,16 +17,6 @@ impl Vector3 {
     }
 
     #[inline]
-    pub fn sub3d(&self, v: &Self) -> Self {
-        self - v
-    }
-
-    #[inline]
-    pub fn add3d(&self, v: &Self) -> Self {
-        self + v
-    }
-
-    #[inline]
     pub fn mul3d(&self, f: Float) -> Self {
         self * f
     }

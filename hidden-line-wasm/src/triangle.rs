@@ -34,7 +34,7 @@ pub struct dreieck {
 
 impl dreieck {
     pub fn new(p1: Rc<punkt3d>, p2: Rc<punkt3d>, p3: Rc<punkt3d>, ls: u8, cols: Color) -> dreieck {
-        let planeNorm = p2.o.sub3d(&p1.o).cross(&p3.o.sub3d(&p1.o)).normalize();
+        let planeNorm = (p2.o - p1.o).cross(&(p3.o - p1.o)).normalize();
 
         let dp1 = p1.b;
         let dp2 = p2.b;

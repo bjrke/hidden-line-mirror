@@ -122,7 +122,7 @@ impl punkt3d {
     pub fn perspektive(mut self, actx: &AppContext) -> Self {
         // self.tiefePerspektive = minmax::new();
 
-        let mut K = Matrix3::new(actx.iv, actx.jv, actx.Auge.sub3d(&self.o));
+        let mut K = Matrix3::new(actx.iv, actx.jv, actx.Auge - self.o);
 
         let kd = K.det3d();
         if kd.abs() > epsilon2 {
@@ -159,7 +159,7 @@ impl Scene {
             let p2 = &result.points[t.p2];
             let p3 = &result.points[t.p3];
 
-            let c = p1.o.sub3d(&p2.o).cross(&p3.o.sub3d(&p2.o));
+            let c = (p1.o - p2.o).cross(&(p3.o - p2.o));
             let faktor = actx.BlickR.invBetrag3d() * c.invBetrag3d();
             let cols = (actx.BlickR.skalar(&c) * faktor).abs();
 
