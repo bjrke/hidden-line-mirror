@@ -97,15 +97,15 @@ pub fn init_scene<F: Fn(Float, Float) -> Float>(f: F) -> SceneBuilder {
 }
 
 pub fn init() -> AppContext {
-    let Auge = Vector3::new(1.5, 2.0, 2.5);
+    let Auge = Vector3(1.5, 2.0, 2.5);
     let BlickR = Auge / -2.0;
 
     AppContext {
         sceneBuilder: SceneBuilder::new(),
         Auge,
         BlickR,
-        iv: Vector3::new(1.0, 0.0, 0.0),
-        jv: Vector3::new(0.0, 0.0, 1.0),
+        iv: Vector3(1.0, 0.0, 0.0),
+        jv: Vector3(0.0, 0.0, 1.0),
         backface: false,
         drawmode: 0,
         ausgabeInsert: false,

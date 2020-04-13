@@ -61,22 +61,22 @@ impl Rect {
 
     #[inline]
     pub fn top_left(&self) -> Vector2 {
-        Vector2::new(*self.x.start(), *self.y.end())
+        Vector2(*self.x.start(), *self.y.end())
     }
 
     #[inline]
     pub fn top_right(&self) -> Vector2 {
-        Vector2::new(*self.x.end(), *self.y.end())
+        Vector2(*self.x.end(), *self.y.end())
     }
 
     #[inline]
     pub fn bottom_left(&self) -> Vector2 {
-        Vector2::new(*self.x.start(), *self.y.start())
+        Vector2(*self.x.start(), *self.y.start())
     }
 
     #[inline]
     pub fn bottom_right(&self) -> Vector2 {
-        Vector2::new(*self.x.end(), *self.y.start())
+        Vector2(*self.x.end(), *self.y.start())
     }
 
     #[inline]
@@ -293,28 +293,28 @@ mod tests {
     fn rect_should_contain_vector() {
         assert!(Rect::new(2.0, 3.0)
             .extend(4.0, 6.0)
-            .contains(&Vector2::new(2.5, 5.0)));
+            .contains(&Vector2(2.5, 5.0)));
     }
 
     #[test]
     fn rect_should_contain_top_left() {
         assert!(Rect::new(2.0, 3.0)
             .extend(4.0, 6.0)
-            .contains(&Vector2::new(2.0, 3.0)));
+            .contains(&Vector2(2.0, 3.0)));
     }
 
     #[test]
     fn rect_should_contain_bottom_right() {
         assert!(Rect::new(2.0, 3.0)
             .extend(4.0, 6.0)
-            .contains(&Vector2::new(4.0, 6.0)));
+            .contains(&Vector2(4.0, 6.0)));
     }
 
     #[test]
     fn rect_top_left() {
         assert_eq!(
             Rect::new(2.0, 3.0).extend(4.0, 6.0).top_left(),
-            Vector2::new(2.0, 6.0)
+            Vector2(2.0, 6.0)
         );
     }
 
@@ -322,7 +322,7 @@ mod tests {
     fn rect_top_right() {
         assert_eq!(
             Rect::new(2.0, 3.0).extend(4.0, 6.0).top_right(),
-            Vector2::new(4.0, 6.0)
+            Vector2(4.0, 6.0)
         );
     }
 
@@ -330,7 +330,7 @@ mod tests {
     fn rect_bottom_left() {
         assert_eq!(
             Rect::new(2.0, 3.0).extend(4.0, 6.0).bottom_left(),
-            Vector2::new(2.0, 3.0)
+            Vector2(2.0, 3.0)
         );
     }
 
@@ -338,7 +338,7 @@ mod tests {
     fn rect_bottom_right() {
         assert_eq!(
             Rect::new(2.0, 3.0).extend(4.0, 6.0).bottom_right(),
-            Vector2::new(4.0, 3.0)
+            Vector2(4.0, 3.0)
         );
     }
 
@@ -365,48 +365,32 @@ mod tests {
 
     #[test]
     fn triangle_should_contain() {
-        let triangle = Triangle::new(
-            &Vector2::new(1.0, 1.0),
-            &Vector2::new(6.0, 2.0),
-            &Vector2::new(4.0, 4.0),
-        );
+        let triangle = Triangle::new(&Vector2(1.0, 1.0), &Vector2(6.0, 2.0), &Vector2(4.0, 4.0));
 
-        assert!(triangle.contains(&Vector2::new(3.0, 3.0)))
+        assert!(triangle.contains(&Vector2(3.0, 3.0)))
     }
 
     #[test]
     fn triangle_should_contain_point_in_rect() {
-        let triangle = Triangle::new(
-            &Vector2::new(1.0, 1.0),
-            &Vector2::new(6.0, 2.0),
-            &Vector2::new(4.0, 4.0),
-        );
+        let triangle = Triangle::new(&Vector2(1.0, 1.0), &Vector2(6.0, 2.0), &Vector2(4.0, 4.0));
 
-        let v = Vector2::new(1.1, 3.9);
+        let v = Vector2(1.1, 3.9);
         assert!(triangle.bounds_contains(&v));
         assert!(!triangle.contains(&v))
     }
 
     #[test]
     fn triangle_should_contain_out_of_rect() {
-        let triangle = Triangle::new(
-            &Vector2::new(1.0, 1.0),
-            &Vector2::new(6.0, 2.0),
-            &Vector2::new(4.0, 4.0),
-        );
+        let triangle = Triangle::new(&Vector2(1.0, 1.0), &Vector2(6.0, 2.0), &Vector2(4.0, 4.0));
 
-        let v = Vector2::new(-3.0, -3.0);
+        let v = Vector2(-3.0, -3.0);
         assert!(!triangle.bounds_contains(&v));
         assert!(!triangle.contains(&v))
     }
 
     #[test]
     fn triangle_should_have_correct_bound() {
-        let triangle = Triangle::new(
-            &Vector2::new(1.0, 1.0),
-            &Vector2::new(6.0, 2.0),
-            &Vector2::new(4.0, 4.0),
-        );
+        let triangle = Triangle::new(&Vector2(1.0, 1.0), &Vector2(6.0, 2.0), &Vector2(4.0, 4.0));
 
         assert_eq!(
             triangle.bounds(),
@@ -419,7 +403,7 @@ mod tests {
 
     #[test]
     fn line_should_have_correct_bounds() {
-        let line = Line::new(Vector2::new(1.0, 1.0), Vector2::new(6.0, 2.0));
+        let line = Line::new(Vector2(1.0, 1.0), Vector2(6.0, 2.0));
         assert_eq!(
             line.bounds(),
             Rect {

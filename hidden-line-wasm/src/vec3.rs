@@ -8,15 +8,20 @@ pub struct Vector3 {
     pub z: Float,
 }
 
+#[inline]
+pub fn Vector3(x: Float, y: Float, z: Float) -> Vector3 {
+    Vector3 { x, y, z }
+}
+
 impl Vector3 {
     #[inline]
     pub fn new(x: Float, y: Float, z: Float) -> Self {
-        Self { x, y, z }
+        Vector3 { x, y, z }
     }
 
     #[inline]
     pub fn cross(&self, v: &Self) -> Self {
-        Vector3::new(
+        Vector3(
             self.y * v.z - self.z * v.y,
             self.z * v.x - self.x * v.z,
             self.x * v.y - self.y * v.x,
@@ -54,7 +59,7 @@ impl Add for Vector3 {
 
     #[inline]
     fn add(self, rhs: Self) -> Self::Output {
-        Self::Output::new(self.x + rhs.x, self.y + rhs.y, self.z + rhs.z)
+        Vector3(self.x + rhs.x, self.y + rhs.y, self.z + rhs.z)
     }
 }
 
@@ -63,7 +68,7 @@ impl Add for &Vector3 {
 
     #[inline]
     fn add(self, rhs: Self) -> Self::Output {
-        Self::Output::new(self.x + rhs.x, self.y + rhs.y, self.z + rhs.z)
+        Vector3(self.x + rhs.x, self.y + rhs.y, self.z + rhs.z)
     }
 }
 
@@ -81,7 +86,7 @@ impl Sub for Vector3 {
 
     #[inline]
     fn sub(self, rhs: Self) -> Self::Output {
-        Self::Output::new(self.x - rhs.x, self.y - rhs.y, self.z - rhs.z)
+        Vector3(self.x - rhs.x, self.y - rhs.y, self.z - rhs.z)
     }
 }
 
@@ -90,7 +95,7 @@ impl Sub for &Vector3 {
 
     #[inline]
     fn sub(self, rhs: Self) -> Self::Output {
-        Self::Output::new(self.x - rhs.x, self.y - rhs.y, self.z - rhs.z)
+        Vector3(self.x - rhs.x, self.y - rhs.y, self.z - rhs.z)
     }
 }
 
@@ -126,7 +131,7 @@ impl Mul<Float> for Vector3 {
 
     #[inline]
     fn mul(self, rhs: Float) -> Self::Output {
-        Self::Output::new(self.x * rhs, self.y * rhs, self.z * rhs)
+        Vector3(self.x * rhs, self.y * rhs, self.z * rhs)
     }
 }
 
@@ -135,7 +140,7 @@ impl Mul<Float> for &Vector3 {
 
     #[inline]
     fn mul(self, rhs: Float) -> Self::Output {
-        Self::Output::new(self.x * rhs, self.y * rhs, self.z * rhs)
+        Vector3(self.x * rhs, self.y * rhs, self.z * rhs)
     }
 }
 
@@ -153,7 +158,7 @@ impl Div<Float> for Vector3 {
 
     #[inline]
     fn div(self, rhs: Float) -> Self::Output {
-        Self::Output::new(self.x / rhs, self.y / rhs, self.z / rhs)
+        Vector3(self.x / rhs, self.y / rhs, self.z / rhs)
     }
 }
 
@@ -162,7 +167,7 @@ impl Div<Float> for &Vector3 {
 
     #[inline]
     fn div(self, rhs: Float) -> Self::Output {
-        Self::Output::new(self.x / rhs, self.y / rhs, self.z / rhs)
+        Vector3(self.x / rhs, self.y / rhs, self.z / rhs)
     }
 }
 
@@ -180,7 +185,7 @@ impl Neg for Vector3 {
 
     #[inline]
     fn neg(self) -> Self::Output {
-        Self::Output::new(-self.x, -self.y, -self.z)
+        Vector3(-self.x, -self.y, -self.z)
     }
 }
 
@@ -189,7 +194,7 @@ impl Neg for &Vector3 {
 
     #[inline]
     fn neg(self) -> Self::Output {
-        Self::Output::new(-self.x, -self.y, -self.z)
+        Vector3(-self.x, -self.y, -self.z)
     }
 }
 

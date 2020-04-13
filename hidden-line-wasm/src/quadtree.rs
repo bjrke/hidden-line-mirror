@@ -159,17 +159,17 @@ mod tests {
     fn tree() {
         let mut tree = QuadTree::new(Rect::new(-1000.0, -1000.0).extend(1000.0, 1000.0));
 
-        let expected1 = Vector2::new(100.0, 100.0);
+        let expected1 = Vector2(100.0, 100.0);
         tree.insert(expected1);
 
-        tree.insert(Vector2::new(-100.0, 100.0));
-        tree.insert(Vector2::new(-200.0, 200.0));
-        tree.insert(Vector2::new(100.0, -100.0));
-        tree.insert(Vector2::new(200.0, -200.0));
-        tree.insert(Vector2::new(-100.0, -100.0));
-        tree.insert(Vector2::new(-200.0, -200.0));
+        tree.insert(Vector2(-100.0, 100.0));
+        tree.insert(Vector2(-200.0, 200.0));
+        tree.insert(Vector2(100.0, -100.0));
+        tree.insert(Vector2(200.0, -200.0));
+        tree.insert(Vector2(-100.0, -100.0));
+        tree.insert(Vector2(-200.0, -200.0));
 
-        let expected2 = Vector2::new(200.0, 200.0);
+        let expected2 = Vector2(200.0, 200.0);
         tree.insert(expected2);
 
         let rect = Rect::new(90.0, 90.0).extend(210.0, 210.0);
@@ -179,8 +179,8 @@ mod tests {
         assert!(elements.contains(&&expected1));
         assert!(elements.contains(&&expected2));
         // let mut expected = HashSet::new();
-        // expected.insert(Vector2::new(100.0, 100.0));
-        // expected.insert(Vector2::new(200.0, 200.0));
+        // expected.insert(Vector2(100.0, 100.0));
+        // expected.insert(Vector2(200.0, 200.0));
         // assert_eq!(expected, tree);
     }
 }

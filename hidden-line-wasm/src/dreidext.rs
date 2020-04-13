@@ -27,7 +27,7 @@ impl SceneBuilder {
     }
 
     pub fn point(&mut self, x: Float, y: Float, z: Float) -> usize {
-        self.push(Vector3::new(x, y, z))
+        self.push(Vector3(x, y, z))
     }
 
     pub fn push(&mut self, p: Vector3) -> usize {
@@ -160,7 +160,7 @@ impl QuadStrip {
         by: Float,
         bz: Float,
     ) -> QuadStrip {
-        QuadStrip::new(scene, Vector3::new(ax, ay, az), Vector3::new(bx, by, bz))
+        QuadStrip::new(scene, Vector3(ax, ay, az), Vector3(bx, by, bz))
     }
 
     pub fn new(mut scene: SceneBuilder, a: Vector3, b: Vector3) -> QuadStrip {
@@ -170,7 +170,7 @@ impl QuadStrip {
     }
 
     pub fn add(&mut self, bx: Float, by: Float, bz: Float, ax: Float, ay: Float, az: Float) {
-        self.addV(Vector3::new(bx, by, bz), Vector3::new(ax, ay, az));
+        self.addV(Vector3(bx, by, bz), Vector3(ax, ay, az));
     }
     pub fn addV(&mut self, b: Vector3, a: Vector3) {
         let h1 = self.scene.push(a);

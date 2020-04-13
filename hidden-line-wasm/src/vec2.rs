@@ -8,12 +8,12 @@ pub struct Vector2 {
     pub y: Float,
 }
 
-impl Vector2 {
-    #[inline]
-    pub fn new(x: Float, y: Float) -> Self {
-        Self { x, y }
-    }
+#[inline]
+pub fn Vector2(x: Float, y: Float) -> Vector2 {
+    Vector2 { x, y }
+}
 
+impl Vector2 {
     #[inline]
     pub fn mul2d(&self, f: Float) -> Self {
         self * f
@@ -46,7 +46,7 @@ impl Vector2 {
 
     #[inline]
     pub fn swap_xy(&self) -> Self {
-        Vector2::new(self.y, self.x)
+        Vector2(self.y, self.x)
     }
 
     #[inline]
@@ -66,7 +66,7 @@ impl Add for Vector2 {
 
     #[inline]
     fn add(self, rhs: Self) -> Self::Output {
-        Self::Output::new(self.x + rhs.x, self.y + rhs.y)
+        Vector2(self.x + rhs.x, self.y + rhs.y)
     }
 }
 
@@ -75,7 +75,7 @@ impl Add for &Vector2 {
 
     #[inline]
     fn add(self, rhs: Self) -> Self::Output {
-        Self::Output::new(self.x + rhs.x, self.y + rhs.y)
+        Vector2(self.x + rhs.x, self.y + rhs.y)
     }
 }
 
@@ -92,7 +92,7 @@ impl Sub for Vector2 {
 
     #[inline]
     fn sub(self, rhs: Self) -> Self::Output {
-        Self::Output::new(self.x - rhs.x, self.y - rhs.y)
+        Vector2(self.x - rhs.x, self.y - rhs.y)
     }
 }
 
@@ -101,7 +101,7 @@ impl Sub for &Vector2 {
 
     #[inline]
     fn sub(self, rhs: Self) -> Self::Output {
-        Self::Output::new(self.x - rhs.x, self.y - rhs.y)
+        Vector2(self.x - rhs.x, self.y - rhs.y)
     }
 }
 
@@ -136,7 +136,7 @@ impl Mul<Float> for Vector2 {
 
     #[inline]
     fn mul(self, rhs: Float) -> Self::Output {
-        Self::Output::new(self.x * rhs, self.y * rhs)
+        Vector2(self.x * rhs, self.y * rhs)
     }
 }
 
@@ -145,7 +145,7 @@ impl Mul<Float> for &Vector2 {
 
     #[inline]
     fn mul(self, rhs: Float) -> Self::Output {
-        Self::Output::new(self.x * rhs, self.y * rhs)
+        Vector2(self.x * rhs, self.y * rhs)
     }
 }
 
@@ -162,7 +162,7 @@ impl Div<Float> for Vector2 {
 
     #[inline]
     fn div(self, rhs: Float) -> Self::Output {
-        Self::Output::new(self.x / rhs, self.y / rhs)
+        Vector2(self.x / rhs, self.y / rhs)
     }
 }
 
@@ -171,7 +171,7 @@ impl Div<Float> for &Vector2 {
 
     #[inline]
     fn div(self, rhs: Float) -> Self::Output {
-        Self::Output::new(self.x / rhs, self.y / rhs)
+        Vector2(self.x / rhs, self.y / rhs)
     }
 }
 
@@ -188,7 +188,7 @@ impl Neg for Vector2 {
 
     #[inline]
     fn neg(self) -> Self::Output {
-        Self::Output::new(-self.x, -self.y)
+        Vector2(-self.x, -self.y)
     }
 }
 
@@ -197,7 +197,7 @@ impl Neg for &Vector2 {
 
     #[inline]
     fn neg(self) -> Self::Output {
-        Self::Output::new(-self.x, -self.y)
+        Vector2(-self.x, -self.y)
     }
 }
 

@@ -11,7 +11,7 @@ pub struct point {
 
 impl point {
     pub fn new0() -> point {
-        point::new(&Vector2::new(0.0, 0.0), 0)
+        point::new(&Vector2(0.0, 0.0), 0)
     }
     pub fn new(bv: &Vector2, ls: u8) -> point {
         point { b: *bv, gz: ls }
@@ -39,7 +39,7 @@ pub struct punkt3d {
 
 impl punkt3d {
     pub fn new(ax: Float, ay: Float, az: Float) -> punkt3d {
-        punkt3d::newV(&Vector3::new(ax, ay, az))
+        punkt3d::newV(&Vector3(ax, ay, az))
     }
 
     pub fn newV(o: &Vector3) -> punkt3d {
