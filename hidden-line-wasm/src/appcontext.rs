@@ -9,38 +9,37 @@ use std::collections::BinaryHeap;
 use std::rc::Rc;
 
 pub struct AppContext {
-    pub Auge: Vector3,
-    pub BlickR: Vector3,
+    pub eye: Vector3,
+    pub view: Vector3,
     pub iv: Vector3,
     pub jv: Vector3,
     pub colmode: bool,
     pub drawmode: u8,
-    pub ausgabeInsert: bool,
-    pub sceneBuilder: SceneBuilder,
+    pub scene_builder: SceneBuilder,
     pub backface: bool,
 }
 
 impl AppContext {
     pub fn neukamera(&mut self) {
-        self.iv = self.BlickR.cross(&self.jv).normalize() * (0.4 * self.BlickR.len());
-        self.jv = self.iv.cross(&self.BlickR).normalize() * (0.4 * self.BlickR.len());
+        self.iv = self.view.cross(&self.jv).normalize() * (0.4 * self.view.len());
+        self.jv = self.iv.cross(&self.view).normalize() * (0.4 * self.view.len());
     }
 
     pub fn rechnung(&mut self) -> Vec<polygon> {
         let mut scene = Scene::new(&self);
 
-        let ED = self.BlickR * self.Auge + epsilon1;
+        let eye_view_plane_dist = self.view * self.eye + EPSILON1;
 
         let mut polys = vec![];
 
         for j in scene.dreiecks.iter_mut() {
             // test if not behind view plane
-            if self.BlickR * j.p1.o > ED &&
-               self.BlickR * j.p2.o > ED &&
-               self.BlickR * j.p3.o > ED &&
+            if self.view * j.p1.o > eye_view_plane_dist &&
+               self.view * j.p2.o > eye_view_plane_dist &&
+               self.view * j.p3.o > eye_view_plane_dist &&
                // evtl kann man das mit der Lichtberechnung beim Initialisieren des Polygons kombinieren
                (!self.backface || ((j.p3.b.x - j.p1.b.x) *
-            (j.p2.b.y - j.p1.b.y) + epsilon1 < (j.p3.b.y - j.p1.b.y) *
+            (j.p2.b.y - j.p1.b.y) + EPSILON1 < (j.p3.b.y - j.p1.b.y) *
             (j.p2.b.x - j.p1.b.x)))
             {
                 if j.flaechentest() {
@@ -54,26 +53,26 @@ impl AppContext {
 
     pub fn on_key(&mut self, ch: char) -> bool {
         match ch {
-            'a' => self.Auge += self.BlickR.normalize(),
-            'A' => self.Auge += self.BlickR.normalize() * 10.0,
-            'y' | 'z' => self.Auge -= self.BlickR.normalize(),
-            'Y' | 'Z' => self.Auge -= self.BlickR.normalize() * 10.0,
-            'k' => self.Auge -= self.iv.normalize(),
-            'K' => self.Auge -= self.iv.normalize() * 10.0,
-            'l' => self.Auge += self.iv.normalize(),
-            'L' => self.Auge += self.iv.normalize() * 10.0,
-            's' => self.Auge -= self.jv.normalize(),
-            'S' => self.Auge -= self.jv.normalize() * 10.0,
-            'x' => self.Auge += self.jv.normalize(),
-            'X' => self.Auge += self.jv.normalize() * 10.0,
-            'd' => rot_vec(&mut self.BlickR, &mut self.jv, 1.0),
-            'D' => rot_vec(&mut self.BlickR, &mut self.jv, 10.0),
-            'c' => rot_vec(&mut self.jv, &mut self.BlickR, 1.0),
-            'C' => rot_vec(&mut self.jv, &mut self.BlickR, 10.0),
-            ',' => rot_vec(&mut self.iv, &mut self.BlickR, 1.0),
-            ';' | '<' => rot_vec(&mut self.iv, &mut self.BlickR, 10.0),
-            '.' => rot_vec(&mut self.BlickR, &mut self.iv, 1.0),
-            ':' | '>' => rot_vec(&mut self.BlickR, &mut self.iv, 10.0),
+            'a' => self.eye += self.view.normalize(),
+            'A' => self.eye += self.view.normalize() * 10.0,
+            'y' | 'z' => self.eye -= self.view.normalize(),
+            'Y' | 'Z' => self.eye -= self.view.normalize() * 10.0,
+            'k' => self.eye -= self.iv.normalize(),
+            'K' => self.eye -= self.iv.normalize() * 10.0,
+            'l' => self.eye += self.iv.normalize(),
+            'L' => self.eye += self.iv.normalize() * 10.0,
+            's' => self.eye -= self.jv.normalize(),
+            'S' => self.eye -= self.jv.normalize() * 10.0,
+            'x' => self.eye += self.jv.normalize(),
+            'X' => self.eye += self.jv.normalize() * 10.0,
+            'd' => rot_vec(&mut self.view, &mut self.jv, 1.0),
+            'D' => rot_vec(&mut self.view, &mut self.jv, 10.0),
+            'c' => rot_vec(&mut self.jv, &mut self.view, 1.0),
+            'C' => rot_vec(&mut self.jv, &mut self.view, 10.0),
+            ',' => rot_vec(&mut self.iv, &mut self.view, 1.0),
+            ';' | '<' => rot_vec(&mut self.iv, &mut self.view, 10.0),
+            '.' => rot_vec(&mut self.view, &mut self.iv, 1.0),
+            ':' | '>' => rot_vec(&mut self.view, &mut self.iv, 10.0),
             'o' => rot_vec(&mut self.jv, &mut self.iv, 1.0),
             'O' => rot_vec(&mut self.jv, &mut self.iv, 10.0),
 
@@ -145,15 +144,15 @@ pub struct Scene {
 
 impl punkt3d {
     pub fn perspektive(mut self, actx: &AppContext) -> Self {
-        let mut K = Matrix3::new(actx.iv, actx.jv, actx.Auge - self.o);
+        let mut k = Matrix3::new(actx.iv, actx.jv, actx.eye - self.o);
 
-        let kd = K.det3d();
-        if kd.abs() > epsilon2 {
-            K.x = -actx.BlickR;
-            self.b.x = K.det3d() / kd;
-            K.y = K.x;
-            K.x = actx.iv;
-            self.b.y = K.det3d() / kd;
+        let kd = k.det3d();
+        if kd.abs() > EPSILON2 {
+            k.x = -actx.view;
+            self.b.x = k.det3d() / kd;
+            k.y = k.x;
+            k.x = actx.iv;
+            self.b.y = k.det3d() / kd;
         }
         self
     }
@@ -166,19 +165,19 @@ impl Scene {
             dreiecks: Vec::new(),
         };
 
-        for p in actx.sceneBuilder.points.iter() {
+        for p in actx.scene_builder.points.iter() {
             result
                 .points
-                .push(Rc::new(punkt3d::newV(p).perspektive(&actx)));
+                .push(Rc::new(punkt3d::new(p).perspektive(&actx)));
         }
 
-        for t in actx.sceneBuilder.triangles.iter() {
+        for t in actx.scene_builder.triangles.iter() {
             let p1 = &result.points[t.p1];
             let p2 = &result.points[t.p2];
             let p3 = &result.points[t.p3];
 
             let c = (p1.o - p2.o).cross(&(p3.o - p2.o));
-            let cols = (actx.BlickR.normalize() * c.normalize()).abs();
+            let cols = (actx.view.normalize() * c.normalize()).abs();
 
             result.dreiecks.push(Rc::new(dreieck::new(
                 p1.clone(),

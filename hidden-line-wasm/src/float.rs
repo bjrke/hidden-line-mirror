@@ -2,9 +2,9 @@ pub type Float = f32;
 pub const PI: Float = std::f32::consts::PI;
 pub const MAX: Float = std::f32::MAX;
 pub const MIN: Float = std::f32::MIN;
-pub const epsilon0: Float = 0.0001;
-pub const epsilon1: Float = epsilon0 * epsilon0;
-pub const epsilon2: Float = epsilon1 * epsilon1;
+pub const EPSILON0: Float = 0.0001;
+pub const EPSILON1: Float = EPSILON0 * EPSILON0;
+pub const EPSILON2: Float = EPSILON1 * EPSILON1;
 
 pub trait FloatExt {
     fn sqr(&self) -> Self;

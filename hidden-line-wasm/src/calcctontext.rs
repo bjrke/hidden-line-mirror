@@ -20,7 +20,7 @@ use crate::vec3::*;
 const DEBUG: bool = false;
 
 pub struct CalcContext {
-    pub minxQueue: Vec<polygon>,
+    pub polygons: Vec<polygon>,
 }
 
 #[derive(Debug)]
@@ -147,12 +147,12 @@ impl Shape for TheLine {
 
 impl CalcContext {
     pub fn new() -> CalcContext {
-        CalcContext { minxQueue: vec![] }
+        CalcContext { polygons: vec![] }
     }
 
     pub fn test(&mut self, dctx: &mut dyn DrawContext, actx: &AppContext) {
         let mut triangles = vec![];
-        while let Some(poly) = self.minxQueue.pop() {
+        while let Some(poly) = self.polygons.pop() {
             triangles.push(TheTriangle::new(poly));
         }
 
@@ -202,7 +202,7 @@ impl CalcContext {
         let normal = (a - b).cross(&c).normalize();
 
         let ref_dist = ref_point * normal;
-        if ref_dist.abs() < epsilon0 {
+        if ref_dist.abs() < EPSILON0 {
             return (Bound::Unbounded, Bound::Unbounded);
         }
 
@@ -219,7 +219,7 @@ impl CalcContext {
 
         let d = p2n - p1n;
 
-        if d.abs() < epsilon0 {
+        if d.abs() < EPSILON0 {
             (Bound::Unbounded, Bound::Unbounded)
         } else {
             let l = p2n / d;
@@ -254,7 +254,7 @@ impl CalcContext {
         let t1 = triangle.poly.p1.o;
         let t2 = triangle.poly.p2.o;
         let t3 = triangle.poly.p3.o;
-        let eye = actx.Auge;
+        let eye = actx.eye;
 
         let reye = Self::clip(p1, p2, t1, t2, t3, eye, true);
         let rt1 = Self::clip(p1, p2, eye, t2, t3, t1, false);
@@ -289,9 +289,9 @@ impl CalcContext {
         let nv = triangle.poly.plane_norm;
         let pd = triangle.poly.plane_dist;
 
-        let eye_dist = nv * actx.Auge - pd;
+        let eye_dist = nv * actx.eye - pd;
 
-        if eye_dist.abs() < epsilon0 {
+        if eye_dist.abs() < EPSILON0 {
             // assume we are on the triangle and can see everything else
             return;
         }
@@ -299,8 +299,8 @@ impl CalcContext {
         let p1_dist = nv * line.p1.o - pd;
         let p2_dist = nv * line.p2.o - pd;
 
-        let p1_on_tri = p1_dist.abs() < epsilon0;
-        let p2_on_tri = p2_dist.abs() < epsilon0;
+        let p1_on_tri = p1_dist.abs() < EPSILON0;
+        let p2_on_tri = p2_dist.abs() < EPSILON0;
         if p1_on_tri && p2_on_tri {
             // the lies on the triangle and is there fore visible
             if DEBUG {
@@ -310,9 +310,9 @@ impl CalcContext {
         }
 
         let p1_visible =
-            eye_dist < 0.0 && p1_dist < epsilon0 || eye_dist > 0.0 && p1_dist > -epsilon0;
+            eye_dist < 0.0 && p1_dist < EPSILON0 || eye_dist > 0.0 && p1_dist > -EPSILON0;
         let p2_visible =
-            eye_dist < 0.0 && p2_dist < epsilon0 || eye_dist > 0.0 && p2_dist > -epsilon0;
+            eye_dist < 0.0 && p2_dist < EPSILON0 || eye_dist > 0.0 && p2_dist > -EPSILON0;
 
         if p1_visible && p2_visible {
             // both points of the line are on the same side of the triangle like the eye, so it is always visible even if it intersects
@@ -358,10 +358,10 @@ impl CalcContext {
         let d21 = p2 - p1;
         let mut min = None;
         let mut max = None;
-        for triLine in triangle.lines(true).iter() {
+        for tri_line in triangle.lines(true).iter() {
             //https://quickmath.com/webMathematica3/quickmath/equations/solve/advanced.jsp#c=solve_advancedsolveequations&v1=lx_1%2Bmx_2%253Dp%250Aly_1%2Bmy_2%253Dq%250Al%2Bm%253D1%250Anx_3%2Box_4%253Dp%250Any_3%2Boy_4%253Dq%250An%2Bo%253D1%250A&v2=l%250Am%250An%250Ao%250Ap%250Aq%250A&v5=1
-            let p3 = triLine.shape.a;
-            let p4 = triLine.shape.e;
+            let p3 = tri_line.shape.a;
+            let p4 = tri_line.shape.e;
 
             let d43 = p4 - p3;
 
@@ -384,7 +384,7 @@ impl CalcContext {
             let n = -(fx4 - fy4 - k21) / d;
             let o = (fx3 - fy3 - k21) / d;
 
-            if n > -epsilon0 && o > -epsilon0 {
+            if n > -EPSILON0 && o > -EPSILON0 {
                 let k43 = Matrix2::new(p3, p4).det2d();
                 let l = (fx2 - fy2 - k43) / d;
 

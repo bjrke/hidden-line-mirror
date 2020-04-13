@@ -10,7 +10,7 @@ pub struct punkt3d {
 }
 
 impl punkt3d {
-    pub fn newV(o: &Vector3) -> punkt3d {
+    pub fn new(o: &Vector3) -> punkt3d {
         punkt3d {
             o: *o,
             b: Vector2(0.0, 0.0),

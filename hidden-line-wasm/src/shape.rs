@@ -200,16 +200,16 @@ impl Line {
 #[inline]
 fn epsilon_value(f: Float) -> Range<Float> {
     Range {
-        start: f - epsilon0,
-        end: f + epsilon0,
+        start: f - EPSILON0,
+        end: f + EPSILON0,
     }
 }
 
 #[inline]
 fn epsilon_range(r: &Range<Float>) -> Range<Float> {
     Range {
-        start: r.start - epsilon0,
-        end: r.end + epsilon0,
+        start: r.start - EPSILON0,
+        end: r.end + EPSILON0,
     }
 }
 

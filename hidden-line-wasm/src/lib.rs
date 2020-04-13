@@ -82,7 +82,7 @@ impl HiddenLine {
     }
 
     pub fn set_function(&mut self, f: &js_sys::Function) {
-        self.app_ctx.sceneBuilder = plot::init_scene(|x, y| {
+        self.app_ctx.scene_builder = plot::init_scene(|x, y| {
             f.call2(&JsValue::NULL, &JsValue::from(x), &JsValue::from(y))
                 .unwrap()
                 .as_f64()

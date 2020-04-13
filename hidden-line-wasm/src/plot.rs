@@ -54,7 +54,10 @@ pub fn init_scene<F: Fn(Float, Float) -> Float>(f: F) -> SceneBuilder {
 
         let mut yy = -ad + sw;
         while yy <= ad {
-            qs.add(xx, yy, f(xx, yy), xx + sw, yy, f(xx + sw, yy));
+            qs.add(
+                Vector3(xx, yy, f(xx, yy)),
+                Vector3(xx + sw, yy, f(xx + sw, yy)),
+            );
             yy = yy + sw;
         }
         xx = xx + sw;
@@ -97,18 +100,17 @@ pub fn init_scene<F: Fn(Float, Float) -> Float>(f: F) -> SceneBuilder {
 }
 
 pub fn init() -> AppContext {
-    let Auge = Vector3(1.5, 2.0, 2.5);
-    let BlickR = Auge / -2.0;
+    let eye = Vector3(1.5, 2.0, 2.5);
+    let view = eye / -2.0;
 
     AppContext {
-        sceneBuilder: SceneBuilder::new(),
-        Auge,
-        BlickR,
+        scene_builder: SceneBuilder::new(),
+        eye,
+        view,
         iv: Vector3(1.0, 0.0, 0.0),
         jv: Vector3(0.0, 0.0, 1.0),
         backface: false,
         drawmode: 0,
-        ausgabeInsert: false,
         colmode: false,
     }
 }
@@ -118,8 +120,8 @@ pub fn darstellung(dctx: &mut dyn DrawContext, actx: &mut AppContext) {
     let polys = actx.rechnung();
 
     println!("Anzahl Polygone: {}", polys.len());
-    println!("Auge: {}", actx.Auge);
-    println!("BlickR: {}", actx.BlickR);
+    println!("Auge: {}", actx.eye);
+    println!("BlickR: {}", actx.view);
     println!("Oben x 10000: {}", actx.jv * 10000.0);
 
     dctx.circle(0.99, 0.99, 0.01, 1.0);
@@ -128,7 +130,7 @@ pub fn darstellung(dctx: &mut dyn DrawContext, actx: &mut AppContext) {
     dctx.circle(-0.99, -0.99, 0.01, 1.0);
 
     let mut ctx = CalcContext::new();
-    ctx.minxQueue = polys;
+    ctx.polygons = polys;
 
     ctx.test(dctx, actx);
 }
@@ -165,7 +167,7 @@ mod tests {
     fn integration() {
         let mut actx = init();
 
-        actx.sceneBuilder = init_scene(|x, y| {
+        actx.scene_builder = init_scene(|x, y| {
             let mut h = 0.0;
             let step = PI / 36.0;
             let mut a = 0.0;
