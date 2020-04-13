@@ -121,7 +121,7 @@ impl Shape for Vector2 {
     }
 }
 
-fn lineIntersect(a1: Vector2, e1: Vector2, a2: Vector2, e2: Vector2) -> Vector2 {
+fn line_intersect(a1: Vector2, e1: Vector2, a2: Vector2, e2: Vector2) -> Vector2 {
     let w2 = e2.x - a2.x;
     let h2 = e2.y - a2.y;
     let w1 = e1.x - a1.x;
@@ -142,7 +142,7 @@ fn lineIntersect(a1: Vector2, e1: Vector2, a2: Vector2, e2: Vector2) -> Vector2 
 }
 
 #[inline]
-fn lineRectBorder<R: RangeBounds<Float>>(
+fn line_rect_border<R: RangeBounds<Float>>(
     x1: Float,
     y1: Float,
     x2: Float,
@@ -166,22 +166,22 @@ fn lineRectBorder<R: RangeBounds<Float>>(
 }
 
 #[inline]
-fn lineX<R: RangeBounds<Float>>(a: &Vector2, e: &Vector2, x: &Float, y_range: &R) -> bool {
-    lineRectBorder(a.x, a.y, e.x, e.y, x, y_range)
+fn line_x<R: RangeBounds<Float>>(a: &Vector2, e: &Vector2, x: &Float, y_range: &R) -> bool {
+    line_rect_border(a.x, a.y, e.x, e.y, x, y_range)
 }
 
 #[inline]
-fn lineY<R: RangeBounds<Float>>(a: &Vector2, e: &Vector2, y: &Float, x_range: &R) -> bool {
-    lineRectBorder(a.y, a.x, e.y, e.x, y, x_range)
+fn line_y<R: RangeBounds<Float>>(a: &Vector2, e: &Vector2, y: &Float, x_range: &R) -> bool {
+    line_rect_border(a.y, a.x, e.y, e.x, y, x_range)
 }
 
 /// warning this method should be used only after r.contains(a) and r.contains(e) check
 #[inline]
-fn lineRect(a: &Vector2, e: &Vector2, r: &&Rect) -> bool {
-    lineY(a, e, r.y.start(), &r.x)
-        || lineY(a, e, r.y.end(), &r.x)
-        || lineX(a, e, r.x.start(), &r.y)
-        || lineX(a, e, r.x.end(), &r.y)
+fn line_rect(a: &Vector2, e: &Vector2, r: &&Rect) -> bool {
+    line_y(a, e, r.y.start(), &r.x)
+        || line_y(a, e, r.y.end(), &r.x)
+        || line_x(a, e, r.x.start(), &r.y)
+        || line_x(a, e, r.x.end(), &r.y)
 }
 
 #[derive(Clone, Debug)]
@@ -216,14 +216,14 @@ fn epsilon_range(r: &Range<Float>) -> Range<Float> {
 impl Shape for Line {
     fn intersects(&self, r: &Rect) -> bool {
         self.bounds_intersect(r) && {
-            r.contains(&self.a) || r.contains(&self.e) || lineRect(&self.a, &self.e, &r)
+            r.contains(&self.a) || r.contains(&self.e) || line_rect(&self.a, &self.e, &r)
         }
     }
 
     fn contains(&self, v: &Vector2) -> bool {
         self.bounds_contains(v) && {
-            lineX(&self.a, &self.e, &v.x, &epsilon_value(v.y))
-                || lineY(&self.a, &self.e, &v.y, &epsilon_value(v.x))
+            line_x(&self.a, &self.e, &v.x, &epsilon_value(v.y))
+                || line_y(&self.a, &self.e, &v.y, &epsilon_value(v.x))
         }
     }
 
@@ -262,9 +262,9 @@ impl Shape for Triangle {
             r.contains(&self.p1)
                 || r.contains(&self.p2)
                 || r.contains(&self.p3)
-                || lineRect(&self.p1, &self.p2, &r)
-                || lineRect(&self.p2, &self.p3, &r)
-                || lineRect(&self.p3, &self.p1, &r)
+                || line_rect(&self.p1, &self.p2, &r)
+                || line_rect(&self.p2, &self.p3, &r)
+                || line_rect(&self.p3, &self.p1, &r)
         }
     }
 

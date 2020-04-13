@@ -176,7 +176,7 @@ mod tests {
     }
 
     #[test]
-    fn removeTwice() {
+    fn remove_twice() {
         let mut s = set1(0.0..=1.0);
 
         for _ in 0..100 {
