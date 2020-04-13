@@ -353,10 +353,6 @@ impl CalcContext {
             // range.remove(&(..));
         }
 
-        range.remove(&Self::zeug(triangle, line));
-    }
-
-    fn zeug(triangle: &TheTriangle, line: &TheLine) -> (Bound<Float>, Bound<Float>) {
         if DEBUG {
             println!("<path style=\"fill:#fff;stroke:#000000;stroke-width: 0.01px;\" d=\"M {:?},{:?} {:?},{:?} {:?},{:?} Z\" />",
                      triangle.shape.p1.x,
@@ -375,27 +371,9 @@ impl CalcContext {
         let p1 = line.shape.a;
         let p2 = line.shape.e;
 
-        let p1_contained = triangle.shape.contains(&p1);
-        let p2_contained = triangle.shape.contains(&p2);
-
-        if p1_contained && p2_contained {
-            return if p1 != triangle.shape.p1 && p1 != triangle.shape.p2 && p1 != triangle.shape.p3
-                || p2 != triangle.shape.p1 && p2 != triangle.shape.p2 && p2 != triangle.shape.p3
-            {
-                if DEBUG {
-                    println!("contained 1");
-                }
-                (Bound::Included(0.0), Bound::Excluded(0.0))
-            } else {
-                if DEBUG {
-                    println!("contained 2");
-                }
-                (Bound::Unbounded, Bound::Unbounded)
-            };
-        }
-
         let d21 = p2 - p1;
-        let mut other_range = None;
+        let mut min = None;
+        let mut max = None;
         for triLine in triangle.lines(true).iter() {
             //https://quickmath.com/webMathematica3/quickmath/equations/solve/advanced.jsp#c=solve_advancedsolveequations&v1=lx_1%2Bmx_2%253Dp%250Aly_1%2Bmy_2%253Dq%250Al%2Bm%253D1%250Anx_3%2Box_4%253Dp%250Any_3%2Boy_4%253Dq%250An%2Bo%253D1%250A&v2=l%250Am%250An%250Ao%250Ap%250Aq%250A&v5=1
             let p3 = triLine.shape.a;
@@ -425,25 +403,22 @@ impl CalcContext {
             if n > -epsilon0 && o > -epsilon0 {
                 let k43 = Matrix2::new(p3, p4).det2d();
                 let l = (fx2 - fy2 - k43) / d;
-                match other_range {
-                    Some(r) => {
-                        if DEBUG {
-                            println!("Some {:?} {:?}", l, r);
-                        }
-                        return (Bound::Excluded(l.min(r)), Bound::Excluded(l.max(r)));
-                    }
-                    None => {
-                        other_range = Some(l);
-                    }
+
+                match min {
+                    None => min = Some(l),
+                    Some(r) => min = Some(l.min(r)),
+                }
+
+                match max {
+                    None => max = Some(l),
+                    Some(r) => max = Some(l.max(r)),
                 }
             }
         }
 
-        if DEBUG {
-            println!("noting found {:?}", other_range);
+        if let (Some(l), Some(r)) = (min, max) {
+            range.remove(&(Bound::Excluded(l), Bound::Excluded(r)));
         }
-
-        (Bound::Included(0.0), Bound::Excluded(0.0))
     }
 
     pub fn pushMinX(&mut self, polygon: polygon) {
