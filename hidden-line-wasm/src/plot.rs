@@ -30,40 +30,6 @@ pub fn init_scene<F: Fn(Float, Float) -> Float>(f: F) -> SceneBuilder {
     scene
 }
 
-pub fn init() -> AppContext {
-    let eye = Vector3(1.5, 2.0, 2.5);
-    let view = eye / -2.0;
-
-    AppContext {
-        scene_builder: SceneBuilder::new(),
-        eye,
-        view,
-        iv: Vector3(1.0, 0.0, 0.0),
-        jv: Vector3(0.0, 0.0, 1.0),
-        back_face: false,
-    }
-}
-
-pub fn darstellung(dctx: &mut dyn DrawContext, actx: &mut AppContext) {
-    actx.recalc_unit_vectors();
-    let polys = actx.filter_polys();
-
-    println!("#polys: {}", polys.len());
-    println!("eye: {}", actx.eye);
-    println!("view: {}", actx.view);
-    println!("up {}", actx.jv);
-
-    dctx.circle(0.99, 0.99, 0.01, 1.0);
-    dctx.circle(0.99, -0.99, 0.01, 1.0);
-    dctx.circle(-0.99, 0.99, 0.01, 1.0);
-    dctx.circle(-0.99, -0.99, 0.01, 1.0);
-
-    let mut ctx = CalcContext::new();
-    ctx.polygons = polys;
-
-    ctx.test(dctx, actx);
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -90,7 +56,7 @@ mod tests {
     }
     #[test]
     fn integration() {
-        let mut actx = init();
+        let mut actx = AppContext::new();
 
         actx.scene_builder = init_scene(|x, y| {
             let mut h = 0.0;
@@ -109,7 +75,7 @@ mod tests {
         actx.back_face = false;
 
         let mut dctx = TestDrawContext::new();
-        darstellung(&mut dctx, &mut actx);
+        actx.darstellung(&mut dctx);
 
         println!("{:?}", dctx.lines);
         println!("{:?}", dctx.lines.len());

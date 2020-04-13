@@ -63,7 +63,7 @@ pub fn main_js() -> Result<(), JsValue> {
 pub fn lets_go(svg: web_sys::SvgElement) -> HiddenLine {
     HiddenLine {
         svgcontext: SvgContext::new(svg),
-        app_ctx: plot::init(),
+        app_ctx: AppContext::new(),
     }
 }
 
@@ -93,8 +93,6 @@ impl HiddenLine {
     }
 
     fn draw(&mut self) {
-        self.svgcontext.cls();
-
-        plot::darstellung(&mut self.svgcontext, &mut self.app_ctx);
+        self.app_ctx.darstellung(&mut self.svgcontext);
     }
 }

@@ -1,8 +1,9 @@
+use crate::calcctontext::hidden_line;
+use crate::drawcontext::DrawContext;
 use crate::dreidext::*;
 use crate::float::*;
 use crate::mat3::*;
 use crate::point::*;
-
 use crate::triangle::*;
 use crate::vec3::*;
 use std::rc::Rc;
@@ -17,6 +18,38 @@ pub struct AppContext {
 }
 
 impl AppContext {
+    pub fn new() -> AppContext {
+        let eye = Vector3(1.5, 2.0, 2.5);
+        let view = eye / -2.0;
+
+        AppContext {
+            scene_builder: SceneBuilder::new(),
+            eye,
+            view,
+            iv: Vector3(1.0, 0.0, 0.0),
+            jv: Vector3(0.0, 0.0, 1.0),
+            back_face: false,
+        }
+    }
+
+    pub fn darstellung(&mut self, dctx: &mut dyn DrawContext) {
+        dctx.cls();
+        self.recalc_unit_vectors();
+        let mut polys = self.filter_polys();
+
+        println!("#polys: {}", polys.len());
+        println!("eye: {}", self.eye);
+        println!("view: {}", self.view);
+        println!("up {}", self.jv);
+
+        dctx.circle(0.99, 0.99, 0.01, 1.0);
+        dctx.circle(0.99, -0.99, 0.01, 1.0);
+        dctx.circle(-0.99, 0.99, 0.01, 1.0);
+        dctx.circle(-0.99, -0.99, 0.01, 1.0);
+
+        hidden_line(&mut polys, dctx, self);
+    }
+
     pub fn recalc_unit_vectors(&mut self) {
         self.iv = self.view.cross(&self.jv).normalize() * (0.4 * self.view.len());
         self.jv = self.iv.cross(&self.view).normalize() * (0.4 * self.view.len());
