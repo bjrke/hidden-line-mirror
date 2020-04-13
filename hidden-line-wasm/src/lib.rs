@@ -31,7 +31,6 @@ mod mat2;
 mod mat3;
 mod plot;
 mod point;
-mod polygon;
 mod quadtree;
 mod range;
 mod rangeset;

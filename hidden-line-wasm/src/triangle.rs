@@ -32,6 +32,8 @@ pub struct dreieck {
     pub plane_dist: Float,
 }
 
+pub type polygon = Rc<dreieck>;
+
 impl dreieck {
     pub fn new(p1: Rc<punkt3d>, p2: Rc<punkt3d>, p3: Rc<punkt3d>, ls: u8, cols: Color) -> dreieck {
         let plane_norm = (p2.o - p1.o).cross(&(p3.o - p1.o)).normalize();

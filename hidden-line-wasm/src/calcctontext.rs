@@ -8,14 +8,14 @@ use crate::drawcontext::*;
 use crate::float::*;
 use crate::mat2::Matrix2;
 use crate::point::punkt3d;
-use crate::polygon::*;
 use crate::quadtree::QuadTree;
 use crate::range::RangeExtCopy;
 use crate::rangeset::RangeSet;
 use crate::shape::{Line, Rect, Shape, Triangle};
 
-use crate::vec2::Vector2;
-use crate::vec3::Vector3;
+use crate::triangle::*;
+use crate::vec2::*;
+use crate::vec3::*;
 
 const DEBUG: bool = false;
 
@@ -31,11 +31,7 @@ struct TheTriangle {
 
 impl TheTriangle {
     fn new(poly: polygon) -> TheTriangle {
-        let shape = Triangle::new(
-            &poly.originalTriangle.p1.b,
-            &poly.originalTriangle.p2.b,
-            &poly.originalTriangle.p3.b,
-        );
+        let shape = Triangle::new(&poly.p1.b, &poly.p2.b, &poly.p3.b);
 
         TheTriangle { poly, shape }
     }
@@ -43,25 +39,27 @@ impl TheTriangle {
     fn lines(&self, all: bool) -> Vec<TheLine> {
         let mut result = vec![];
 
-        if all || DEBUG || self.poly.originalTriangle.delegate.gl & 4 == 4 {
+        let color = self.poly.delegate.cols;
+
+        if all || DEBUG || self.poly.delegate.gl & 4 == 4 {
             result.push(TheLine::new(
-                self.poly.originalTriangle.p1.clone(),
-                self.poly.originalTriangle.p2.clone(),
-                self.poly.delegate.cols,
+                self.poly.p1.clone(),
+                self.poly.p2.clone(),
+                color,
             ));
         }
-        if all || DEBUG || self.poly.originalTriangle.delegate.gl & 1 == 1 {
+        if all || DEBUG || self.poly.delegate.gl & 1 == 1 {
             result.push(TheLine::new(
-                self.poly.originalTriangle.p2.clone(),
-                self.poly.originalTriangle.p3.clone(),
-                self.poly.delegate.cols,
+                self.poly.p2.clone(),
+                self.poly.p3.clone(),
+                color,
             ));
         }
-        if all || DEBUG || self.poly.originalTriangle.delegate.gl & 2 == 2 {
+        if all || DEBUG || self.poly.delegate.gl & 2 == 2 {
             result.push(TheLine::new(
-                self.poly.originalTriangle.p3.clone(),
-                self.poly.originalTriangle.p1.clone(),
-                self.poly.delegate.cols,
+                self.poly.p3.clone(),
+                self.poly.p1.clone(),
+                color,
             ));
         }
 
@@ -253,9 +251,9 @@ impl CalcContext {
     ) {
         let p1 = line.p1.o;
         let p2 = line.p2.o;
-        let t1 = triangle.poly.originalTriangle.p1.o;
-        let t2 = triangle.poly.originalTriangle.p2.o;
-        let t3 = triangle.poly.originalTriangle.p3.o;
+        let t1 = triangle.poly.p1.o;
+        let t2 = triangle.poly.p2.o;
+        let t3 = triangle.poly.p3.o;
         let eye = actx.Auge;
 
         let reye = Self::clip(p1, p2, t1, t2, t3, eye, true);
@@ -284,12 +282,12 @@ impl CalcContext {
         line: &TheLine,
         range: &mut RangeSet<Float>,
     ) {
-        let t1 = triangle.poly.originalTriangle.p1.o;
-        let t2 = triangle.poly.originalTriangle.p2.o;
-        let t3 = triangle.poly.originalTriangle.p3.o;
+        let t1 = triangle.poly.p1.o;
+        let t2 = triangle.poly.p2.o;
+        let t3 = triangle.poly.p3.o;
 
-        let nv = triangle.poly.originalTriangle.plane_norm;
-        let pd = triangle.poly.originalTriangle.plane_dist;
+        let nv = triangle.poly.plane_norm;
+        let pd = triangle.poly.plane_dist;
 
         let eye_dist = nv * actx.Auge - pd;
 

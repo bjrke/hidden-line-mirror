@@ -2,7 +2,6 @@ use crate::dreidext::*;
 use crate::float::*;
 use crate::mat3::*;
 use crate::point::*;
-use crate::polygon::*;
 
 use crate::triangle::*;
 use crate::vec3::*;
@@ -45,8 +44,7 @@ impl AppContext {
             (j.delegate.p2.x - j.delegate.p1.x)))
             {
                 if j.delegate.flaechentest() {
-                    let polygon = polygon::newpoly(j.clone());
-                    polys.push(polygon);
+                    polys.push(j.clone());
                 }
             }
         }
