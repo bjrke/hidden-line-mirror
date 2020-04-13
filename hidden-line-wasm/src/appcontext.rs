@@ -1,5 +1,5 @@
 use crate::calcctontext::hidden_line;
-use crate::drawcontext::DrawContext;
+use crate::drawcontext::{Color, DrawContext};
 use crate::dreidext::*;
 use crate::float::*;
 use crate::mat3::*;
@@ -7,6 +7,7 @@ use crate::point::*;
 use crate::triangle::*;
 use crate::vec2::colinear;
 use crate::vec3::*;
+use std::collections::HashMap;
 use std::rc::Rc;
 
 pub struct AppContext {
@@ -123,6 +124,7 @@ fn rot_vec(to_rot1: &mut Vector3, to_rot2: &mut Vector3, t: Float) {
 pub struct Scene {
     pub points: Vec<Rc<Point>>,
     pub triangles: Vec<Polygon>,
+    pub lines: HashMap<(usize, usize), Color>,
 }
 
 impl Point {
@@ -146,6 +148,7 @@ impl Scene {
         let mut result = Scene {
             points: Vec::new(),
             triangles: Vec::new(),
+            lines: HashMap::new(),
         };
 
         for p in actx.scene_builder.points.iter() {
@@ -173,16 +176,27 @@ impl Scene {
                         < (p3.b.y - p1.b.y) * (p2.b.x - p1.b.x)))
                 && !colinear(&p1.b, &p2.b, &p3.b)
             {
-                result.triangles.push(Polygon::new(
-                    p1.clone(),
-                    p2.clone(),
-                    p3.clone(),
-                    t.lset,
-                    cols,
-                ));
+                result
+                    .triangles
+                    .push(Polygon::new(p1.clone(), p2.clone(), p3.clone()));
+
+                if t.lset & 4 == 4 {
+                    result.push_line(t.p1, t.p2, cols);
+                }
+                if t.lset & 1 == 1 {
+                    result.push_line(t.p2, t.p3, cols);
+                }
+                if t.lset & 2 == 2 {
+                    result.push_line(t.p3, t.p1, cols);
+                }
             }
         }
 
         result
+    }
+
+    fn push_line(&mut self, p1: usize, p2: usize, col: Color) {
+        let key = (p1.min(p2), p1.max(p2));
+        self.lines.insert(key, col);
     }
 }

@@ -30,34 +30,12 @@ impl TheTriangle {
         TheTriangle { poly, shape }
     }
 
-    fn lines(&self, all: bool) -> Vec<TheLine> {
-        let mut result = vec![];
-
-        let color = self.poly.cols;
-
-        if all || DEBUG || self.poly.gl & 4 == 4 {
-            result.push(TheLine::new(
-                self.poly.p1.clone(),
-                self.poly.p2.clone(),
-                color,
-            ));
-        }
-        if all || DEBUG || self.poly.gl & 1 == 1 {
-            result.push(TheLine::new(
-                self.poly.p2.clone(),
-                self.poly.p3.clone(),
-                color,
-            ));
-        }
-        if all || DEBUG || self.poly.gl & 2 == 2 {
-            result.push(TheLine::new(
-                self.poly.p3.clone(),
-                self.poly.p1.clone(),
-                color,
-            ));
-        }
-
-        result
+    fn lines(&self) -> Vec<Line> {
+        vec![
+            Line::new(self.poly.p1.b, self.poly.p2.b),
+            Line::new(self.poly.p2.b, self.poly.p3.b),
+            Line::new(self.poly.p3.b, self.poly.p1.b),
+        ]
     }
 }
 
@@ -75,68 +53,34 @@ impl Shape for TheTriangle {
     }
 }
 
-#[derive(Debug)]
-struct TheLine {
-    p1: Rc<Point>,
-    p2: Rc<Point>,
-    color: Color,
-    shape: Line,
-}
-
-impl TheLine {
-    fn new(p1: Rc<Point>, p2: Rc<Point>, color: Color) -> TheLine {
-        let shape = Line::new(p1.b, p2.b);
-        TheLine {
-            p1,
-            p2,
-            color,
-            shape,
-        }
-    }
-
-    pub fn draw(&self, ctx: &mut dyn DrawContext, ranges: &RangeSet<Float>) {
-        let mut last = 0.0;
-        let RangeSet(ranges) = ranges;
-        for range in ranges {
-            match range {
-                (Bound::Included(l1), Bound::Included(l2))
-                | (Bound::Excluded(l1), Bound::Excluded(l2))
-                | (Bound::Included(l1), Bound::Excluded(l2))
-                | (Bound::Excluded(l1), Bound::Included(l2)) => {
-                    if DEBUG && last < *l1 {
-                        self.line(ctx, last, *l1, -MAX);
-                    }
-                    self.line(ctx, *l1, *l2, self.color);
-                    last = *l2;
+pub fn draw(ctx: &mut dyn DrawContext, line: &Line, ranges: &RangeSet<Float>, color: Color) {
+    let mut last = 0.0;
+    let RangeSet(ranges) = ranges;
+    for range in ranges {
+        match range {
+            (Bound::Included(l1), Bound::Included(l2))
+            | (Bound::Excluded(l1), Bound::Excluded(l2))
+            | (Bound::Included(l1), Bound::Excluded(l2))
+            | (Bound::Excluded(l1), Bound::Included(l2)) => {
+                if DEBUG && last < *l1 {
+                    draw_line_range(ctx, line, last, *l1, -MAX);
                 }
-                _ => {}
+                draw_line_range(ctx, line, *l1, *l2, color);
+                last = *l2;
             }
-        }
-        if DEBUG && last < 1.0 {
-            self.line(ctx, last, 1.0, -MAX);
+            _ => {}
         }
     }
-
-    fn line(&self, ctx: &mut dyn DrawContext, l1: Float, l2: Float, color: Color) {
-        let p1 = self.shape.a.mix(&self.shape.e, l1);
-        let p2 = self.shape.a.mix(&self.shape.e, l2);
-
-        ctx.line(p1.x, p1.y, p2.x, p2.y, color);
+    if DEBUG && last < 1.0 {
+        draw_line_range(ctx, line, last, 1.0, -MAX);
     }
 }
 
-impl Shape for TheLine {
-    fn intersects(&self, r: &Rect) -> bool {
-        self.shape.intersects(r)
-    }
+fn draw_line_range(ctx: &mut dyn DrawContext, line: &Line, l1: Float, l2: Float, color: Color) {
+    let p1 = line.a.mix(&line.e, l1);
+    let p2 = line.a.mix(&line.e, l2);
 
-    fn contains(&self, v: &Vector2) -> bool {
-        self.shape.contains(v)
-    }
-
-    fn bounds(&self) -> Rect {
-        self.shape.bounds()
-    }
+    ctx.line(p1.x, p1.y, p2.x, p2.y, color);
 }
 
 pub fn hidden_line(mut scene: Scene, dctx: &mut dyn DrawContext, actx: &AppContext) {
@@ -160,21 +104,23 @@ pub fn hidden_line(mut scene: Scene, dctx: &mut dyn DrawContext, actx: &AppConte
             tree.insert(t);
         }
 
-        for t in tree.elements() {
-            for l in t.lines(false).iter() {
-                let bounds = l.shape.bounds();
-                let mut r: RangeSet<Float> = RangeSet::from_range(&(0.0..=1.0));
-                let mut candidates = tree.elements_intersecting(&bounds);
-                while let Some(next) = if r.is_empty() {
-                    None
-                } else {
-                    candidates.next()
-                } {
-                    intersect(actx, &next, &l, &mut r);
-                }
+        for (&(a, e), &color) in scene.lines.iter() {
+            let p1 = scene.points[a].clone();
+            let p2 = scene.points[e].clone();
+            let line_shape = Line::new(p1.b, p2.b);
 
-                l.draw(dctx, &r);
+            let bounds = line_shape.bounds();
+            let mut r: RangeSet<Float> = RangeSet::from_range(&(0.0..=1.0));
+            let mut candidates = tree.elements_intersecting(&bounds);
+            while let Some(next) = if r.is_empty() {
+                None
+            } else {
+                candidates.next()
+            } {
+                intersect(actx, &next, &p1, &p2, &mut r);
             }
+
+            draw(dctx, &line_shape, &r, color);
         }
     }
 }
@@ -234,11 +180,10 @@ fn clip(
 fn intersect2(
     actx: &AppContext,
     triangle: &TheTriangle,
-    line: &TheLine,
+    p1: Vector3,
+    p2: Vector3,
     range: &mut RangeSet<Float>,
 ) {
-    let p1 = line.p1.o;
-    let p2 = line.p2.o;
     let t1 = triangle.poly.p1.o;
     let t2 = triangle.poly.p2.o;
     let t3 = triangle.poly.p3.o;
@@ -266,7 +211,8 @@ fn intersect2(
 fn intersect(
     actx: &AppContext,
     triangle: &TheTriangle,
-    line: &TheLine,
+    p1: &Point,
+    p2: &Point,
     range: &mut RangeSet<Float>,
 ) {
     let t1 = triangle.poly.p1.o;
@@ -283,8 +229,8 @@ fn intersect(
         return;
     }
 
-    let p1_dist = nv * line.p1.o - pd;
-    let p2_dist = nv * line.p2.o - pd;
+    let p1_dist = nv * p1.o - pd;
+    let p2_dist = nv * p2.o - pd;
 
     let p1_on_tri = p1_dist.abs() < EPSILON0;
     let p2_on_tri = p2_dist.abs() < EPSILON0;
@@ -308,10 +254,7 @@ fn intersect(
     }
 
     if DEBUG {
-        println!(
-            "t {:?} {:?} {:?} l {:?} {:?}",
-            t1, t2, t3, line.p1.o, line.p2.o
-        );
+        println!("t {:?} {:?} {:?} l {:?} {:?}", t1, t2, t3, p1.o, p2.o);
         println!(
             "eye_dist {:?} p1_dist {:?} p2_dist {:?}",
             eye_dist, p1_dist, p2_dist
@@ -333,20 +276,20 @@ fn intersect(
 
         println!(
             "<path style=\"stroke:#000000;stroke-width: 0.01px;\" d=\"M {:?},{:?} {:?},{:?} \"/>",
-            line.shape.a.x, -line.shape.a.y, line.shape.e.x, -line.shape.e.y
+            p1.b.x, -p1.b.y, p2.b.x, -p2.b.y
         );
     }
 
-    let p1 = line.shape.a;
-    let p2 = line.shape.e;
+    let p1 = p1.b;
+    let p2 = p2.b;
 
     let d21 = p2 - p1;
     let mut min = None;
     let mut max = None;
-    for tri_line in triangle.lines(true).iter() {
+    for tri_line in triangle.lines().iter() {
         //https://quickmath.com/webMathematica3/quickmath/equations/solve/advanced.jsp#c=solve_advancedsolveequations&v1=lx_1%2Bmx_2%253Dp%250Aly_1%2Bmy_2%253Dq%250Al%2Bm%253D1%250Anx_3%2Box_4%253Dp%250Any_3%2Boy_4%253Dq%250An%2Bo%253D1%250A&v2=l%250Am%250An%250Ao%250Ap%250Aq%250A&v5=1
-        let p3 = tri_line.shape.a;
-        let p4 = tri_line.shape.e;
+        let p3 = tri_line.a;
+        let p4 = tri_line.e;
 
         let d43 = p4 - p3;
 
