@@ -5,6 +5,7 @@ use crate::float::*;
 use crate::mat3::*;
 use crate::point::*;
 use crate::triangle::*;
+use crate::vec2::colinear;
 use crate::vec3::*;
 use std::rc::Rc;
 
@@ -161,20 +162,24 @@ impl Scene {
             let c = (p1.o - p2.o).cross(&(p3.o - p2.o));
             let cols = (actx.view.normalize() * c.normalize()).abs();
 
-            let triangle = Polygon::new(p1.clone(), p2.clone(), p3.clone(), t.lset, cols);
-
             let eye_view_plane_dist = actx.view * actx.eye + EPSILON1;
 
             // test if not behind view plane
-            if actx.view * triangle.p1.o > eye_view_plane_dist &&
-                    actx.view * triangle.p2.o > eye_view_plane_dist &&
-                    actx.view * triangle.p3.o > eye_view_plane_dist &&
-                    // evtl kann man das mit der Lichtberechnung beim Initialisieren des Polygons kombinieren
-                    (!actx.back_face || ((triangle.p3.b.x - triangle.p1.b.x) *
-                        (triangle.p2.b.y - triangle.p1.b.y) + EPSILON1 < (triangle.p3.b.y - triangle.p1.b.y) *
-                        (triangle.p2.b.x - triangle.p1.b.x))) && triangle.has_no_area()
+            if actx.view * p1.o > eye_view_plane_dist
+                && actx.view * p2.o > eye_view_plane_dist
+                && actx.view * p3.o > eye_view_plane_dist
+                && (!actx.back_face
+                    || ((p3.b.x - p1.b.x) * (p2.b.y - p1.b.y) + EPSILON1
+                        < (p3.b.y - p1.b.y) * (p2.b.x - p1.b.x)))
+                && !colinear(&p1.b, &p2.b, &p3.b)
             {
-                result.triangles.push(triangle);
+                result.triangles.push(Polygon::new(
+                    p1.clone(),
+                    p2.clone(),
+                    p3.clone(),
+                    t.lset,
+                    cols,
+                ));
             }
         }
 
