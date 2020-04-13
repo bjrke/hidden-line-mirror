@@ -34,7 +34,11 @@ impl AppContext {
 
     pub fn darstellung(&mut self, dctx: &mut dyn DrawContext) {
         dctx.cls();
-        self.recalc_unit_vectors();
+
+        let unit_vec_len = (0.4 * self.view.len());
+        self.iv = self.view.cross(&self.jv).normalize() * unit_vec_len;
+        self.jv = self.iv.cross(&self.view).normalize() * unit_vec_len;
+
         let mut polys = self.filter_polys();
 
         println!("#polys: {}", polys.len());
@@ -50,33 +54,10 @@ impl AppContext {
         hidden_line(&mut polys, dctx, self);
     }
 
-    pub fn recalc_unit_vectors(&mut self) {
-        self.iv = self.view.cross(&self.jv).normalize() * (0.4 * self.view.len());
-        self.jv = self.iv.cross(&self.view).normalize() * (0.4 * self.view.len());
-    }
-
-    pub fn filter_polys(&mut self) -> Vec<Polygon> {
+    fn filter_polys(&mut self) -> Vec<Polygon> {
         let scene = Scene::new(&self);
 
-        let eye_view_plane_dist = self.view * self.eye + EPSILON1;
-
-        let mut polys = vec![];
-
-        for j in scene.triangles.iter() {
-            // test if not behind view plane
-            if self.view * j.p1.o > eye_view_plane_dist &&
-               self.view * j.p2.o > eye_view_plane_dist &&
-               self.view * j.p3.o > eye_view_plane_dist &&
-               // evtl kann man das mit der Lichtberechnung beim Initialisieren des Polygons kombinieren
-               (!self.back_face || ((j.p3.b.x - j.p1.b.x) *
-            (j.p2.b.y - j.p1.b.y) + EPSILON1 < (j.p3.b.y - j.p1.b.y) *
-            (j.p2.b.x - j.p1.b.x))) && j.has_no_area()
-            {
-                polys.push(j.clone());
-            }
-        }
-
-        polys
+        scene.triangles
     }
 
     pub fn on_key(&mut self, ch: char) -> bool {
@@ -187,14 +168,23 @@ impl Scene {
             let c = (p1.o - p2.o).cross(&(p3.o - p2.o));
             let cols = (actx.view.normalize() * c.normalize()).abs();
 
-            result.triangles.push(Rc::new(Triangle::new(
-                p1.clone(),
-                p2.clone(),
-                p3.clone(),
-                t.lset,
-                cols,
-            )));
+            let triangle = Polygon::new(p1.clone(), p2.clone(), p3.clone(), t.lset, cols);
+
+            let eye_view_plane_dist = actx.view * actx.eye + EPSILON1;
+
+            // test if not behind view plane
+            if actx.view * triangle.p1.o > eye_view_plane_dist &&
+                    actx.view * triangle.p2.o > eye_view_plane_dist &&
+                    actx.view * triangle.p3.o > eye_view_plane_dist &&
+                    // evtl kann man das mit der Lichtberechnung beim Initialisieren des Polygons kombinieren
+                    (!actx.back_face || ((triangle.p3.b.x - triangle.p1.b.x) *
+                        (triangle.p2.b.y - triangle.p1.b.y) + EPSILON1 < (triangle.p3.b.y - triangle.p1.b.y) *
+                        (triangle.p2.b.x - triangle.p1.b.x))) && triangle.has_no_area()
+            {
+                result.triangles.push(triangle);
+            }
         }
+
         result
     }
 }
