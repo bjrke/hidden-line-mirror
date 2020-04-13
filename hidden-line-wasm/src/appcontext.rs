@@ -32,16 +32,16 @@ impl AppContext {
         }
     }
 
-    pub fn darstellung(&mut self, dctx: &mut dyn DrawContext) {
+    pub fn render(&mut self, dctx: &mut dyn DrawContext) {
         dctx.cls();
 
         let unit_vec_len = (0.4 * self.view.len());
         self.iv = self.view.cross(&self.jv).normalize() * unit_vec_len;
         self.jv = self.iv.cross(&self.view).normalize() * unit_vec_len;
 
-        let mut polys = self.filter_polys();
+        let scene = Scene::new(&self);
 
-        println!("#polys: {}", polys.len());
+        println!("#polys: {}", scene.triangles.len());
         println!("eye: {}", self.eye);
         println!("view: {}", self.view);
         println!("up {}", self.jv);
@@ -51,13 +51,7 @@ impl AppContext {
         dctx.circle(-0.99, 0.99, 0.01, 1.0);
         dctx.circle(-0.99, -0.99, 0.01, 1.0);
 
-        hidden_line(&mut polys, dctx, self);
-    }
-
-    fn filter_polys(&mut self) -> Vec<Polygon> {
-        let scene = Scene::new(&self);
-
-        scene.triangles
+        hidden_line(scene, dctx, self);
     }
 
     pub fn on_key(&mut self, ch: char) -> bool {
@@ -126,9 +120,8 @@ fn rot_vec(to_rot1: &mut Vector3, to_rot2: &mut Vector3, t: Float) {
 }
 
 pub struct Scene {
-    points: Vec<Rc<Point>>,
-
-    triangles: Vec<Polygon>,
+    pub points: Vec<Rc<Point>>,
+    pub triangles: Vec<Polygon>,
 }
 
 impl Point {

@@ -75,7 +75,7 @@ mod tests {
         actx.back_face = false;
 
         let mut dctx = TestDrawContext::new();
-        actx.darstellung(&mut dctx);
+        actx.render(&mut dctx);
 
         println!("{:?}", dctx.lines);
         println!("{:?}", dctx.lines.len());

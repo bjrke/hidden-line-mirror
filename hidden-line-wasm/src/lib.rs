@@ -93,6 +93,6 @@ impl HiddenLine {
     }
 
     fn draw(&mut self) {
-        self.app_ctx.darstellung(&mut self.svgcontext);
+        self.app_ctx.render(&mut self.svgcontext);
     }
 }

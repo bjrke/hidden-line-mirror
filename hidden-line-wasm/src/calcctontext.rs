@@ -139,9 +139,9 @@ impl Shape for TheLine {
     }
 }
 
-pub fn hidden_line(polygons: &mut Vec<Polygon>, dctx: &mut dyn DrawContext, actx: &AppContext) {
+pub fn hidden_line(mut scene: Scene, dctx: &mut dyn DrawContext, actx: &AppContext) {
     let mut triangles = vec![];
-    while let Some(poly) = polygons.pop() {
+    while let Some(poly) = scene.triangles.pop() {
         triangles.push(TheTriangle::new(poly));
     }
 
