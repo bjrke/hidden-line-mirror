@@ -26,16 +26,8 @@ pub struct AppContext {
 
 impl AppContext {
     pub fn neukamera(&mut self) {
-        let iv = self.BlickR.kreuz(&self.jv);
-        //  if iv.betrag3d=0 then outstring('i=0');
-
-        let iv = iv.mul3d(0.4 * iv.invBetrag3d() / self.BlickR.invBetrag3d());
-        let jv = iv.kreuz(&self.BlickR);
-        //   //  if jv.betrag3d=0 then outstring('j=0');
-        let jv = jv.mul3d(0.4 * jv.invBetrag3d() / self.BlickR.invBetrag3d());
-
-        self.iv = iv;
-        self.jv = jv;
+        self.iv = self.BlickR.cross(&self.jv).normalize() * (0.4 * self.BlickR.len());
+        self.jv = self.iv.cross(&self.BlickR).normalize() * (0.4 * self.BlickR.len());
     }
 
     pub fn rechnung(&mut self) -> BinaryHeap<MinxQueueEntry> {
@@ -80,19 +72,19 @@ impl AppContext {
             'S' => self.Auge = self.Auge.move3d(&self.jv, -10.0),
             'x' => self.Auge = self.Auge.move3d(&self.jv, 1.0),
             'X' => self.Auge = self.Auge.move3d(&self.jv, 10.0),
-            'd' => RotVec(&mut self.BlickR, &mut self.jv, 1.0),
-            'D' => RotVec(&mut self.BlickR, &mut self.jv, 10.0),
-            'c' => RotVec(&mut self.jv, &mut self.BlickR, 1.0),
-            'C' => RotVec(&mut self.jv, &mut self.BlickR, 10.0),
-            ',' => RotVec(&mut self.iv, &mut self.BlickR, 1.0),
-            ';' | '<' => RotVec(&mut self.iv, &mut self.BlickR, 10.0),
-            '.' => RotVec(&mut self.BlickR, &mut self.iv, 1.0),
-            ':' | '>' => RotVec(&mut self.BlickR, &mut self.iv, 10.0),
-            'o' => RotVec(&mut self.jv, &mut self.iv, 1.0),
-            'O' => RotVec(&mut self.jv, &mut self.iv, 10.0),
+            'd' => rot_vec(&mut self.BlickR, &mut self.jv, 1.0),
+            'D' => rot_vec(&mut self.BlickR, &mut self.jv, 10.0),
+            'c' => rot_vec(&mut self.jv, &mut self.BlickR, 1.0),
+            'C' => rot_vec(&mut self.jv, &mut self.BlickR, 10.0),
+            ',' => rot_vec(&mut self.iv, &mut self.BlickR, 1.0),
+            ';' | '<' => rot_vec(&mut self.iv, &mut self.BlickR, 10.0),
+            '.' => rot_vec(&mut self.BlickR, &mut self.iv, 1.0),
+            ':' | '>' => rot_vec(&mut self.BlickR, &mut self.iv, 10.0),
+            'o' => rot_vec(&mut self.jv, &mut self.iv, 1.0),
+            'O' => rot_vec(&mut self.jv, &mut self.iv, 10.0),
 
-            'i' => RotVec(&mut self.iv, &mut self.jv, 1.0),
-            'I' => RotVec(&mut self.iv, &mut self.jv, 10.0),
+            'i' => rot_vec(&mut self.iv, &mut self.jv, 1.0),
+            'I' => rot_vec(&mut self.iv, &mut self.jv, 10.0),
             'f' | 'F' => self.colmode = !self.colmode,
             // 't' | 'T' => self.tausgabe = !self.tausgabe,
             'b' | 'B' => self.backface = !self.backface,
@@ -167,7 +159,7 @@ impl Scene {
             let p2 = &result.points[t.p2];
             let p3 = &result.points[t.p3];
 
-            let c = p1.o.sub3d(&p2.o).kreuz(&p3.o.sub3d(&p2.o));
+            let c = p1.o.sub3d(&p2.o).cross(&p3.o.sub3d(&p2.o));
             let faktor = actx.BlickR.invBetrag3d() * c.invBetrag3d();
             let cols = calcColor((actx.BlickR.skalar(&c) * faktor).abs());
 

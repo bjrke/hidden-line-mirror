@@ -215,7 +215,7 @@ impl CalcContext {
         ref_point: Vector3,
         ref_point_visible: bool,
     ) -> (Bound<Float>, Bound<Float>) {
-        let normal = (a - b).kreuz(&c).normalize();
+        let normal = (a - b).cross(&c).normalize();
 
         let ref_dist = ref_point * normal;
         if ref_dist.abs() < epsilon0 {

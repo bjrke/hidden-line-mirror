@@ -41,7 +41,7 @@ impl Vector3 {
     }
 
     #[inline]
-    pub fn kreuz(&self, v: &Self) -> Self {
+    pub fn cross(&self, v: &Self) -> Self {
         Vector3::new(
             self.y * v.z - self.z * v.y,
             self.z * v.x - self.x * v.z,
@@ -56,7 +56,17 @@ impl Vector3 {
 
     #[inline]
     pub fn invBetrag3d(&self) -> Float {
-        (self * self).inv_sqrt()
+        1.0 / self.len()
+    }
+
+    #[inline]
+    pub fn len(&self) -> Float {
+        self.len_sq().sqrt()
+    }
+
+    #[inline]
+    pub fn len_sq(&self) -> Float {
+        self * self
     }
 
     #[inline]
@@ -176,36 +186,33 @@ impl std::fmt::Display for Vector3 {
     }
 }
 
-pub fn RotVec(ToRot1: &mut Vector3, ToRot2: &mut Vector3, t: Float) {
-    let RotInc = (t * PI / 180.0).cos() / (t * PI / 180.0).sin();
-    let InvRotVecLength = 1.0 / (RotInc * RotInc + 1.0).sqrt();
+pub fn rot_vec(to_rot1: &mut Vector3, to_rot2: &mut Vector3, t: Float) {
+    let rad = t * PI / 180.0;
+    let rot_inc = rad.cos() / rad.sin();
+    let rot_len = (rot_inc.sqr() + 1.0).sqrt();
+    let rot_inc = (rot_inc / rot_len);
 
-    let Copy1 = *ToRot1;
-    let Copy2 = *ToRot2;
+    let copy1 = *to_rot1;
+    let copy2 = *to_rot2;
 
-    let InvLength1 = Copy1.invBetrag3d();
-    let InvLength2 = Copy2.invBetrag3d();
+    let len1 = to_rot1.len();
+    let len2 = to_rot2.len();
 
-    if InvRotVecLength == 0.0 {
-        println!("InvRotVecLength=0");
+    if len1 == 0.0 {
+        println!("len1 = 0");
     }
-    if InvLength1 == 0.0 {
-        println!("InvLength1=0");
+    if len2 == 0.0 {
+        println!("len2 = 0");
     }
-    if InvLength2 == 0.0 {
-        println!("InvLength2=0");
-    }
-    ToRot1.x =
-        (InvRotVecLength / InvLength1) * (RotInc * Copy1.x * InvLength1 + Copy2.x * InvLength2);
-    ToRot1.y =
-        (InvRotVecLength / InvLength1) * (RotInc * Copy1.y * InvLength1 + Copy2.y * InvLength2);
-    ToRot1.z =
-        (InvRotVecLength / InvLength1) * (RotInc * Copy1.z * InvLength1 + Copy2.z * InvLength2);
 
-    ToRot2.x =
-        (InvRotVecLength / InvLength2) * (-Copy1.x * InvLength1 + RotInc * Copy2.x * InvLength2);
-    ToRot2.y =
-        (InvRotVecLength / InvLength2) * (-Copy1.y * InvLength1 + RotInc * Copy2.y * InvLength2);
-    ToRot2.z =
-        (InvRotVecLength / InvLength2) * (-Copy1.z * InvLength1 + RotInc * Copy2.z * InvLength2);
+    let f1 = len1 / (len2 * rot_len);
+    let f2 = -len2 / (len1 * rot_len);
+
+    to_rot1.x = rot_inc * copy1.x + copy2.x * f1;
+    to_rot1.y = rot_inc * copy1.y + copy2.y * f1;
+    to_rot1.z = rot_inc * copy1.z + copy2.z * f1;
+
+    to_rot2.x = f2 * copy1.x + rot_inc * copy2.x;
+    to_rot2.y = f2 * copy1.y + rot_inc * copy2.y;
+    to_rot2.z = f2 * copy1.z + rot_inc * copy2.z;
 }
