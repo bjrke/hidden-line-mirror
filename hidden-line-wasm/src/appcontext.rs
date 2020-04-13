@@ -126,7 +126,7 @@ impl punkt3d {
 
         let kd = K.det3d();
         if kd.abs() > epsilon2 {
-            K.x = actx.BlickR.neg3d();
+            K.x = -actx.BlickR;
             self.b.b.x = K.det3d() / kd;
             K.y = K.x;
             K.x = actx.iv;

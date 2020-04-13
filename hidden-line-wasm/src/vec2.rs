@@ -1,6 +1,6 @@
 use crate::float::*;
 use std::cmp::*;
-use std::ops::{Add, Div, Mul, Sub};
+use std::ops::{Add, Div, Mul, Neg, Sub};
 
 #[derive(Default, Clone, Copy, PartialEq, PartialOrd)]
 pub struct Vector2 {
@@ -148,6 +148,24 @@ impl Div<Float> for &Vector2 {
     #[inline]
     fn div(self, rhs: Float) -> Self::Output {
         Self::Output::new(self.x / rhs, self.y / rhs)
+    }
+}
+
+impl Neg for Vector2 {
+    type Output = Vector2;
+
+    #[inline]
+    fn neg(self) -> Self::Output {
+        Self::Output::new(-self.x, -self.y)
+    }
+}
+
+impl Neg for &Vector2 {
+    type Output = Vector2;
+
+    #[inline]
+    fn neg(self) -> Self::Output {
+        Self::Output::new(-self.x, -self.y)
     }
 }
 

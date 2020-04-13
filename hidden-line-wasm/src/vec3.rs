@@ -1,5 +1,5 @@
 use crate::float::*;
-use std::ops::{Add, Div, Mul, Sub};
+use std::ops::{Add, Div, Mul, Neg, Sub};
 
 #[derive(Clone, Copy)]
 pub struct Vector3 {
@@ -11,6 +11,7 @@ pub struct Vector3 {
 const MOVE_SPEED: Float = 1.0;
 
 impl Vector3 {
+    #[inline]
     pub fn new(x: Float, y: Float, z: Float) -> Self {
         Self { x, y, z }
     }
@@ -33,11 +34,6 @@ impl Vector3 {
     #[inline]
     pub fn div3d(&self, d: Float) -> Self {
         self / d
-    }
-
-    #[inline]
-    pub fn neg3d(&self) -> Self {
-        Vector3::new(-self.x, -self.y, -self.z)
     }
 
     #[inline]
@@ -177,6 +173,24 @@ impl Div<Float> for &Vector3 {
     #[inline]
     fn div(self, rhs: Float) -> Self::Output {
         Self::Output::new(self.x / rhs, self.y / rhs, self.y / rhs)
+    }
+}
+
+impl Neg for Vector3 {
+    type Output = Vector3;
+
+    #[inline]
+    fn neg(self) -> Self::Output {
+        Self::Output::new(-self.x, -self.y, -self.z)
+    }
+}
+
+impl Neg for &Vector3 {
+    type Output = Vector3;
+
+    #[inline]
+    fn neg(self) -> Self::Output {
+        Self::Output::new(-self.x, -self.y, -self.z)
     }
 }
 
