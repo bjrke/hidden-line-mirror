@@ -181,15 +181,6 @@ impl Neg for &Vector2 {
     }
 }
 
-impl Eq for Vector2 {}
-
-impl Ord for Vector2 {
-    #[inline]
-    fn cmp(&self, other: &Self) -> Ordering {
-        self.partial_cmp(other).unwrap()
-    }
-}
-
 impl std::fmt::Display for Vector2 {
     #[inline]
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {

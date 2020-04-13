@@ -30,8 +30,6 @@ mod float;
 mod linesegment;
 mod mat2;
 mod mat3;
-mod maxxqueue;
-mod minxqueue;
 mod plot;
 mod point;
 mod polygon;

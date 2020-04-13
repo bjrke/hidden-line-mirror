@@ -7,8 +7,6 @@ use crate::appcontext::*;
 use crate::drawcontext::*;
 use crate::float::*;
 use crate::mat2::Matrix2;
-use crate::maxxqueue::*;
-use crate::minxqueue::*;
 use crate::point::punkt3d;
 use crate::polygon::*;
 use crate::quadtree::QuadTree;
@@ -22,11 +20,7 @@ use crate::vec3::Vector3;
 const DEBUG: bool = false;
 
 pub struct CalcContext {
-    pub minxQueue: BinaryHeap<MinxQueueEntry>,
-    pub queue2: Vec<polygon>,
-    pub maxxQueue: BTreeSet<MaxxQueueEntry>,
-    pub xscan: Float,
-    pub currentSweep: Vec<Rc<polygon>>,
+    pub minxQueue: Vec<polygon>,
 }
 
 #[derive(Debug)]
@@ -155,18 +149,12 @@ impl Shape for TheLine {
 
 impl CalcContext {
     pub fn new() -> CalcContext {
-        CalcContext {
-            minxQueue: BinaryHeap::new(),
-            queue2: Vec::new(),
-            maxxQueue: BTreeSet::new(),
-            xscan: MIN,
-            currentSweep: Vec::new(),
-        }
+        CalcContext { minxQueue: vec![] }
     }
 
     pub fn test(&mut self, dctx: &mut dyn DrawContext, actx: &AppContext) {
         let mut triangles = vec![];
-        while let Some(MinxQueueEntry { polygon: poly }) = self.minxQueue.pop() {
+        while let Some(poly) = self.minxQueue.pop() {
             triangles.push(TheTriangle::new(poly));
         }
 
@@ -416,31 +404,6 @@ impl CalcContext {
 
         if let (Some(l), Some(r)) = (min, max) {
             range.remove(&(Bound::Excluded(l), Bound::Excluded(r)));
-        }
-    }
-
-    pub fn pushMinX(&mut self, polygon: polygon) {
-        self.minxQueue.push(MinxQueueEntry { polygon });
-    }
-
-    pub fn pushQ2(&mut self, polygon: polygon) {
-        self.queue2.push(polygon);
-    }
-
-    pub fn pushSweep(&mut self, polygon: polygon, pos: usize) {
-        let polygon = Rc::new(polygon);
-        self.currentSweep.insert(pos, polygon.clone());
-        self.maxxQueue.insert(MaxxQueueEntry { polygon });
-    }
-
-    pub fn sdelete(&mut self, pos: usize) -> polygon {
-        let polygon = self.currentSweep.remove(pos);
-        self.maxxQueue.remove(&MaxxQueueEntry {
-            polygon: polygon.clone(),
-        });
-        match Rc::try_unwrap(polygon) {
-            Ok(r) => r,
-            _ => panic!("should not happen"),
         }
     }
 }

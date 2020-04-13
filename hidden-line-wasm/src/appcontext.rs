@@ -1,7 +1,6 @@
 use crate::dreidext::*;
 use crate::float::*;
 use crate::mat3::*;
-use crate::minxqueue::*;
 use crate::point::*;
 use crate::polygon::*;
 
@@ -28,12 +27,12 @@ impl AppContext {
         self.jv = self.iv.cross(&self.BlickR).normalize() * (0.4 * self.BlickR.len());
     }
 
-    pub fn rechnung(&mut self) -> BinaryHeap<MinxQueueEntry> {
+    pub fn rechnung(&mut self) -> Vec<polygon> {
         let mut scene = Scene::new(&self);
 
         let ED = self.BlickR * self.Auge + epsilon1;
 
-        let mut polys = BinaryHeap::new();
+        let mut polys = vec![];
 
         for j in scene.dreiecks.iter_mut() {
             // test if not behind view plane
@@ -47,13 +46,12 @@ impl AppContext {
             {
                 if j.delegate.flaechentest() {
                     let polygon = polygon::newpoly(j.clone());
-                    polys.push(MinxQueueEntry { polygon });
+                    polys.push(polygon);
                 }
             }
         }
 
         polys
-        //   {  xscan:=-1e20;}
     }
 
     pub fn on_key(&mut self, ch: char) -> bool {
