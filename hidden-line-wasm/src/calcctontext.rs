@@ -39,9 +39,9 @@ struct TheTriangle {
 impl TheTriangle {
     fn new(poly: polygon) -> TheTriangle {
         let shape = Triangle::new(
-            &poly.originalTriangle.origPoint1.b.b,
-            &poly.originalTriangle.origPoint2.b.b,
-            &poly.originalTriangle.origPoint3.b.b,
+            &poly.originalTriangle.p1.b.b,
+            &poly.originalTriangle.p2.b.b,
+            &poly.originalTriangle.p3.b.b,
         );
 
         TheTriangle { poly, shape }
@@ -52,22 +52,22 @@ impl TheTriangle {
 
         if all || DEBUG || self.poly.originalTriangle.delegate.gl & 4 == 4 {
             result.push(TheLine::new(
-                self.poly.originalTriangle.origPoint1.clone(),
-                self.poly.originalTriangle.origPoint2.clone(),
+                self.poly.originalTriangle.p1.clone(),
+                self.poly.originalTriangle.p2.clone(),
                 self.poly.delegate.cols,
             ));
         }
         if all || DEBUG || self.poly.originalTriangle.delegate.gl & 1 == 1 {
             result.push(TheLine::new(
-                self.poly.originalTriangle.origPoint2.clone(),
-                self.poly.originalTriangle.origPoint3.clone(),
+                self.poly.originalTriangle.p2.clone(),
+                self.poly.originalTriangle.p3.clone(),
                 self.poly.delegate.cols,
             ));
         }
         if all || DEBUG || self.poly.originalTriangle.delegate.gl & 2 == 2 {
             result.push(TheLine::new(
-                self.poly.originalTriangle.origPoint3.clone(),
-                self.poly.originalTriangle.origPoint1.clone(),
+                self.poly.originalTriangle.p3.clone(),
+                self.poly.originalTriangle.p1.clone(),
                 self.poly.delegate.cols,
             ));
         }
@@ -267,9 +267,9 @@ impl CalcContext {
     ) {
         let p1 = line.p1.o;
         let p2 = line.p2.o;
-        let t1 = triangle.poly.originalTriangle.origPoint1.o;
-        let t2 = triangle.poly.originalTriangle.origPoint2.o;
-        let t3 = triangle.poly.originalTriangle.origPoint3.o;
+        let t1 = triangle.poly.originalTriangle.p1.o;
+        let t2 = triangle.poly.originalTriangle.p2.o;
+        let t3 = triangle.poly.originalTriangle.p3.o;
         let eye = actx.Auge;
 
         let reye = Self::clip(p1, p2, t1, t2, t3, eye, true);
@@ -298,12 +298,12 @@ impl CalcContext {
         line: &TheLine,
         range: &mut RangeSet<Float>,
     ) {
-        let t1 = triangle.poly.originalTriangle.origPoint1.o;
-        let t2 = triangle.poly.originalTriangle.origPoint2.o;
-        let t3 = triangle.poly.originalTriangle.origPoint3.o;
+        let t1 = triangle.poly.originalTriangle.p1.o;
+        let t2 = triangle.poly.originalTriangle.p2.o;
+        let t3 = triangle.poly.originalTriangle.p3.o;
 
-        let nv = triangle.poly.originalTriangle.planeNorm;
-        let pd = triangle.poly.originalTriangle.planeDist;
+        let nv = triangle.poly.originalTriangle.plane_norm;
+        let pd = triangle.poly.originalTriangle.plane_dist;
 
         let eye_dist = nv * actx.Auge - pd;
 

@@ -25,26 +25,26 @@ impl dreiecktyp {
 #[derive(Debug)]
 pub struct dreieck {
     pub delegate: dreiecktyp,
-    pub origPoint1: Rc<punkt3d>,
-    pub origPoint2: Rc<punkt3d>,
-    pub origPoint3: Rc<punkt3d>,
-    pub planeNorm: Vector3,
-    pub planeDist: Float,
+    pub p1: Rc<punkt3d>,
+    pub p2: Rc<punkt3d>,
+    pub p3: Rc<punkt3d>,
+    pub plane_norm: Vector3,
+    pub plane_dist: Float,
 }
 
 impl dreieck {
     pub fn new(p1: Rc<punkt3d>, p2: Rc<punkt3d>, p3: Rc<punkt3d>, ls: u8, cols: Color) -> dreieck {
-        let planeNorm = (p2.o - p1.o).cross(&(p3.o - p1.o)).normalize();
+        let plane_norm = (p2.o - p1.o).cross(&(p3.o - p1.o)).normalize();
 
         let dp1 = p1.b;
         let dp2 = p2.b;
         let dp3 = p3.b;
 
-        let planeDist = planeNorm * p1.o;
+        let plane_dist = plane_norm * p1.o;
         dreieck {
-            origPoint1: p1,
-            origPoint2: p2,
-            origPoint3: p3,
+            p1,
+            p2,
+            p3,
             delegate: dreiecktyp {
                 p1: dp1,
                 p2: dp2,
@@ -52,8 +52,8 @@ impl dreieck {
                 gl: ls,
                 cols,
             },
-            planeNorm,
-            planeDist,
+            plane_norm,
+            plane_dist,
         }
     }
 }

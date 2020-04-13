@@ -39,9 +39,9 @@ impl AppContext {
 
         for j in scene.dreiecks.iter_mut() {
             // test if not behind view plane
-            if self.BlickR * j.origPoint1.o > ED &&
-               self.BlickR * j.origPoint2.o > ED &&
-               self.BlickR * j.origPoint3.o > ED &&
+            if self.BlickR * j.p1.o > ED &&
+               self.BlickR * j.p2.o > ED &&
+               self.BlickR * j.p3.o > ED &&
                // evtl kann man das mit der Lichtberechnung beim Initialisieren des Polygons kombinieren
                (!self.backface || ((j.delegate.p3.b.x - j.delegate.p1.b.x) *
             (j.delegate.p2.b.y - j.delegate.p1.b.y) + epsilon1 < (j.delegate.p3.b.y - j.delegate.p1.b.y) *
