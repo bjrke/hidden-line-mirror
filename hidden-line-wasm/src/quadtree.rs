@@ -136,9 +136,5 @@ mod tests {
         assert_eq!(elements.len(), 2);
         assert!(elements.contains(&&expected1));
         assert!(elements.contains(&&expected2));
-        // let mut expected = HashSet::new();
-        // expected.insert(Vector2(100.0, 100.0));
-        // expected.insert(Vector2(200.0, 200.0));
-        // assert_eq!(expected, tree);
     }
 }

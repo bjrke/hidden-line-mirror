@@ -13,35 +13,33 @@ pub struct AppContext {
     pub iv: Vector3,
     pub jv: Vector3,
     pub scene_builder: SceneBuilder,
-    pub backface: bool,
+    pub back_face: bool,
 }
 
 impl AppContext {
-    pub fn neukamera(&mut self) {
+    pub fn recalc_unit_vectors(&mut self) {
         self.iv = self.view.cross(&self.jv).normalize() * (0.4 * self.view.len());
         self.jv = self.iv.cross(&self.view).normalize() * (0.4 * self.view.len());
     }
 
-    pub fn rechnung(&mut self) -> Vec<Polygon> {
-        let mut scene = Scene::new(&self);
+    pub fn filter_polys(&mut self) -> Vec<Polygon> {
+        let scene = Scene::new(&self);
 
         let eye_view_plane_dist = self.view * self.eye + EPSILON1;
 
         let mut polys = vec![];
 
-        for j in scene.dreiecks.iter_mut() {
+        for j in scene.triangles.iter() {
             // test if not behind view plane
             if self.view * j.p1.o > eye_view_plane_dist &&
                self.view * j.p2.o > eye_view_plane_dist &&
                self.view * j.p3.o > eye_view_plane_dist &&
                // evtl kann man das mit der Lichtberechnung beim Initialisieren des Polygons kombinieren
-               (!self.backface || ((j.p3.b.x - j.p1.b.x) *
+               (!self.back_face || ((j.p3.b.x - j.p1.b.x) *
             (j.p2.b.y - j.p1.b.y) + EPSILON1 < (j.p3.b.y - j.p1.b.y) *
-            (j.p2.b.x - j.p1.b.x)))
+            (j.p2.b.x - j.p1.b.x))) && j.has_no_area()
             {
-                if j.flaechentest() {
-                    polys.push(j.clone());
-                }
+                polys.push(j.clone());
             }
         }
 
@@ -75,7 +73,7 @@ impl AppContext {
 
             'i' => rot_vec(&mut self.iv, &mut self.jv, 1.0),
             'I' => rot_vec(&mut self.iv, &mut self.jv, 10.0),
-            'b' | 'B' => self.backface = !self.backface,
+            'b' | 'B' => self.back_face = !self.back_face,
             _ => return false,
         }
         true
@@ -85,7 +83,7 @@ impl AppContext {
 fn rot_vec(to_rot1: &mut Vector3, to_rot2: &mut Vector3, t: Float) {
     let rad = t * PI / 180.0;
     let rot_inc = rad.cos() / rad.sin();
-    let rot_len = (rot_inc.sqr() + 1.0).sqrt();
+    let rot_len = (rot_inc * rot_inc + 1.0).sqrt();
     let rot_inc = rot_inc / rot_len;
 
     let copy1 = *to_rot1;
@@ -116,20 +114,20 @@ fn rot_vec(to_rot1: &mut Vector3, to_rot2: &mut Vector3, t: Float) {
 pub struct Scene {
     points: Vec<Rc<Point>>,
 
-    dreiecks: Vec<Polygon>,
+    triangles: Vec<Polygon>,
 }
 
 impl Point {
     pub fn perspektive(mut self, actx: &AppContext) -> Self {
         let mut k = Matrix3::new(actx.iv, actx.jv, actx.eye - self.o);
 
-        let kd = k.det3d();
+        let kd = k.determinant();
         if kd.abs() > EPSILON2 {
             k.x = -actx.view;
-            self.b.x = k.det3d() / kd;
+            self.b.x = k.determinant() / kd;
             k.y = k.x;
             k.x = actx.iv;
-            self.b.y = k.det3d() / kd;
+            self.b.y = k.determinant() / kd;
         }
         self
     }
@@ -139,7 +137,7 @@ impl Scene {
     pub fn new(actx: &AppContext) -> Scene {
         let mut result = Scene {
             points: Vec::new(),
-            dreiecks: Vec::new(),
+            triangles: Vec::new(),
         };
 
         for p in actx.scene_builder.points.iter() {
@@ -156,7 +154,7 @@ impl Scene {
             let c = (p1.o - p2.o).cross(&(p3.o - p2.o));
             let cols = (actx.view.normalize() * c.normalize()).abs();
 
-            result.dreiecks.push(Rc::new(Triangle::new(
+            result.triangles.push(Rc::new(Triangle::new(
                 p1.clone(),
                 p2.clone(),
                 p3.clone(),

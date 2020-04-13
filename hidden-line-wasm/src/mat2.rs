@@ -12,7 +12,7 @@ impl Matrix2 {
         Matrix2 { x, y }
     }
 
-    pub fn det2d(&self) -> Float {
+    pub fn determinant(&self) -> Float {
         self.x.x * self.y.y - self.x.y * self.y.x
     }
 }

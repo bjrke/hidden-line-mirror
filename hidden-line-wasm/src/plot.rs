@@ -6,44 +6,7 @@ use crate::float::*;
 
 use crate::vec3::*;
 
-// program dreidplot;
-// uses ptccrt, ptcgraph, vector, dreidext, projekt, dreiecke, polyswee, polygon,
-//   punkte, zeit, linien;
-// var
-//   ch:char;
-//   p:ppoly;
-//   palettePos: Integer;
-
 pub fn init_scene<F: Fn(Float, Float) -> Float>(f: F) -> SceneBuilder {
-    // var {a,b,c:int;}
-    //     {h:^triStrip;}
-    //     qs:^quadstrip;
-    //     xx,yy:float;
-
-    // const
-    // //  xs=4;      ys=4;      zs=4;
-    // //  xo=3;      yo=3;      zo=3;
-
-    // //  w34=0.43301270189221932338186158537647;
-
-    // {var
-    //   r1,r2,r3:float;}
-
-    // begin
-    //   tausgabe:=true;
-
-    // { tetraeder(0,0,0, -1,0,-2, 1,1,-2 ,1,-1,-2);
-
-    //   cube(-4,2,-2, 3,0,0, 0,3,0, 0,0,3);
-
-    //   kegel(1,3,-2, 1,0,0, 0,1,0, 0,0,2, 8);
-
-    //   kugel(0,8,0, 3, 32, 16); }
-
-    // {  kegel(0,0,0, 2,0,0, 0,2,0, 0,0,-4, 10);  }
-
-    // {  cube (0,0,0, 1,0,0, 0,1,0, 0,0,1);}
-
     let ad = 1.0;
     let sw = 0.04;
     let mut xx = -ad;
@@ -64,38 +27,6 @@ pub fn init_scene<F: Fn(Float, Float) -> Float>(f: F) -> SceneBuilder {
         scene = qs.build();
     }
 
-    // {  for a:=1 to 20 do begin
-    //     triangle(-a/2,a,-w34*a, a/2,a,-w34*a, 0,a,w34*a);
-    //   end;}
-
-    // {  kugel(0,0,20,10,12,12);
-    //   kugel(0,0,0,10,12,12);}
-
-    // { kugel(11,11,-10,10,20,20);
-    //   kugel(11,-11,-10,10,20,20);
-    //   kugel(-11,11,-10,10,20,20);
-    //   kugel(-11,-11,-10,10,20,20);
-    //   kugel(0,0,5,10,20,20);}
-
-    // {  for a:=-xo to xo do
-    //     for b:=-yo to yo do
-    //       for c:=-zo to zo do
-    //         tetraeder(a*xs,b*ys,c*zs-2,a*xs,b*ys+1,c*zs,a*xs+1,b*ys-1,c*zs,a*xs-1,b*ys-1,c*zs);
-
-    // {        case random(3) of
-    //     0:kugel(a*xs,b*ys,c*zs,(xs+ys+zs)*random/8,8,8);
-    //     1:begin
-    //           r1:=random;
-    //           r2:=random;
-    //           r3:=random;
-    //         cube((a-0.4*r1)*xs,(b-0.4*r2)*ys,(c-0.4*r3)*zs,0.4*(random+r1)*xs,0,0, 0,0.4*(random+r2)*ys,0, 0,0,0.4*(random+r3)*zs);
-    //       end;
-    //     2:begin
-    //           r1:=random;
-    //           r2:=random;
-    //           kegel(a*xs,b*ys,c*zs-r1,      xs*r2*0.4,0,0,    0,ys*r2*0.4,0, 0,0,zs*(random+r1)*0.4, 8)
-    //       end
-    //   end}
     scene
 }
 
@@ -109,18 +40,18 @@ pub fn init() -> AppContext {
         view,
         iv: Vector3(1.0, 0.0, 0.0),
         jv: Vector3(0.0, 0.0, 1.0),
-        backface: false,
+        back_face: false,
     }
 }
 
 pub fn darstellung(dctx: &mut dyn DrawContext, actx: &mut AppContext) {
-    actx.neukamera();
-    let polys = actx.rechnung();
+    actx.recalc_unit_vectors();
+    let polys = actx.filter_polys();
 
-    println!("Anzahl Polygone: {}", polys.len());
-    println!("Auge: {}", actx.eye);
-    println!("BlickR: {}", actx.view);
-    println!("Oben x 10000: {}", actx.jv * 10000.0);
+    println!("#polys: {}", polys.len());
+    println!("eye: {}", actx.eye);
+    println!("view: {}", actx.view);
+    println!("up {}", actx.jv);
 
     dctx.circle(0.99, 0.99, 0.01, 1.0);
     dctx.circle(0.99, -0.99, 0.01, 1.0);
@@ -149,10 +80,6 @@ mod tests {
             self.lines.push((xa, ya, xe, ye, c));
         }
 
-        fn poly(&mut self, _coordinates: &[Vector2], _c: Color) {}
-
-        fn putpixel(&mut self, _x: i32, _y: i32, _c: Color) {}
-
         fn cls(&mut self) {}
     }
 
@@ -179,7 +106,7 @@ mod tests {
             }
             h / 10.0
         });
-        actx.backface = false;
+        actx.back_face = false;
 
         let mut dctx = TestDrawContext::new();
         darstellung(&mut dctx, &mut actx);

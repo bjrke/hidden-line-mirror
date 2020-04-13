@@ -61,37 +61,6 @@ impl DrawContext for SvgContext {
         self.append(line);
     }
 
-    fn poly(&mut self, coordinates: &[Vector2], c: Color) {
-        let polygon = self
-            .document
-            .create_element_ns(Some("http://www.w3.org/2000/svg"), "polygon")
-            .unwrap();
-
-        let points: Vec<String> = coordinates
-            .iter()
-            .map(|p| format!("{},{}", self.scale_x(p.x), self.scale_y(p.y)))
-            .collect();
-
-        polygon.set_attribute("points", &points.join(" ")).unwrap();
-        let color = &html_color(c);
-        polygon.set_attribute("fill", color).unwrap();
-        polygon.set_attribute("stroke", color).unwrap();
-        self.append(polygon);
-    }
-
-    fn putpixel(&mut self, x: i32, y: i32, c: Color) {
-        let rect = self
-            .document
-            .create_element_ns(Some("http://www.w3.org/2000/svg"), "rect")
-            .unwrap();
-        rect.set_attribute("x", &self.scale_x(x as Float)).unwrap();
-        rect.set_attribute("y", &self.scale_y(y as Float)).unwrap();
-        rect.set_attribute("width", "1").unwrap();
-        rect.set_attribute("height", "1").unwrap();
-        rect.set_attribute("fill", &html_color(c)).unwrap();
-        self.append(rect);
-    }
-
     fn cls(&mut self) {
         loop {
             match self.svg.last_child() {

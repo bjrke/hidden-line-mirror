@@ -34,7 +34,7 @@ impl Triangle {
         }
     }
 
-    pub fn flaechentest(&self) -> bool {
+    pub fn has_no_area(&self) -> bool {
         !colinear(&self.p1.b, &self.p2.b, &self.p3.b)
     }
 }

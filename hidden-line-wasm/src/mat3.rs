@@ -13,7 +13,7 @@ impl Matrix3 {
         Matrix3 { x, y, z }
     }
 
-    pub fn det3d(&self) -> Float {
+    pub fn determinant(&self) -> Float {
         self.x.x * self.y.y * self.z.z
             + self.y.x * self.z.y * self.x.z
             + self.z.x * self.x.y * self.y.z
