@@ -12,10 +12,9 @@ impl Ord for MinxQueueEntry {
             .polygon
             .delegate
             .p1
-            .b
-            .cmp(&self.polygon.delegate.p1.b)
-            .then_with(|| self.polygon.delegate.p2.b.cmp(&other.polygon.delegate.p2.b))
-            .then_with(|| self.polygon.delegate.p3.b.cmp(&other.polygon.delegate.p3.b))
+            .cmp(&self.polygon.delegate.p1)
+            .then_with(|| self.polygon.delegate.p2.cmp(&other.polygon.delegate.p2))
+            .then_with(|| self.polygon.delegate.p3.cmp(&other.polygon.delegate.p3))
     }
 }
 

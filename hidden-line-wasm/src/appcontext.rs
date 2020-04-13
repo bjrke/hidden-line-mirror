@@ -41,9 +41,9 @@ impl AppContext {
                self.BlickR * j.p2.o > ED &&
                self.BlickR * j.p3.o > ED &&
                // evtl kann man das mit der Lichtberechnung beim Initialisieren des Polygons kombinieren
-               (!self.backface || ((j.delegate.p3.b.x - j.delegate.p1.b.x) *
-            (j.delegate.p2.b.y - j.delegate.p1.b.y) + epsilon1 < (j.delegate.p3.b.y - j.delegate.p1.b.y) *
-            (j.delegate.p2.b.x - j.delegate.p1.b.x)))
+               (!self.backface || ((j.delegate.p3.x - j.delegate.p1.x) *
+            (j.delegate.p2.y - j.delegate.p1.y) + epsilon1 < (j.delegate.p3.y - j.delegate.p1.y) *
+            (j.delegate.p2.x - j.delegate.p1.x)))
             {
                 if j.delegate.flaechentest() {
                     let polygon = polygon::newpoly(j.clone());
@@ -149,22 +149,15 @@ pub struct Scene {
 
 impl punkt3d {
     pub fn perspektive(mut self, actx: &AppContext) -> Self {
-        // self.tiefePerspektive = minmax::new();
-
         let mut K = Matrix3::new(actx.iv, actx.jv, actx.Auge - self.o);
 
         let kd = K.det3d();
         if kd.abs() > epsilon2 {
             K.x = -actx.BlickR;
-            self.b.b.x = K.det3d() / kd;
+            self.b.x = K.det3d() / kd;
             K.y = K.x;
             K.x = actx.iv;
-            self.b.b.y = K.det3d() / kd;
-
-            // if self.drawmode == 5 {
-            //     self.tiefePerspektive
-            //         .update(1.0 / p.o.sub3d(&self.Auge).invBetrag3d());
-            // }
+            self.b.y = K.det3d() / kd;
         }
         self
     }

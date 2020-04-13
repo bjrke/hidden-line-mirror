@@ -9,16 +9,16 @@ use std::rc::Rc;
 
 #[derive(Clone, Debug)]
 pub struct dreiecktyp {
-    pub p1: point,
-    pub p2: point,
-    pub p3: point,
+    pub p1: Vector2,
+    pub p2: Vector2,
+    pub p3: Vector2,
     pub gl: u8,
     pub cols: Color,
 }
 
 impl dreiecktyp {
     pub fn flaechentest(&self) -> bool {
-        !colinear(&self.p1.b, &self.p2.b, &self.p3.b)
+        !colinear(&self.p1, &self.p2, &self.p3)
     }
 }
 

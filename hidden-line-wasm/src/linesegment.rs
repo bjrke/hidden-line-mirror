@@ -29,8 +29,8 @@ impl Line {
 
     pub fn draw(&self, dctx: &mut dyn DrawContext) {
         for (start, end) in self.ranges.0.iter() {
-            let a = self.p_1.b.b.mix(&self.p_2.b.b, *start.unwrap(&0.0));
-            let e = self.p_1.b.b.mix(&self.p_2.b.b, *end.unwrap(&1.0));
+            let a = self.p_1.b.mix(&self.p_2.b, *start.unwrap(&0.0));
+            let e = self.p_1.b.mix(&self.p_2.b, *end.unwrap(&1.0));
             dctx.line(a.x, a.y, e.x, e.y, self.color);
         }
     }

@@ -38,9 +38,9 @@ struct TheTriangle {
 impl TheTriangle {
     fn new(poly: polygon) -> TheTriangle {
         let shape = Triangle::new(
-            &poly.originalTriangle.p1.b.b,
-            &poly.originalTriangle.p2.b.b,
-            &poly.originalTriangle.p3.b.b,
+            &poly.originalTriangle.p1.b,
+            &poly.originalTriangle.p2.b,
+            &poly.originalTriangle.p3.b,
         );
 
         TheTriangle { poly, shape }
@@ -99,7 +99,7 @@ struct TheLine {
 
 impl TheLine {
     fn new(p1: Rc<punkt3d>, p2: Rc<punkt3d>, color: Color) -> TheLine {
-        let shape = Line::new(p1.b.b, p2.b.b);
+        let shape = Line::new(p1.b, p2.b);
         TheLine {
             p1,
             p2,

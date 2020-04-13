@@ -19,8 +19,7 @@ impl Ord for MaxxQueueEntry {
         self.polygon
             .delegate
             .p3
-            .b
-            .cmp(&other.polygon.delegate.p3.b)
+            .cmp(&other.polygon.delegate.p3)
             .then_with(|| self.raw_ptr_addr().cmp(&other.raw_ptr_addr()))
     }
 }
