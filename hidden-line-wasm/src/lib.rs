@@ -36,7 +36,6 @@ mod minxqueue;
 mod plot;
 mod point;
 mod polygon;
-mod polysweep;
 mod quadtree;
 mod range;
 mod rangeset;
