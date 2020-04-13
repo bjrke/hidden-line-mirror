@@ -11,37 +11,37 @@ pub struct Vector3 {
 const MOVE_SPEED: Float = 1.0;
 
 impl Vector3 {
-    pub fn new(x: Float, y: Float, z: Float) -> Vector3 {
-        Vector3 { x, y, z }
+    pub fn new(x: Float, y: Float, z: Float) -> Self {
+        Self { x, y, z }
     }
 
     #[inline]
-    pub fn sub3d(&self, v: &Vector3) -> Vector3 {
-        *self - *v
+    pub fn sub3d(&self, v: &Self) -> Self {
+        self - v
     }
 
     #[inline]
-    pub fn add3d(&self, v: &Vector3) -> Vector3 {
-        *self + *v
+    pub fn add3d(&self, v: &Self) -> Self {
+        self + v
     }
 
     #[inline]
-    pub fn mul3d(&self, f: Float) -> Vector3 {
-        *self * f
+    pub fn mul3d(&self, f: Float) -> Self {
+        self * f
     }
 
     #[inline]
-    pub fn div3d(&self, d: Float) -> Vector3 {
-        *self / d
+    pub fn div3d(&self, d: Float) -> Self {
+        self / d
     }
 
     #[inline]
-    pub fn neg3d(&self) -> Vector3 {
+    pub fn neg3d(&self) -> Self {
         Vector3::new(-self.x, -self.y, -self.z)
     }
 
     #[inline]
-    pub fn kreuz(&self, v: &Vector3) -> Vector3 {
+    pub fn kreuz(&self, v: &Self) -> Self {
         Vector3::new(
             self.y * v.z - self.z * v.y,
             self.z * v.x - self.x * v.z,
@@ -50,23 +50,23 @@ impl Vector3 {
     }
 
     #[inline]
-    pub fn skalar(&self, v: &Vector3) -> Float {
-        *self * *v
+    pub fn skalar(&self, v: &Self) -> Float {
+        self * v
     }
 
     #[inline]
     pub fn invBetrag3d(&self) -> Float {
-        (*self * *self).inv_sqrt()
+        (self * self).inv_sqrt()
     }
 
     #[inline]
-    pub fn move3d(&self, direction: &Vector3, polarisation: Float) -> Vector3 {
-        *self + (*direction * (polarisation * MOVE_SPEED * direction.invBetrag3d()))
+    pub fn move3d(&self, direction: &Self, polarisation: Float) -> Self {
+        self + &(direction * (polarisation * MOVE_SPEED * direction.invBetrag3d()))
     }
 
     #[inline]
-    pub fn normalize(&self) -> Vector3 {
-        *self * self.invBetrag3d()
+    pub fn normalize(&self) -> Self {
+        self * self.invBetrag3d()
     }
 }
 
@@ -81,47 +81,92 @@ impl std::fmt::Debug for Vector3 {
 }
 
 impl Add for Vector3 {
+    type Output = Self;
+
+    #[inline]
+    fn add(self, rhs: Self) -> Self::Output {
+        Self::Output::new(self.x + rhs.x, self.y + rhs.y, self.z + rhs.z)
+    }
+}
+
+impl Add for &Vector3 {
     type Output = Vector3;
 
     #[inline]
     fn add(self, rhs: Self) -> Self::Output {
-        Vector3::new(self.x + rhs.x, self.y + rhs.y, self.z + rhs.z)
+        Self::Output::new(self.x + rhs.x, self.y + rhs.y, self.z + rhs.z)
     }
 }
 
 impl Sub for Vector3 {
+    type Output = Self;
+
+    #[inline]
+    fn sub(self, rhs: Self) -> Self::Output {
+        Self::Output::new(self.x - rhs.x, self.y - rhs.y, self.z - rhs.z)
+    }
+}
+
+impl Sub for &Vector3 {
     type Output = Vector3;
 
     #[inline]
     fn sub(self, rhs: Self) -> Self::Output {
-        Vector3::new(self.x - rhs.x, self.y - rhs.y, self.z - rhs.z)
+        Self::Output::new(self.x - rhs.x, self.y - rhs.y, self.z - rhs.z)
     }
 }
 
-impl Mul<Vector3> for Vector3 {
+impl Mul for Vector3 {
     type Output = Float;
 
     #[inline]
-    fn mul(self, rhs: Vector3) -> Self::Output {
+    fn mul(self, rhs: Self) -> Self::Output {
+        self.x * rhs.x + self.y * rhs.y + self.z * rhs.z
+    }
+}
+
+impl Mul for &Vector3 {
+    type Output = Float;
+
+    #[inline]
+    fn mul(self, rhs: Self) -> Self::Output {
         self.x * rhs.x + self.y * rhs.y + self.z * rhs.z
     }
 }
 
 impl Mul<Float> for Vector3 {
+    type Output = Self;
+
+    #[inline]
+    fn mul(self, rhs: Float) -> Self::Output {
+        Self::Output::new(self.x * rhs, self.y * rhs, self.z * rhs)
+    }
+}
+
+impl Mul<Float> for &Vector3 {
     type Output = Vector3;
 
     #[inline]
     fn mul(self, rhs: Float) -> Self::Output {
-        Vector3::new(self.x * rhs, self.y * rhs, self.z * rhs)
+        Self::Output::new(self.x * rhs, self.y * rhs, self.z * rhs)
     }
 }
 
 impl Div<Float> for Vector3 {
+    type Output = Self;
+
+    #[inline]
+    fn div(self, rhs: Float) -> Self::Output {
+        Self::Output::new(self.x / rhs, self.y / rhs, self.y / rhs)
+    }
+}
+
+impl Div<Float> for &Vector3 {
     type Output = Vector3;
 
     #[inline]
     fn div(self, rhs: Float) -> Self::Output {
-        Vector3::new(self.x / rhs, self.y / rhs, self.y / rhs)
+        Self::Output::new(self.x / rhs, self.y / rhs, self.y / rhs)
     }
 }
 

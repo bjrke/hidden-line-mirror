@@ -10,33 +10,33 @@ pub struct Vector2 {
 
 impl Vector2 {
     #[inline]
-    pub fn new(x: Float, y: Float) -> Vector2 {
-        Vector2 { x, y }
+    pub fn new(x: Float, y: Float) -> Self {
+        Self { x, y }
     }
 
     #[inline]
-    pub fn mul2d(&self, f: Float) -> Vector2 {
-        *self * f
+    pub fn mul2d(&self, f: Float) -> Self {
+        self * f
     }
 
     #[inline]
-    pub fn div2d(&self, d: Float) -> Vector2 {
-        *self / d
+    pub fn div2d(&self, d: Float) -> Self {
+        self / d
     }
 
     #[inline]
-    pub fn sub2d(&self, v: &Vector2) -> Vector2 {
-        *self - *v
+    pub fn sub2d(&self, v: &Self) -> Self {
+        self - v
     }
 
     #[inline]
-    pub fn add2d(&self, v: &Vector2) -> Vector2 {
-        *self + *v
+    pub fn add2d(&self, v: &Self) -> Self {
+        self + v
     }
 
     #[inline]
     pub fn sqrbetrag2d(&self) -> Float {
-        *self * *self
+        self * self
     }
 
     #[inline]
@@ -45,13 +45,13 @@ impl Vector2 {
     }
 
     #[inline]
-    pub fn swap_xy(&self) -> Vector2 {
+    pub fn swap_xy(&self) -> Self {
         Vector2::new(self.y, self.x)
     }
 
     #[inline]
-    pub fn mix(&self, other: &Vector2, t: Float) -> Vector2 {
-        (*self * t) + (*other * (1.0 - t))
+    pub fn mix(&self, other: &Self, t: Float) -> Vector2 {
+        (self * t) + (other * (1.0 - t))
     }
 }
 
@@ -66,7 +66,16 @@ impl Add for Vector2 {
 
     #[inline]
     fn add(self, rhs: Self) -> Self::Output {
-        Vector2::new(self.x + rhs.x, self.y + rhs.y)
+        Self::Output::new(self.x + rhs.x, self.y + rhs.y)
+    }
+}
+
+impl Add for &Vector2 {
+    type Output = Vector2;
+
+    #[inline]
+    fn add(self, rhs: Self) -> Self::Output {
+        Self::Output::new(self.x + rhs.x, self.y + rhs.y)
     }
 }
 
@@ -75,15 +84,33 @@ impl Sub for Vector2 {
 
     #[inline]
     fn sub(self, rhs: Self) -> Self::Output {
-        Vector2::new(self.x - rhs.x, self.y - rhs.y)
+        Self::Output::new(self.x - rhs.x, self.y - rhs.y)
     }
 }
 
-impl Mul<Vector2> for Vector2 {
+impl Sub for &Vector2 {
+    type Output = Vector2;
+
+    #[inline]
+    fn sub(self, rhs: Self) -> Self::Output {
+        Self::Output::new(self.x - rhs.x, self.y - rhs.y)
+    }
+}
+
+impl Mul for Vector2 {
     type Output = Float;
 
     #[inline]
-    fn mul(self, rhs: Vector2) -> Self::Output {
+    fn mul(self, rhs: Self) -> Self::Output {
+        self.x * rhs.x + self.y * rhs.y
+    }
+}
+
+impl Mul for &Vector2 {
+    type Output = Float;
+
+    #[inline]
+    fn mul(self, rhs: Self) -> Self::Output {
         self.x * rhs.x + self.y * rhs.y
     }
 }
@@ -93,7 +120,16 @@ impl Mul<Float> for Vector2 {
 
     #[inline]
     fn mul(self, rhs: Float) -> Self::Output {
-        Vector2::new(self.x * rhs, self.y * rhs)
+        Self::Output::new(self.x * rhs, self.y * rhs)
+    }
+}
+
+impl Mul<Float> for &Vector2 {
+    type Output = Vector2;
+
+    #[inline]
+    fn mul(self, rhs: Float) -> Self::Output {
+        Self::Output::new(self.x * rhs, self.y * rhs)
     }
 }
 
@@ -102,7 +138,16 @@ impl Div<Float> for Vector2 {
 
     #[inline]
     fn div(self, rhs: Float) -> Self::Output {
-        Vector2::new(self.x / rhs, self.y / rhs)
+        Self::Output::new(self.x / rhs, self.y / rhs)
+    }
+}
+
+impl Div<Float> for &Vector2 {
+    type Output = Vector2;
+
+    #[inline]
+    fn div(self, rhs: Float) -> Self::Output {
+        Self::Output::new(self.x / rhs, self.y / rhs)
     }
 }
 
