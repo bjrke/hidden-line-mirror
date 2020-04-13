@@ -27,7 +27,6 @@ mod calcctontext;
 mod drawcontext;
 mod dreidext;
 mod float;
-mod line;
 mod linesegment;
 mod mat2;
 mod mat3;

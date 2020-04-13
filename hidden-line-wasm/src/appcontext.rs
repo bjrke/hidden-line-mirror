@@ -161,7 +161,7 @@ impl Scene {
 
             let c = p1.o.sub3d(&p2.o).cross(&p3.o.sub3d(&p2.o));
             let faktor = actx.BlickR.invBetrag3d() * c.invBetrag3d();
-            let cols = calcColor((actx.BlickR.skalar(&c) * faktor).abs());
+            let cols = (actx.BlickR.skalar(&c) * faktor).abs();
 
             result.dreiecks.push(Rc::new(dreieck::new(
                 p1.clone(),
