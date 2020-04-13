@@ -15,38 +15,18 @@ pub fn Vector2(x: Float, y: Float) -> Vector2 {
 
 impl Vector2 {
     #[inline]
-    pub fn mul2d(&self, f: Float) -> Self {
-        self * f
-    }
-
-    #[inline]
-    pub fn div2d(&self, d: Float) -> Self {
-        self / d
-    }
-
-    #[inline]
-    pub fn sub2d(&self, v: &Self) -> Self {
-        self - v
-    }
-
-    #[inline]
-    pub fn add2d(&self, v: &Self) -> Self {
-        self + v
-    }
-
-    #[inline]
     pub fn sqrbetrag2d(&self) -> Float {
         self * self
     }
 
     #[inline]
-    pub fn betrag2d(&self) -> Float {
-        self.sqrbetrag2d().sqrt()
+    pub fn len(&self) -> Float {
+        self.len_sq().sqrt()
     }
 
     #[inline]
-    pub fn swap_xy(&self) -> Self {
-        Vector2(self.y, self.x)
+    pub fn len_sq(&self) -> Float {
+        self * self
     }
 
     #[inline]
