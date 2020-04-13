@@ -80,11 +80,6 @@ impl Rect {
     }
 
     #[inline]
-    pub fn is_empty(&self) -> bool {
-        self.x.is_empty() || self.y.is_empty()
-    }
-
-    #[inline]
     pub fn contains_rect(&self, r: &Rect) -> bool {
         self.x.contains_range(&r.x) && self.y.contains_range(&r.y)
     }
@@ -118,26 +113,6 @@ impl Shape for Vector2 {
 
     fn bounds(&self) -> Rect {
         Rect::from_vector(self)
-    }
-}
-
-fn line_intersect(a1: Vector2, e1: Vector2, a2: Vector2, e2: Vector2) -> Vector2 {
-    let w2 = e2.x - a2.x;
-    let h2 = e2.y - a2.y;
-    let w1 = e1.x - a1.x;
-    let h1 = e1.y - a1.y;
-
-    let divisor = w1 * h2 - h1 * w2;
-
-    let q1 = a1.x * e1.y - a1.y * e1.x;
-    let q2 = a2.x * e2.y - a2.y * e2.x;
-
-    let x = w1 * q2 - w2 * q1;
-    let y = h1 * q2 - h2 * q1;
-
-    Vector2 {
-        x: x / divisor,
-        y: y / divisor,
     }
 }
 

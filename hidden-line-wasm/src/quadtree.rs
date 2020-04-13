@@ -107,48 +107,6 @@ impl<S: Shape + Debug> QuadTree<S> {
             Rect::from_vector(v).extend_vector(&self.center),
         ));
     }
-
-    fn entries<P>(&self, p: P) -> QuadTreeIterator<S, P>
-    where
-        P: FnMut(&dyn Shape) -> bool,
-    {
-        QuadTreeIterator {
-            element_stack: VecDeque::new(),
-            tree_stack: VecDeque::new(),
-            p,
-        }
-    }
-}
-
-struct QuadTreeIterator<'a, T, P> {
-    element_stack: VecDeque<&'a T>,
-    tree_stack: VecDeque<&'a QuadTree<T>>,
-    p: P,
-}
-
-impl<'a, T: Shape, P: FnMut(&dyn Shape) -> bool> Iterator for QuadTreeIterator<'a, T, P> {
-    type Item = &'a T;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        loop {
-            if let Some(element) = self.element_stack.pop_back() {
-                return Some(element);
-            } else if let Some(tree) = self.tree_stack.pop_back() {
-                for subtree in tree.subtrees.iter() {
-                    if (self.p)(&subtree.bounds) {
-                        self.tree_stack.push_back(subtree);
-                    }
-                }
-                for element in tree.content.iter() {
-                    if (self.p)(element) {
-                        self.element_stack.push_back(element);
-                    }
-                }
-            } else {
-                return None;
-            }
-        }
-    }
 }
 
 #[cfg(test)]

@@ -16,7 +16,7 @@ impl<Idx> BoundExt<Idx> for Bound<Idx> {
 }
 
 pub trait RangeExt<Idx: PartialOrd> {
-    fn is_empty(&self) -> bool;
+    fn is_empty_range(&self) -> bool;
 
     fn contains_range<R: RangeBounds<Idx>>(&self, other: &R) -> bool;
 }
@@ -40,7 +40,7 @@ pub trait RangeExtCopy<Idx: PartialOrd + Copy>: RangeExt<Idx> {
 }
 
 impl<Idx: PartialOrd<Idx>, T: RangeBounds<Idx>> RangeExt<Idx> for T {
-    fn is_empty(&self) -> bool {
+    fn is_empty_range(&self) -> bool {
         match (self.start_bound(), self.end_bound()) {
             (Bound::Unbounded, _) | (_, Bound::Unbounded) => false,
             (Bound::Included(a), Bound::Included(e)) => a > e,
@@ -51,8 +51,8 @@ impl<Idx: PartialOrd<Idx>, T: RangeBounds<Idx>> RangeExt<Idx> for T {
     }
 
     fn contains_range<R: RangeBounds<Idx>>(&self, other: &R) -> bool {
-        !self.is_empty() && {
-            other.is_empty() || {
+        !self.is_empty_range() && {
+            other.is_empty_range() || {
                 match (self.start_bound(), other.start_bound()) {
                     (Bound::Unbounded, _) => true,
                     (Bound::Included(s), Bound::Included(o))
@@ -88,7 +88,7 @@ impl<Idx: PartialOrd<Idx> + Copy, T: RangeBounds<Idx>> RangeExtCopy<Idx> for T {
             min(self.end(), other.end(), false),
         );
 
-        if range.is_empty() {
+        if range.is_empty_range() {
             None
         } else {
             Some(range)

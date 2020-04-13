@@ -1,5 +1,3 @@
-use std::collections::BTreeSet;
-use std::collections::BinaryHeap;
 use std::ops::Bound;
 use std::rc::Rc;
 
@@ -7,7 +5,7 @@ use crate::appcontext::*;
 use crate::drawcontext::*;
 use crate::float::*;
 use crate::mat2::Matrix2;
-use crate::point::punkt3d;
+use crate::point::Point;
 use crate::quadtree::QuadTree;
 use crate::range::RangeExtCopy;
 use crate::rangeset::RangeSet;
@@ -20,17 +18,17 @@ use crate::vec3::*;
 const DEBUG: bool = false;
 
 pub struct CalcContext {
-    pub polygons: Vec<polygon>,
+    pub polygons: Vec<Polygon>,
 }
 
 #[derive(Debug)]
 struct TheTriangle {
     shape: Triangle,
-    poly: polygon,
+    poly: Polygon,
 }
 
 impl TheTriangle {
-    fn new(poly: polygon) -> TheTriangle {
+    fn new(poly: Polygon) -> TheTriangle {
         let shape = Triangle::new(&poly.p1.b, &poly.p2.b, &poly.p3.b);
 
         TheTriangle { poly, shape }
@@ -83,14 +81,14 @@ impl Shape for TheTriangle {
 
 #[derive(Debug)]
 struct TheLine {
-    p1: Rc<punkt3d>,
-    p2: Rc<punkt3d>,
+    p1: Rc<Point>,
+    p2: Rc<Point>,
     color: Color,
     shape: Line,
 }
 
 impl TheLine {
-    fn new(p1: Rc<punkt3d>, p2: Rc<punkt3d>, color: Color) -> TheLine {
+    fn new(p1: Rc<Point>, p2: Rc<Point>, color: Color) -> TheLine {
         let shape = Line::new(p1.b, p2.b);
         TheLine {
             p1,

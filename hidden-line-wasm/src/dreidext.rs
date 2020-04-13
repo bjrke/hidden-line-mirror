@@ -2,20 +2,16 @@ use crate::float::*;
 use crate::vec3::*;
 
 #[derive(Clone, Copy)]
-pub struct Triangle {
+pub struct SceneTriangle {
     pub p1: usize,
-
     pub p2: usize,
-
     pub p3: usize,
-
     pub lset: u8,
 }
 
 pub struct SceneBuilder {
     pub points: Vec<Vector3>,
-
-    pub triangles: Vec<Triangle>,
+    pub triangles: Vec<SceneTriangle>,
 }
 
 impl SceneBuilder {
@@ -36,7 +32,7 @@ impl SceneBuilder {
     }
 
     pub fn triangle(&mut self, p1: usize, p2: usize, p3: usize, lset: u8) -> usize {
-        self.triangles.push(Triangle { p1, p2, p3, lset });
+        self.triangles.push(SceneTriangle { p1, p2, p3, lset });
         self.triangles.len() - 1
     }
 
@@ -87,7 +83,7 @@ impl TriFan {
         self.last
     }
 
-    pub fn done(mut self) -> SceneBuilder {
+    pub fn build(mut self) -> SceneBuilder {
         self.scene.triangle(self.center, self.last, self.first, 7);
         self.scene
     }

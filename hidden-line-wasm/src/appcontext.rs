@@ -5,7 +5,6 @@ use crate::point::*;
 
 use crate::triangle::*;
 use crate::vec3::*;
-use std::collections::BinaryHeap;
 use std::rc::Rc;
 
 pub struct AppContext {
@@ -25,7 +24,7 @@ impl AppContext {
         self.jv = self.iv.cross(&self.view).normalize() * (0.4 * self.view.len());
     }
 
-    pub fn rechnung(&mut self) -> Vec<polygon> {
+    pub fn rechnung(&mut self) -> Vec<Polygon> {
         let mut scene = Scene::new(&self);
 
         let eye_view_plane_dist = self.view * self.eye + EPSILON1;
@@ -109,7 +108,7 @@ fn rot_vec(to_rot1: &mut Vector3, to_rot2: &mut Vector3, t: Float) {
     let rad = t * PI / 180.0;
     let rot_inc = rad.cos() / rad.sin();
     let rot_len = (rot_inc.sqr() + 1.0).sqrt();
-    let rot_inc = (rot_inc / rot_len);
+    let rot_inc = rot_inc / rot_len;
 
     let copy1 = *to_rot1;
     let copy2 = *to_rot2;
@@ -137,12 +136,12 @@ fn rot_vec(to_rot1: &mut Vector3, to_rot2: &mut Vector3, t: Float) {
 }
 
 pub struct Scene {
-    points: Vec<Rc<punkt3d>>,
+    points: Vec<Rc<Point>>,
 
-    dreiecks: Vec<Rc<dreieck>>,
+    dreiecks: Vec<Polygon>,
 }
 
-impl punkt3d {
+impl Point {
     pub fn perspektive(mut self, actx: &AppContext) -> Self {
         let mut k = Matrix3::new(actx.iv, actx.jv, actx.eye - self.o);
 
@@ -168,7 +167,7 @@ impl Scene {
         for p in actx.scene_builder.points.iter() {
             result
                 .points
-                .push(Rc::new(punkt3d::new(p).perspektive(&actx)));
+                .push(Rc::new(Point::new(p).perspektive(&actx)));
         }
 
         for t in actx.scene_builder.triangles.iter() {
@@ -179,7 +178,7 @@ impl Scene {
             let c = (p1.o - p2.o).cross(&(p3.o - p2.o));
             let cols = (actx.view.normalize() * c.normalize()).abs();
 
-            result.dreiecks.push(Rc::new(dreieck::new(
+            result.dreiecks.push(Rc::new(Triangle::new(
                 p1.clone(),
                 p2.clone(),
                 p3.clone(),
