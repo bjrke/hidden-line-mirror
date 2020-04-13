@@ -319,6 +319,9 @@ impl CalcContext {
         let p2_on_tri = p2_dist.abs() < epsilon0;
         if p1_on_tri && p2_on_tri {
             // the lies on the triangle and is there fore visible
+            if DEBUG {
+                println!("p1_on_tri && p2_on_tri");
+            }
             return;
         }
 
@@ -329,6 +332,9 @@ impl CalcContext {
 
         if p1_visible && p2_visible {
             // both points of the line are on the same side of the triangle like the eye, so it is always visible even if it intersects
+            if DEBUG {
+                println!("p1_visible && p2_visible");
+            }
             return;
         }
 
@@ -411,44 +417,33 @@ impl CalcContext {
 
             let d = fx2 - fy2 + fy1 - fx1;
 
-            let k43 = Matrix2::new(p3, p4).det2d();
             let k21 = Matrix2::new(p1, p2).det2d();
-
-            let l = (fx2 - fy2 - k43) / d;
 
             let n = -(fx4 - fy4 - k21) / d;
             let o = (fx3 - fy3 - k21) / d;
 
-            if n > -epsilon0 && o > -epsilon0 && l > -epsilon0 && l - epsilon0 < 1.0 {
-                match (p1_contained, p2_contained) {
-                    (false, false) => match other_range {
-                        Some(r) => {
-                            if DEBUG {
-                                println!("Some {:?} {:?}", l, r);
-                            }
-                            return (Bound::Excluded(l.min(r)), Bound::Excluded(l.max(r)));
+            if n > -epsilon0 && o > -epsilon0 {
+                let k43 = Matrix2::new(p3, p4).det2d();
+                let l = (fx2 - fy2 - k43) / d;
+                match other_range {
+                    Some(r) => {
+                        if DEBUG {
+                            println!("Some {:?} {:?}", l, r);
                         }
-                        None => {
-                            other_range = Some(l);
-                        }
-                    },
-                    (true, false) => {
-                        return (Bound::Excluded(l), Bound::Unbounded);
+                        return (Bound::Excluded(l.min(r)), Bound::Excluded(l.max(r)));
                     }
-                    (false, true) => {
-                        return (Bound::Unbounded, Bound::Excluded(l));
+                    None => {
+                        other_range = Some(l);
                     }
-                    _ => {}
                 }
             }
-            // // numeric approximation
-            // let p = (p1 * l + p2 * m + p3 * n + p4 * o) / 2.0;
         }
 
         if DEBUG {
             println!("noting found {:?}", other_range);
         }
-        return (Bound::Included(0.0), Bound::Excluded(0.0));
+
+        (Bound::Included(0.0), Bound::Excluded(0.0))
     }
 
     pub fn pushMinX(&mut self, polygon: polygon) {
