@@ -3,7 +3,7 @@ use std::ops::Bound;
 use crate::appcontext::*;
 use crate::drawcontext::*;
 use crate::float::*;
-use crate::mat2::Matrix2;
+use crate::matrix::Matrix2;
 use crate::quadtree::QuadTree;
 use crate::range::RangeExtCopy;
 use crate::rangeset::RangeSet;
@@ -322,13 +322,13 @@ fn intersect(
 
         let d = fx2 - fy2 + fy1 - fx1;
 
-        let k21 = Matrix2::new(b1, b2).determinant();
+        let k21 = Matrix2(b1, b2).determinant();
 
         let n = -(fx4 - fy4 - k21) / d;
         let o = (fx3 - fy3 - k21) / d;
 
         if n > -EPSILON0 && o > -EPSILON0 {
-            let k43 = Matrix2::new(p3, p4).determinant();
+            let k43 = Matrix2(p3, p4).determinant();
             let l = (fx2 - fy2 - k43) / d;
 
             match min {

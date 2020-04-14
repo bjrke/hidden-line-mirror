@@ -2,7 +2,7 @@ use crate::calcctontext::hidden_line;
 use crate::drawcontext::{Color, DrawContext};
 use crate::dreidext::*;
 use crate::float::*;
-use crate::mat3::*;
+use crate::matrix::*;
 use crate::vec2::*;
 use crate::vec3::*;
 use std::collections::HashMap;
@@ -125,14 +125,14 @@ pub struct Scene {
 }
 
 fn perspektive(actx: &AppContext, o: &Vector3) -> Vector2 {
-    let mut k = Matrix3::new(actx.iv, actx.jv, actx.eye - *o);
+    let mut k = Matrix3(actx.iv, actx.jv, actx.eye - *o);
 
     let kd = k.determinant();
     if kd.abs() > EPSILON2 {
-        k.x = -actx.view;
+        k.0 = -actx.view;
         let x = k.determinant() / kd;
-        k.y = k.x;
-        k.x = actx.iv;
+        k.1 = k.0;
+        k.0 = actx.iv;
         let y = k.determinant() / kd;
         Vector2(x, y)
     } else {
