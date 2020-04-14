@@ -6,15 +6,15 @@ pub struct Matrix2(pub Vector2, pub Vector2);
 
 impl Matrix2 {
     pub fn determinant(&self) -> Float {
-        let Matrix2(x, y) = self;
-        x.x * y.y - x.y * y.x
+        let Matrix2(Vector2(xx, xy), Vector2(yx, yy)) = self;
+        xx * yy - xy * yx
     }
 }
 
 impl std::fmt::Display for Matrix2 {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let Matrix2(x, y) = self;
-        write!(f, "({}, {})", x, y)
+        write!(f, "({:?}, {:?})", x, y)
     }
 }
 

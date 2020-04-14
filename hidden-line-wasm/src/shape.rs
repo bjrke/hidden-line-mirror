@@ -38,7 +38,8 @@ impl Rect {
 
     #[inline]
     pub fn from_vector(v: &Vector2) -> Rect {
-        Rect::new(v.x, v.y)
+        let Vector2(x, y) = *v;
+        Rect::new(x, y)
     }
 
     #[inline]
@@ -93,7 +94,7 @@ impl Shape for Rect {
 
     #[inline]
     fn contains(&self, v: &Vector2) -> bool {
-        self.x.contains(&v.x) && self.y.contains(&v.y)
+        self.x.contains(&v.0) && self.y.contains(&v.1)
     }
 
     #[inline]
@@ -108,7 +109,7 @@ impl Shape for Vector2 {
     }
 
     fn contains(&self, v: &Vector2) -> bool {
-        self.x == v.x && self.y == v.y
+        return self == v;
     }
 
     fn bounds(&self) -> Rect {
@@ -122,7 +123,7 @@ fn line_rect_border<R: RangeBounds<Float>>(
     y1: Float,
     x2: Float,
     y2: Float,
-    x: &Float,
+    x: Float,
     y_range: &R,
 ) -> bool {
     let divisor = x2 - x1;
@@ -141,22 +142,26 @@ fn line_rect_border<R: RangeBounds<Float>>(
 }
 
 #[inline]
-fn line_x<R: RangeBounds<Float>>(a: &Vector2, e: &Vector2, x: &Float, y_range: &R) -> bool {
-    line_rect_border(a.x, a.y, e.x, e.y, x, y_range)
+fn line_x<R: RangeBounds<Float>>(a: &Vector2, e: &Vector2, x: Float, y_range: &R) -> bool {
+    let Vector2(ax, ay) = *a;
+    let Vector2(ex, ey) = *e;
+    line_rect_border(ax, ay, ex, ey, x, y_range)
 }
 
 #[inline]
-fn line_y<R: RangeBounds<Float>>(a: &Vector2, e: &Vector2, y: &Float, x_range: &R) -> bool {
-    line_rect_border(a.y, a.x, e.y, e.x, y, x_range)
+fn line_y<R: RangeBounds<Float>>(a: &Vector2, e: &Vector2, y: Float, x_range: &R) -> bool {
+    let Vector2(ax, ay) = *a;
+    let Vector2(ex, ey) = *e;
+    line_rect_border(ay, ax, ey, ex, y, x_range)
 }
 
 /// warning this method should be used only after r.contains(a) and r.contains(e) check
 #[inline]
 fn line_rect(a: &Vector2, e: &Vector2, r: &&Rect) -> bool {
-    line_y(a, e, r.y.start(), &r.x)
-        || line_y(a, e, r.y.end(), &r.x)
-        || line_x(a, e, r.x.start(), &r.y)
-        || line_x(a, e, r.x.end(), &r.y)
+    line_y(a, e, *r.y.start(), &r.x)
+        || line_y(a, e, *r.y.end(), &r.x)
+        || line_x(a, e, *r.x.start(), &r.y)
+        || line_x(a, e, *r.x.end(), &r.y)
 }
 
 #[derive(Debug)]
@@ -188,7 +193,8 @@ impl Shape for Line {
     fn contains(&self, v: &Vector2) -> bool {
         self.bounds_contains(v) && {
             let Line(a, e) = self;
-            line_x(a, e, &v.x, &epsilon_value(v.y)) || line_y(a, e, &v.y, &epsilon_value(v.x))
+            let Vector2(vx, vy) = *v;
+            line_x(a, e, vx, &epsilon_value(vy)) || line_y(a, e, vy, &epsilon_value(vx))
         }
     }
 
@@ -204,7 +210,10 @@ pub struct Triangle(pub Vector2, pub Vector2, pub Vector2);
 
 #[inline]
 fn sign(p: &Vector2, a: &Vector2, e: &Vector2) -> Float {
-    ((p.x - e.x) * (a.y - e.y) - (a.x - e.x) * (p.y - e.y)).signum()
+    let Vector2(px, py) = *p;
+    let Vector2(ax, ay) = *a;
+    let Vector2(ex, ey) = *e;
+    ((px - ex) * (ay - ey) - (ax - ex) * (py - ey)).signum()
 }
 
 impl Shape for Triangle {

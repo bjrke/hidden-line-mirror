@@ -89,10 +89,9 @@ pub fn draw(ctx: &mut dyn DrawContext, line: &Line, ranges: &RangeSet<Float>, co
 
 fn draw_line_range(ctx: &mut dyn DrawContext, line: &Line, l1: Float, l2: Float, color: Color) {
     let Line(a, e) = line;
-    let p1 = a.mix(&e, l1);
-    let p2 = a.mix(&e, l2);
-
-    ctx.line(p1.x, p1.y, p2.x, p2.y, color);
+    let Vector2(xa, ya) = a.mix(&e, l1);
+    let Vector2(xe, ye) = a.mix(&e, l2);
+    ctx.line(xa, ya, xe, ye, color);
 }
 
 pub fn hidden_line(mut scene: Scene, dctx: &mut dyn DrawContext, actx: &AppContext) {
@@ -286,17 +285,20 @@ fn intersect(
     let Line(b1, b2) = *line_shape;
 
     if DEBUG {
+        let Triangle(Vector2(ax, ay), Vector2(bx, by), Vector2(cx, cy)) = triangle.shape;
         println!("<path style=\"fill:#fff;stroke:#000000;stroke-width: 0.01px;\" d=\"M {:?},{:?} {:?},{:?} {:?},{:?} Z\" />",
-                     triangle.shape.0.x,
-                     -triangle.shape.0.y,
-                     triangle.shape.1.x,
-                     -triangle.shape.1.y,
-                     triangle.shape.2.x,
-                     -triangle.shape.2.y);
+                     ax,
+                     -ay,
+                    bx,
+                     -by,
+                    cx,
+                     -cy);
 
+        let Vector2(b1x, b1y) = b1;
+        let Vector2(b2x, b2y) = b1;
         println!(
             "<path style=\"stroke:#000000;stroke-width: 0.01px;\" d=\"M {:?},{:?} {:?},{:?} \"/>",
-            b1.x, -b1.y, b2.x, -b2.y
+            b1x, -b1y, b2x, -b2y
         );
     }
 
@@ -308,17 +310,17 @@ fn intersect(
 
         let d43 = p4 - p3;
 
-        let fx1 = b1.x * d43.y;
-        let fy1 = b1.y * d43.x;
+        let fx1 = b1.0 * d43.1;
+        let fy1 = b1.1 * d43.0;
 
-        let fx2 = b2.x * d43.y;
-        let fy2 = b2.y * d43.x;
+        let fx2 = b2.0 * d43.1;
+        let fy2 = b2.1 * d43.0;
 
-        let fx3 = p3.x * d21.y;
-        let fy3 = p3.y * d21.x;
+        let fx3 = p3.0 * d21.1;
+        let fy3 = p3.1 * d21.0;
 
-        let fx4 = p4.x * d21.y;
-        let fy4 = p4.y * d21.x;
+        let fx4 = p4.0 * d21.1;
+        let fy4 = p4.1 * d21.0;
 
         let d = fx2 - fy2 + fy1 - fx1;
 

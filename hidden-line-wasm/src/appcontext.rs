@@ -171,7 +171,7 @@ impl Scene {
                 && actx.view * o2 > eye_view_plane_dist
                 && actx.view * o3 > eye_view_plane_dist
                 && (!actx.back_face
-                    || ((p3.x - p1.x) * (p2.y - p1.y) + EPSILON1 < (p3.y - p1.y) * (p2.x - p1.x)))
+                    || ((p3.0 - p1.0) * (p2.1 - p1.1) + EPSILON1 < (p3.1 - p1.1) * (p2.0 - p1.0)))
                 && !colinear(&p1, &p2, &p3)
             {
                 result.triangles.push((t.p1, t.p2, t.p3));

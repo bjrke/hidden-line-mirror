@@ -2,23 +2,10 @@ use crate::float::*;
 use std::cmp::*;
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 
-#[derive(Clone, Copy, PartialEq, PartialOrd)]
-pub struct Vector2 {
-    pub x: Float,
-    pub y: Float,
-}
-
-#[inline]
-pub fn Vector2(x: Float, y: Float) -> Vector2 {
-    Vector2 { x, y }
-}
+#[derive(Clone, Copy, PartialEq, PartialOrd, Debug)]
+pub struct Vector2(pub Float, pub Float);
 
 impl Vector2 {
-    #[inline]
-    pub fn sqrbetrag2d(&self) -> Float {
-        self * self
-    }
-
     #[inline]
     pub fn len(&self) -> Float {
         self.len_sq().sqrt()
@@ -35,18 +22,14 @@ impl Vector2 {
     }
 }
 
-impl std::fmt::Debug for Vector2 {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_tuple("").field(&self.x).field(&self.y).finish()
-    }
-}
-
 impl Add for Vector2 {
     type Output = Vector2;
 
     #[inline]
     fn add(self, rhs: Self) -> Self::Output {
-        Vector2(self.x + rhs.x, self.y + rhs.y)
+        let Vector2(sx, sy) = self;
+        let Vector2(rx, ry) = rhs;
+        Vector2(sx + rx, sy + ry)
     }
 }
 
@@ -55,15 +38,19 @@ impl Add for &Vector2 {
 
     #[inline]
     fn add(self, rhs: Self) -> Self::Output {
-        Vector2(self.x + rhs.x, self.y + rhs.y)
+        let Vector2(sx, sy) = *self;
+        let Vector2(rx, ry) = *rhs;
+        Vector2(sx + rx, sy + ry)
     }
 }
 
 impl AddAssign for Vector2 {
     #[inline]
     fn add_assign(&mut self, rhs: Self) {
-        self.x += rhs.x;
-        self.y += rhs.y;
+        let Vector2(mut sx, mut sy) = self;
+        let Vector2(rx, ry) = rhs;
+        sx += rx;
+        sy += ry;
     }
 }
 
@@ -72,7 +59,9 @@ impl Sub for Vector2 {
 
     #[inline]
     fn sub(self, rhs: Self) -> Self::Output {
-        Vector2(self.x - rhs.x, self.y - rhs.y)
+        let Vector2(sx, sy) = self;
+        let Vector2(rx, ry) = rhs;
+        Vector2(sx - rx, sy - ry)
     }
 }
 
@@ -81,15 +70,19 @@ impl Sub for &Vector2 {
 
     #[inline]
     fn sub(self, rhs: Self) -> Self::Output {
-        Vector2(self.x - rhs.x, self.y - rhs.y)
+        let Vector2(sx, sy) = *self;
+        let Vector2(rx, ry) = *rhs;
+        Vector2(sx - rx, sy - ry)
     }
 }
 
 impl SubAssign for Vector2 {
     #[inline]
     fn sub_assign(&mut self, rhs: Self) {
-        self.x -= rhs.x;
-        self.y -= rhs.y;
+        let Vector2(mut sx, mut sy) = self;
+        let Vector2(rx, ry) = rhs;
+        sx -= rx;
+        sy -= ry;
     }
 }
 
@@ -98,7 +91,9 @@ impl Mul for Vector2 {
 
     #[inline]
     fn mul(self, rhs: Self) -> Self::Output {
-        self.x * rhs.x + self.y * rhs.y
+        let Vector2(sx, sy) = self;
+        let Vector2(rx, ry) = rhs;
+        sx * rx + sy * ry
     }
 }
 
@@ -107,7 +102,9 @@ impl Mul for &Vector2 {
 
     #[inline]
     fn mul(self, rhs: Self) -> Self::Output {
-        self.x * rhs.x + self.y * rhs.y
+        let Vector2(sx, sy) = *self;
+        let Vector2(rx, ry) = *rhs;
+        sx * rx + sy * ry
     }
 }
 
@@ -116,7 +113,8 @@ impl Mul<Float> for Vector2 {
 
     #[inline]
     fn mul(self, rhs: Float) -> Self::Output {
-        Vector2(self.x * rhs, self.y * rhs)
+        let Vector2(sx, sy) = self;
+        Vector2(sx * rhs, sy * rhs)
     }
 }
 
@@ -125,15 +123,17 @@ impl Mul<Float> for &Vector2 {
 
     #[inline]
     fn mul(self, rhs: Float) -> Self::Output {
-        Vector2(self.x * rhs, self.y * rhs)
+        let Vector2(sx, sy) = *self;
+        Vector2(sx * rhs, sy * rhs)
     }
 }
 
 impl MulAssign<Float> for Vector2 {
     #[inline]
     fn mul_assign(&mut self, rhs: Float) {
-        self.x *= rhs;
-        self.y *= rhs;
+        let Vector2(mut sx, mut sy) = self;
+        sx *= rhs;
+        sy *= rhs;
     }
 }
 
@@ -142,7 +142,8 @@ impl Div<Float> for Vector2 {
 
     #[inline]
     fn div(self, rhs: Float) -> Self::Output {
-        Vector2(self.x / rhs, self.y / rhs)
+        let Vector2(sx, sy) = self;
+        Vector2(sx / rhs, sy / rhs)
     }
 }
 
@@ -151,15 +152,17 @@ impl Div<Float> for &Vector2 {
 
     #[inline]
     fn div(self, rhs: Float) -> Self::Output {
-        Vector2(self.x / rhs, self.y / rhs)
+        let Vector2(sx, sy) = *self;
+        Vector2(sx / rhs, sy / rhs)
     }
 }
 
 impl DivAssign<Float> for Vector2 {
     #[inline]
     fn div_assign(&mut self, rhs: Float) {
-        self.x /= rhs;
-        self.y /= rhs;
+        let Vector2(mut sx, mut sy) = self;
+        sx /= rhs;
+        sy /= rhs;
     }
 }
 
@@ -168,7 +171,8 @@ impl Neg for Vector2 {
 
     #[inline]
     fn neg(self) -> Self::Output {
-        Vector2(-self.x, -self.y)
+        let Vector2(sx, sy) = self;
+        Vector2(-sx, -sy)
     }
 }
 
@@ -177,18 +181,15 @@ impl Neg for &Vector2 {
 
     #[inline]
     fn neg(self) -> Self::Output {
-        Vector2(-self.x, -self.y)
-    }
-}
-
-impl std::fmt::Display for Vector2 {
-    #[inline]
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "({}, {})", self.x, self.y)
+        let Vector2(sx, sy) = *self;
+        Vector2(-sx, -sy)
     }
 }
 
 #[inline]
 pub fn colinear(p1: &Vector2, p2: &Vector2, p3: &Vector2) -> bool {
-    ((p1.y - p2.y) * (p3.x - p2.x) - (p1.x - p2.x) * (p3.y - p2.y)).abs() < EPSILON2
+    let Vector2(x1, y1) = *p1;
+    let Vector2(x2, y2) = *p2;
+    let Vector2(x3, y3) = *p3;
+    ((y1 - y2) * (x3 - x3) - (x1 - x2) * (y3 - y2)).abs() < EPSILON2
 }

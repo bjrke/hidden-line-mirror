@@ -19,10 +19,10 @@ fn create_content_array<T>() -> Vec<T> {
 
 impl<S: Shape + Debug> QuadTree<S> {
     pub fn new(bounds: Rect) -> QuadTree<S> {
-        let center = Vector2 {
-            x: (bounds.x.start() + bounds.x.end()) / 2.0,
-            y: (bounds.y.start() + bounds.y.end()) / 2.0,
-        };
+        let center = Vector2(
+            (bounds.x.start() + bounds.x.end()) / 2.0,
+            (bounds.y.start() + bounds.y.end()) / 2.0,
+        );
         QuadTree {
             content: create_content_array(),
             subtrees: Vec::with_capacity(4),
