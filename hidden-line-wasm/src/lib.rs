@@ -36,7 +36,6 @@ mod range;
 mod rangeset;
 mod shape;
 mod svgcontext;
-mod triangle;
 mod vec2;
 mod vec3;
 

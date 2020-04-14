@@ -10,8 +10,6 @@ use crate::quadtree::QuadTree;
 use crate::range::RangeExtCopy;
 use crate::rangeset::RangeSet;
 use crate::shape::{Line, Rect, Shape, Triangle};
-
-use crate::triangle::*;
 use crate::vec2::*;
 use crate::vec3::*;
 
@@ -20,22 +18,47 @@ const DEBUG: bool = false;
 #[derive(Debug)]
 struct TheTriangle {
     shape: Triangle,
-    poly: Polygon,
+    plane_norm: Vector3,
+    plane_dist: Float,
+    o1: Vector3,
+    o2: Vector3,
+    o3: Vector3,
 }
 
 impl TheTriangle {
-    fn new(poly: Polygon) -> TheTriangle {
-        let shape = Triangle::new(&poly.p1.b, &poly.p2.b, &poly.p3.b);
+    fn new(poly: (usize, usize, usize), scene: &Scene) -> TheTriangle {
+        let (i1, i2, i3) = poly;
 
-        TheTriangle { poly, shape }
+        let p1 = scene.points[i1].clone();
+        let p2 = scene.points[i2].clone();
+        let p3 = scene.points[i3].clone();
+
+        let o1 = p1.o;
+        let o2 = p2.o;
+        let o3 = p3.o;
+
+        let b1 = p1.b;
+        let b2 = p2.b;
+        let b3 = p3.b;
+
+        let shape = Triangle::new(&b1, &b2, &b3);
+
+        let plane_norm = (o2 - o1).cross(&(o3 - o1)).normalize();
+        let plane_dist = plane_norm * o1;
+
+        TheTriangle {
+            shape,
+            plane_norm,
+            plane_dist,
+            o1,
+            o2,
+            o3,
+        }
     }
 
     fn lines(&self) -> Vec<Line> {
-        vec![
-            Line::new(self.poly.p1.b, self.poly.p2.b),
-            Line::new(self.poly.p2.b, self.poly.p3.b),
-            Line::new(self.poly.p3.b, self.poly.p1.b),
-        ]
+        let Triangle(p1, p2, p3) = self.shape;
+        vec![Line::new(p1, p2), Line::new(p2, p3), Line::new(p3, p1)]
     }
 }
 
@@ -86,7 +109,7 @@ fn draw_line_range(ctx: &mut dyn DrawContext, line: &Line, l1: Float, l2: Float,
 pub fn hidden_line(mut scene: Scene, dctx: &mut dyn DrawContext, actx: &AppContext) {
     let mut triangles = vec![];
     while let Some(poly) = scene.triangles.pop() {
-        triangles.push(TheTriangle::new(poly));
+        triangles.push(TheTriangle::new(poly, &scene));
     }
 
     let screen = triangles.iter().fold(None, |acc: Option<Rect>, t| {
@@ -184,9 +207,9 @@ fn intersect2(
     p2: Vector3,
     range: &mut RangeSet<Float>,
 ) {
-    let t1 = triangle.poly.p1.o;
-    let t2 = triangle.poly.p2.o;
-    let t3 = triangle.poly.p3.o;
+    let t1 = triangle.o1;
+    let t2 = triangle.o2;
+    let t3 = triangle.o3;
     let eye = actx.eye;
 
     let reye = clip(p1, p2, t1, t2, t3, eye, true);
@@ -215,12 +238,12 @@ fn intersect(
     p2: &Point,
     range: &mut RangeSet<Float>,
 ) {
-    let t1 = triangle.poly.p1.o;
-    let t2 = triangle.poly.p2.o;
-    let t3 = triangle.poly.p3.o;
+    let t1 = triangle.o1;
+    let t2 = triangle.o2;
+    let t3 = triangle.o3;
 
-    let nv = triangle.poly.plane_norm;
-    let pd = triangle.poly.plane_dist;
+    let nv = triangle.plane_norm;
+    let pd = triangle.plane_dist;
 
     let eye_dist = nv * actx.eye - pd;
 
@@ -267,12 +290,12 @@ fn intersect(
 
     if DEBUG {
         println!("<path style=\"fill:#fff;stroke:#000000;stroke-width: 0.01px;\" d=\"M {:?},{:?} {:?},{:?} {:?},{:?} Z\" />",
-                     triangle.shape.p1.x,
-                     -triangle.shape.p1.y,
-                     triangle.shape.p2.x,
-                     -triangle.shape.p2.y,
-                     triangle.shape.p3.x,
-                     -triangle.shape.p3.y);
+                     triangle.shape.0.x,
+                     -triangle.shape.0.y,
+                     triangle.shape.1.x,
+                     -triangle.shape.1.y,
+                     triangle.shape.2.x,
+                     -triangle.shape.2.y);
 
         println!(
             "<path style=\"stroke:#000000;stroke-width: 0.01px;\" d=\"M {:?},{:?} {:?},{:?} \"/>",

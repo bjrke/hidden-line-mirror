@@ -209,11 +209,7 @@ impl Shape for Line {
 }
 
 #[derive(Debug, Copy, Clone)]
-pub struct Triangle {
-    pub p1: Vector2,
-    pub p2: Vector2,
-    pub p3: Vector2,
-}
+pub struct Triangle(pub Vector2, pub Vector2, pub Vector2);
 
 #[inline]
 fn sign(p: &Vector2, a: &Vector2, e: &Vector2) -> Float {
@@ -223,39 +219,35 @@ fn sign(p: &Vector2, a: &Vector2, e: &Vector2) -> Float {
 impl Triangle {
     #[inline]
     pub fn new(p1: &Vector2, p2: &Vector2, p3: &Vector2) -> Triangle {
-        Triangle {
-            p1: *p1,
-            p2: *p2,
-            p3: *p3,
-        }
+        Triangle(*p1, *p2, *p3)
     }
 }
 
 impl Shape for Triangle {
     fn intersects(&self, r: &Rect) -> bool {
         self.bounds_intersect(r) && {
-            r.contains(&self.p1)
-                || r.contains(&self.p2)
-                || r.contains(&self.p3)
-                || line_rect(&self.p1, &self.p2, &r)
-                || line_rect(&self.p2, &self.p3, &r)
-                || line_rect(&self.p3, &self.p1, &r)
+            r.contains(&self.0)
+                || r.contains(&self.1)
+                || r.contains(&self.2)
+                || line_rect(&self.0, &self.1, &r)
+                || line_rect(&self.1, &self.2, &r)
+                || line_rect(&self.2, &self.0, &r)
         }
     }
 
     #[inline]
     fn contains(&self, v: &Vector2) -> bool {
         self.bounds_contains(v) && {
-            let d1 = sign(v, &self.p1, &self.p2);
-            d1 == sign(v, &self.p2, &self.p3) && d1 == sign(v, &self.p3, &self.p1)
+            let Triangle(p1, p2, p3) = self;
+            let d1 = sign(v, &p1, &p2);
+            d1 == sign(v, &p2, &p3) && d1 == sign(v, &p3, &p1)
         }
     }
 
     #[inline]
     fn bounds(&self) -> Rect {
-        Rect::from_vector(&self.p1)
-            .extend_vector(&self.p2)
-            .extend_vector(&self.p3)
+        let Triangle(p1, p2, p3) = self;
+        Rect::from_vector(&p1).extend_vector(&p2).extend_vector(&p3)
     }
 }
 

@@ -4,7 +4,6 @@ use crate::dreidext::*;
 use crate::float::*;
 use crate::mat3::*;
 use crate::point::*;
-use crate::triangle::*;
 use crate::vec2::colinear;
 use crate::vec3::*;
 use std::collections::HashMap;
@@ -123,7 +122,7 @@ fn rot_vec(to_rot1: &mut Vector3, to_rot2: &mut Vector3, t: Float) {
 
 pub struct Scene {
     pub points: Vec<Rc<Point>>,
-    pub triangles: Vec<Polygon>,
+    pub triangles: Vec<(usize, usize, usize)>,
     pub lines: HashMap<(usize, usize), Color>,
 }
 
@@ -176,9 +175,7 @@ impl Scene {
                         < (p3.b.y - p1.b.y) * (p2.b.x - p1.b.x)))
                 && !colinear(&p1.b, &p2.b, &p3.b)
             {
-                result
-                    .triangles
-                    .push(Polygon::new(p1.clone(), p2.clone(), p3.clone()));
+                result.triangles.push((t.p1, t.p2, t.p3));
 
                 if t.lset & 4 == 4 {
                     result.push_line(t.p1, t.p2, cols);

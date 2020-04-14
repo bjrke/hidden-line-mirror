@@ -2,7 +2,7 @@ use crate::float::*;
 use std::cmp::*;
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 
-#[derive(Default, Clone, Copy, PartialEq, PartialOrd)]
+#[derive(Clone, Copy, PartialEq, PartialOrd)]
 pub struct Vector2 {
     pub x: Float,
     pub y: Float,
