@@ -1,7 +1,6 @@
 use crate::float::*;
 use crate::vec2::Vector2;
 
-#[derive(Clone, Copy)]
 pub struct Matrix2 {
     pub x: Vector2,
     pub y: Vector2,

@@ -27,21 +27,15 @@ impl TheTriangle {
     fn new(poly: (usize, usize, usize), scene: &Scene, actx: &AppContext) -> TheTriangle {
         let (i1, i2, i3) = poly;
 
-        let b1 = scene.points[i1];
-        let b2 = scene.points[i2];
-        let b3 = scene.points[i3];
-
         let o1 = actx.scene_builder.points[i1];
         let o2 = actx.scene_builder.points[i2];
         let o3 = actx.scene_builder.points[i3];
-
-        let shape = Triangle::new(&b1, &b2, &b3);
 
         let plane_norm = (o2 - o1).cross(&(o3 - o1)).normalize();
         let plane_dist = plane_norm * o1;
 
         TheTriangle {
-            shape,
+            shape: Triangle(scene.points[i1], scene.points[i2], scene.points[i3]),
             plane_norm,
             plane_dist,
             o1,
@@ -52,7 +46,7 @@ impl TheTriangle {
 
     fn lines(&self) -> Vec<Line> {
         let Triangle(p1, p2, p3) = self.shape;
-        vec![Line::new(p1, p2), Line::new(p2, p3), Line::new(p3, p1)]
+        vec![Line(p1, p2), Line(p2, p3), Line(p3, p1)]
     }
 }
 
@@ -94,8 +88,9 @@ pub fn draw(ctx: &mut dyn DrawContext, line: &Line, ranges: &RangeSet<Float>, co
 }
 
 fn draw_line_range(ctx: &mut dyn DrawContext, line: &Line, l1: Float, l2: Float, color: Color) {
-    let p1 = line.a.mix(&line.e, l1);
-    let p2 = line.a.mix(&line.e, l2);
+    let Line(a, e) = line;
+    let p1 = a.mix(&e, l1);
+    let p2 = a.mix(&e, l2);
 
     ctx.line(p1.x, p1.y, p2.x, p2.y, color);
 }
@@ -122,9 +117,7 @@ pub fn hidden_line(mut scene: Scene, dctx: &mut dyn DrawContext, actx: &AppConte
         }
 
         for (&(a, e), &color) in scene.lines.iter() {
-            let b1 = scene.points[a];
-            let b2 = scene.points[e];
-            let line_shape = Line::new(b1, b2);
+            let line_shape = Line(scene.points[a], scene.points[e]);
 
             let bounds = line_shape.bounds();
             let mut r: RangeSet<Float> = RangeSet::from_range(&(0.0..=1.0));
@@ -137,8 +130,7 @@ pub fn hidden_line(mut scene: Scene, dctx: &mut dyn DrawContext, actx: &AppConte
                 intersect(
                     actx,
                     &next,
-                    b1,
-                    b2,
+                    &line_shape,
                     actx.scene_builder.points[a],
                     actx.scene_builder.points[e],
                     &mut r,
@@ -236,8 +228,7 @@ fn intersect2(
 fn intersect(
     actx: &AppContext,
     triangle: &TheTriangle,
-    b1: Vector2,
-    b2: Vector2,
+    line_shape: &Line,
     o1: Vector3,
     o2: Vector3,
     range: &mut RangeSet<Float>,
@@ -292,6 +283,8 @@ fn intersect(
         // range.remove(&(..));
     }
 
+    let Line(b1, b2) = *line_shape;
+
     if DEBUG {
         println!("<path style=\"fill:#fff;stroke:#000000;stroke-width: 0.01px;\" d=\"M {:?},{:?} {:?},{:?} {:?},{:?} Z\" />",
                      triangle.shape.0.x,
@@ -307,24 +300,19 @@ fn intersect(
         );
     }
 
-    let p1 = b1;
-    let p2 = b2;
-
-    let d21 = p2 - p1;
+    let d21 = b2 - b1;
     let mut min = None;
     let mut max = None;
-    for tri_line in triangle.lines().iter() {
+    for Line(p3, p4) in triangle.lines() {
         //https://quickmath.com/webMathematica3/quickmath/equations/solve/advanced.jsp#c=solve_advancedsolveequations&v1=lx_1%2Bmx_2%253Dp%250Aly_1%2Bmy_2%253Dq%250Al%2Bm%253D1%250Anx_3%2Box_4%253Dp%250Any_3%2Boy_4%253Dq%250An%2Bo%253D1%250A&v2=l%250Am%250An%250Ao%250Ap%250Aq%250A&v5=1
-        let p3 = tri_line.a;
-        let p4 = tri_line.e;
 
         let d43 = p4 - p3;
 
-        let fx1 = p1.x * d43.y;
-        let fy1 = p1.y * d43.x;
+        let fx1 = b1.x * d43.y;
+        let fy1 = b1.y * d43.x;
 
-        let fx2 = p2.x * d43.y;
-        let fy2 = p2.y * d43.x;
+        let fx2 = b2.x * d43.y;
+        let fy2 = b2.y * d43.x;
 
         let fx3 = p3.x * d21.y;
         let fy3 = p3.y * d21.x;
@@ -334,7 +322,7 @@ fn intersect(
 
         let d = fx2 - fy2 + fy1 - fx1;
 
-        let k21 = Matrix2::new(p1, p2).determinant();
+        let k21 = Matrix2::new(b1, b2).determinant();
 
         let n = -(fx4 - fy4 - k21) / d;
         let o = (fx3 - fy3 - k21) / d;

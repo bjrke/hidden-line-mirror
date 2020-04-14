@@ -1,7 +1,6 @@
 use crate::float::*;
 use crate::vec3::*;
 
-#[derive(Clone, Copy)]
 pub struct SceneTriangle {
     pub p1: usize,
     pub p2: usize,

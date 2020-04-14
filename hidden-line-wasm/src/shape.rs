@@ -159,18 +159,8 @@ fn line_rect(a: &Vector2, e: &Vector2, r: &&Rect) -> bool {
         || line_x(a, e, r.x.end(), &r.y)
 }
 
-#[derive(Clone, Debug)]
-pub struct Line {
-    pub a: Vector2,
-    pub e: Vector2,
-}
-
-impl Line {
-    #[inline]
-    pub fn new(a: Vector2, e: Vector2) -> Line {
-        Line { a, e }
-    }
-}
+#[derive(Debug)]
+pub struct Line(pub Vector2, pub Vector2);
 
 #[inline]
 fn epsilon_value(f: Float) -> Range<Float> {
@@ -191,36 +181,30 @@ fn epsilon_range(r: &Range<Float>) -> Range<Float> {
 impl Shape for Line {
     fn intersects(&self, r: &Rect) -> bool {
         self.bounds_intersect(r) && {
-            r.contains(&self.a) || r.contains(&self.e) || line_rect(&self.a, &self.e, &r)
+            r.contains(&self.0) || r.contains(&self.1) || line_rect(&self.0, &self.1, &r)
         }
     }
 
     fn contains(&self, v: &Vector2) -> bool {
         self.bounds_contains(v) && {
-            line_x(&self.a, &self.e, &v.x, &epsilon_value(v.y))
-                || line_y(&self.a, &self.e, &v.y, &epsilon_value(v.x))
+            let Line(a, e) = self;
+            line_x(a, e, &v.x, &epsilon_value(v.y)) || line_y(a, e, &v.y, &epsilon_value(v.x))
         }
     }
 
     #[inline]
     fn bounds(&self) -> Rect {
-        Rect::from_vector(&self.a).extend_vector(&self.e)
+        let Line(a, e) = self;
+        Rect::from_vector(a).extend_vector(e)
     }
 }
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub struct Triangle(pub Vector2, pub Vector2, pub Vector2);
 
 #[inline]
 fn sign(p: &Vector2, a: &Vector2, e: &Vector2) -> Float {
     ((p.x - e.x) * (a.y - e.y) - (a.x - e.x) * (p.y - e.y)).signum()
-}
-
-impl Triangle {
-    #[inline]
-    pub fn new(p1: &Vector2, p2: &Vector2, p3: &Vector2) -> Triangle {
-        Triangle(*p1, *p2, *p3)
-    }
 }
 
 impl Shape for Triangle {
@@ -332,14 +316,14 @@ mod tests {
 
     #[test]
     fn triangle_should_contain() {
-        let triangle = Triangle::new(&Vector2(1.0, 1.0), &Vector2(6.0, 2.0), &Vector2(4.0, 4.0));
+        let triangle = Triangle(Vector2(1.0, 1.0), Vector2(6.0, 2.0), Vector2(4.0, 4.0));
 
         assert!(triangle.contains(&Vector2(3.0, 3.0)))
     }
 
     #[test]
     fn triangle_should_contain_point_in_rect() {
-        let triangle = Triangle::new(&Vector2(1.0, 1.0), &Vector2(6.0, 2.0), &Vector2(4.0, 4.0));
+        let triangle = Triangle(Vector2(1.0, 1.0), Vector2(6.0, 2.0), Vector2(4.0, 4.0));
 
         let v = Vector2(1.1, 3.9);
         assert!(triangle.bounds_contains(&v));
@@ -348,7 +332,7 @@ mod tests {
 
     #[test]
     fn triangle_should_contain_out_of_rect() {
-        let triangle = Triangle::new(&Vector2(1.0, 1.0), &Vector2(6.0, 2.0), &Vector2(4.0, 4.0));
+        let triangle = Triangle(Vector2(1.0, 1.0), Vector2(6.0, 2.0), Vector2(4.0, 4.0));
 
         let v = Vector2(-3.0, -3.0);
         assert!(!triangle.bounds_contains(&v));
@@ -357,7 +341,7 @@ mod tests {
 
     #[test]
     fn triangle_should_have_correct_bound() {
-        let triangle = Triangle::new(&Vector2(1.0, 1.0), &Vector2(6.0, 2.0), &Vector2(4.0, 4.0));
+        let triangle = Triangle(Vector2(1.0, 1.0), Vector2(6.0, 2.0), Vector2(4.0, 4.0));
 
         assert_eq!(
             triangle.bounds(),
@@ -370,7 +354,7 @@ mod tests {
 
     #[test]
     fn line_should_have_correct_bounds() {
-        let line = Line::new(Vector2(1.0, 1.0), Vector2(6.0, 2.0));
+        let line = Line(Vector2(1.0, 1.0), Vector2(6.0, 2.0));
         assert_eq!(
             line.bounds(),
             Rect {

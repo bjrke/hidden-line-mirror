@@ -1,7 +1,7 @@
 use crate::float::*;
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, PartialEq, PartialOrd)]
 pub struct Vector3 {
     pub x: Float,
     pub y: Float,

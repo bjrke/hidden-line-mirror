@@ -1,7 +1,6 @@
 use crate::float::Float;
 use crate::vec3::Vector3;
 
-#[derive(Clone, Copy)]
 pub struct Matrix3 {
     pub x: Vector3,
     pub y: Vector3,
