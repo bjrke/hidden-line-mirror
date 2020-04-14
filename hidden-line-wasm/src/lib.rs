@@ -30,7 +30,6 @@ mod float;
 mod mat2;
 mod mat3;
 mod plot;
-mod point;
 mod quadtree;
 mod range;
 mod rangeset;

@@ -1,11 +1,9 @@
 use std::ops::Bound;
-use std::rc::Rc;
 
 use crate::appcontext::*;
 use crate::drawcontext::*;
 use crate::float::*;
 use crate::mat2::Matrix2;
-use crate::point::Point;
 use crate::quadtree::QuadTree;
 use crate::range::RangeExtCopy;
 use crate::rangeset::RangeSet;
@@ -26,20 +24,16 @@ struct TheTriangle {
 }
 
 impl TheTriangle {
-    fn new(poly: (usize, usize, usize), scene: &Scene) -> TheTriangle {
+    fn new(poly: (usize, usize, usize), scene: &Scene, actx: &AppContext) -> TheTriangle {
         let (i1, i2, i3) = poly;
 
-        let p1 = scene.points[i1].clone();
-        let p2 = scene.points[i2].clone();
-        let p3 = scene.points[i3].clone();
+        let b1 = scene.points[i1];
+        let b2 = scene.points[i2];
+        let b3 = scene.points[i3];
 
-        let o1 = p1.o;
-        let o2 = p2.o;
-        let o3 = p3.o;
-
-        let b1 = p1.b;
-        let b2 = p2.b;
-        let b3 = p3.b;
+        let o1 = actx.scene_builder.points[i1];
+        let o2 = actx.scene_builder.points[i2];
+        let o3 = actx.scene_builder.points[i3];
 
         let shape = Triangle::new(&b1, &b2, &b3);
 
@@ -109,7 +103,7 @@ fn draw_line_range(ctx: &mut dyn DrawContext, line: &Line, l1: Float, l2: Float,
 pub fn hidden_line(mut scene: Scene, dctx: &mut dyn DrawContext, actx: &AppContext) {
     let mut triangles = vec![];
     while let Some(poly) = scene.triangles.pop() {
-        triangles.push(TheTriangle::new(poly, &scene));
+        triangles.push(TheTriangle::new(poly, &scene, &actx));
     }
 
     let screen = triangles.iter().fold(None, |acc: Option<Rect>, t| {
@@ -128,9 +122,9 @@ pub fn hidden_line(mut scene: Scene, dctx: &mut dyn DrawContext, actx: &AppConte
         }
 
         for (&(a, e), &color) in scene.lines.iter() {
-            let p1 = scene.points[a].clone();
-            let p2 = scene.points[e].clone();
-            let line_shape = Line::new(p1.b, p2.b);
+            let b1 = scene.points[a];
+            let b2 = scene.points[e];
+            let line_shape = Line::new(b1, b2);
 
             let bounds = line_shape.bounds();
             let mut r: RangeSet<Float> = RangeSet::from_range(&(0.0..=1.0));
@@ -140,7 +134,15 @@ pub fn hidden_line(mut scene: Scene, dctx: &mut dyn DrawContext, actx: &AppConte
             } else {
                 candidates.next()
             } {
-                intersect(actx, &next, &p1, &p2, &mut r);
+                intersect(
+                    actx,
+                    &next,
+                    b1,
+                    b2,
+                    actx.scene_builder.points[a],
+                    actx.scene_builder.points[e],
+                    &mut r,
+                );
             }
 
             draw(dctx, &line_shape, &r, color);
@@ -234,8 +236,10 @@ fn intersect2(
 fn intersect(
     actx: &AppContext,
     triangle: &TheTriangle,
-    p1: &Point,
-    p2: &Point,
+    b1: Vector2,
+    b2: Vector2,
+    o1: Vector3,
+    o2: Vector3,
     range: &mut RangeSet<Float>,
 ) {
     let t1 = triangle.o1;
@@ -252,8 +256,8 @@ fn intersect(
         return;
     }
 
-    let p1_dist = nv * p1.o - pd;
-    let p2_dist = nv * p2.o - pd;
+    let p1_dist = nv * o1 - pd;
+    let p2_dist = nv * o2 - pd;
 
     let p1_on_tri = p1_dist.abs() < EPSILON0;
     let p2_on_tri = p2_dist.abs() < EPSILON0;
@@ -277,7 +281,7 @@ fn intersect(
     }
 
     if DEBUG {
-        println!("t {:?} {:?} {:?} l {:?} {:?}", t1, t2, t3, p1.o, p2.o);
+        println!("t {:?} {:?} {:?} l {:?} {:?}", t1, t2, t3, o1, o2);
         println!(
             "eye_dist {:?} p1_dist {:?} p2_dist {:?}",
             eye_dist, p1_dist, p2_dist
@@ -299,12 +303,12 @@ fn intersect(
 
         println!(
             "<path style=\"stroke:#000000;stroke-width: 0.01px;\" d=\"M {:?},{:?} {:?},{:?} \"/>",
-            p1.b.x, -p1.b.y, p2.b.x, -p2.b.y
+            b1.x, -b1.y, b2.x, -b2.y
         );
     }
 
-    let p1 = p1.b;
-    let p2 = p2.b;
+    let p1 = b1;
+    let p2 = b2;
 
     let d21 = p2 - p1;
     let mut min = None;

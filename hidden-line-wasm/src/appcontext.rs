@@ -3,11 +3,9 @@ use crate::drawcontext::{Color, DrawContext};
 use crate::dreidext::*;
 use crate::float::*;
 use crate::mat3::*;
-use crate::point::*;
-use crate::vec2::colinear;
+use crate::vec2::*;
 use crate::vec3::*;
 use std::collections::HashMap;
-use std::rc::Rc;
 
 pub struct AppContext {
     pub eye: Vector3,
@@ -121,24 +119,24 @@ fn rot_vec(to_rot1: &mut Vector3, to_rot2: &mut Vector3, t: Float) {
 }
 
 pub struct Scene {
-    pub points: Vec<Rc<Point>>,
+    pub points: Vec<Vector2>,
     pub triangles: Vec<(usize, usize, usize)>,
     pub lines: HashMap<(usize, usize), Color>,
 }
 
-impl Point {
-    pub fn perspektive(mut self, actx: &AppContext) -> Self {
-        let mut k = Matrix3::new(actx.iv, actx.jv, actx.eye - self.o);
+fn perspektive(actx: &AppContext, o: &Vector3) -> Vector2 {
+    let mut k = Matrix3::new(actx.iv, actx.jv, actx.eye - *o);
 
-        let kd = k.determinant();
-        if kd.abs() > EPSILON2 {
-            k.x = -actx.view;
-            self.b.x = k.determinant() / kd;
-            k.y = k.x;
-            k.x = actx.iv;
-            self.b.y = k.determinant() / kd;
-        }
-        self
+    let kd = k.determinant();
+    if kd.abs() > EPSILON2 {
+        k.x = -actx.view;
+        let x = k.determinant() / kd;
+        k.y = k.x;
+        k.x = actx.iv;
+        let y = k.determinant() / kd;
+        Vector2(x, y)
+    } else {
+        Vector2(0.0, 0.0)
     }
 }
 
@@ -151,29 +149,30 @@ impl Scene {
         };
 
         for p in actx.scene_builder.points.iter() {
-            result
-                .points
-                .push(Rc::new(Point::new(p).perspektive(&actx)));
+            result.points.push(perspektive(&actx, &p));
         }
 
         for t in actx.scene_builder.triangles.iter() {
-            let p1 = &result.points[t.p1];
-            let p2 = &result.points[t.p2];
-            let p3 = &result.points[t.p3];
+            let o1 = actx.scene_builder.points[t.p1];
+            let o2 = actx.scene_builder.points[t.p2];
+            let o3 = actx.scene_builder.points[t.p3];
 
-            let c = (p1.o - p2.o).cross(&(p3.o - p2.o));
+            let p1 = result.points[t.p1];
+            let p2 = result.points[t.p2];
+            let p3 = result.points[t.p3];
+
+            let c = (o1 - o2).cross(&(o3 - o2));
             let cols = (actx.view.normalize() * c.normalize()).abs();
 
             let eye_view_plane_dist = actx.view * actx.eye + EPSILON1;
 
             // test if not behind view plane
-            if actx.view * p1.o > eye_view_plane_dist
-                && actx.view * p2.o > eye_view_plane_dist
-                && actx.view * p3.o > eye_view_plane_dist
+            if actx.view * o1 > eye_view_plane_dist
+                && actx.view * o2 > eye_view_plane_dist
+                && actx.view * o3 > eye_view_plane_dist
                 && (!actx.back_face
-                    || ((p3.b.x - p1.b.x) * (p2.b.y - p1.b.y) + EPSILON1
-                        < (p3.b.y - p1.b.y) * (p2.b.x - p1.b.x)))
-                && !colinear(&p1.b, &p2.b, &p3.b)
+                    || ((p3.x - p1.x) * (p2.y - p1.y) + EPSILON1 < (p3.y - p1.y) * (p2.x - p1.x)))
+                && !colinear(&p1, &p2, &p3)
             {
                 result.triangles.push((t.p1, t.p2, t.p3));
 
