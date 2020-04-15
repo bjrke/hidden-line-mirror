@@ -1,19 +1,17 @@
 use crate::float::*;
-use crate::range::{RangeExt, RangeExtCopy};
 use crate::vec2::*;
-use std::ops::{Bound, RangeBounds};
 
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub struct FloatRange(pub Float, pub Float);
 
 impl FloatRange {
     #[inline]
-    pub fn epsilon_value(f: Float) -> Self {
+    fn epsilon_value(f: Float) -> Self {
         Self(f, f).epsilon_range()
     }
 
     #[inline]
-    pub fn epsilon_range(&self) -> Self {
+    fn epsilon_range(&self) -> Self {
         let Self(start, end) = self;
         Self(start - EPSILON0, end + EPSILON0)
     }
@@ -48,19 +46,25 @@ impl FloatRange {
             }
         }
     }
-}
 
-impl RangeBounds<Float> for FloatRange {
     #[inline]
-    fn start_bound(&self) -> Bound<&Float> {
-        let Self(start, _) = self;
-        Bound::Included(start)
+    fn contains_range(&self, rhs: &Self) -> bool {
+        let Self(ss, se) = self;
+        let Self(rs, re) = rhs;
+        ss <= se && (rs > re || ss <= rs && se >= re)
     }
 
     #[inline]
-    fn end_bound(&self) -> Bound<&Float> {
-        let Self(_, end) = self;
-        Bound::Included(end)
+    fn contains(&self, item: &Float) -> bool {
+        let Self(start, end) = self;
+        start <= item && item <= end
+    }
+
+    #[inline]
+    fn range_overlap(&self, rhs: &FloatRange) -> bool {
+        let Self(ss, se) = self;
+        let Self(rs, re) = rhs;
+        ss <= se && ss <= re && rs <= re && rs <= se
     }
 }
 
@@ -73,6 +77,7 @@ pub struct Rect {
 pub trait Shape {
     fn intersects(&self, r: &Rect) -> bool;
 
+    #[inline]
     fn contains(&self, v: &Vector2) -> bool {
         self.intersects(&Rect::from_vector(v))
     }
@@ -417,5 +422,15 @@ mod tests {
                 y: FloatRange(1.0, 2.0)
             }
         )
+    }
+
+    #[test]
+    fn range_should_contain_range() {
+        assert!(FloatRange(-9.0, 3.0).contains_range(&FloatRange(-9.0, -3.0)));
+    }
+
+    #[test]
+    fn range_should_not_contain_range() {
+        assert!(!FloatRange(-10.0, 1.0).contains_range(&FloatRange(-2.0, 5.0)));
     }
 }

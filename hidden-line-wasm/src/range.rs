@@ -17,8 +17,6 @@ impl<Idx> BoundExt<Idx> for Bound<Idx> {
 
 pub trait RangeExt<Idx: PartialOrd> {
     fn is_empty_range(&self) -> bool;
-
-    fn contains_range<R: RangeBounds<Idx>>(&self, other: &R) -> bool;
 }
 
 pub trait RangeExtCopy<Idx: PartialOrd + Copy>: RangeExt<Idx> {
@@ -47,30 +45,6 @@ impl<Idx: PartialOrd<Idx>, T: RangeBounds<Idx>> RangeExt<Idx> for T {
             (Bound::Excluded(a), Bound::Excluded(e))
             | (Bound::Included(a), Bound::Excluded(e))
             | (Bound::Excluded(a), Bound::Included(e)) => a >= e,
-        }
-    }
-
-    fn contains_range<R: RangeBounds<Idx>>(&self, other: &R) -> bool {
-        !self.is_empty_range() && {
-            other.is_empty_range() || {
-                match (self.start_bound(), other.start_bound()) {
-                    (Bound::Unbounded, _) => true,
-                    (Bound::Included(s), Bound::Included(o))
-                    | (Bound::Included(s), Bound::Excluded(o))
-                    | (Bound::Excluded(s), Bound::Excluded(o)) => s <= o,
-                    (Bound::Excluded(s), Bound::Included(o)) => s < o,
-                    (_, Bound::Unbounded) => false,
-                }
-            } && {
-                match (self.end_bound(), other.end_bound()) {
-                    (Bound::Unbounded, _) => true,
-                    (Bound::Included(s), Bound::Included(o))
-                    | (Bound::Included(s), Bound::Excluded(o))
-                    | (Bound::Excluded(s), Bound::Excluded(o)) => s >= o,
-                    (Bound::Excluded(s), Bound::Included(o)) => s > o,
-                    (_, Bound::Unbounded) => false,
-                }
-            }
         }
     }
 }
@@ -320,15 +294,5 @@ mod tests {
     #[test]
     fn range_should_not_overlap() {
         assert!(!(2.0..3.0).range_overlap(&(1.0..=1.5)));
-    }
-
-    #[test]
-    fn range_should_contain_range() {
-        assert!((-9..=3).contains_range(&(-9..=-3)));
-    }
-
-    #[test]
-    fn range_should_not_contain_range() {
-        assert!(!(-10..=1).contains_range(&(-2..=5)));
     }
 }
