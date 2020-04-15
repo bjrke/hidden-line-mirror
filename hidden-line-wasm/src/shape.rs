@@ -61,10 +61,29 @@ impl FloatRange {
     }
 
     #[inline]
-    fn range_overlap(&self, rhs: &FloatRange) -> bool {
+    fn range_overlap(&self, rhs: &Self) -> bool {
         let Self(ss, se) = self;
         let Self(rs, re) = rhs;
         ss <= se && ss <= re && rs <= re && rs <= se
+    }
+
+    #[inline]
+    fn extend(&self, rhs: Float) -> Self {
+        let Self(ss, se) = *self;
+        if rhs < ss {
+            Self(rhs, se)
+        } else if rhs <= se {
+            *self
+        } else {
+            Self(ss, rhs)
+        }
+    }
+
+    #[inline]
+    fn extend_range(&self, rhs: &Self) -> Self {
+        let Self(ss, se) = *self;
+        let Self(rs, re) = *rhs;
+        Self(ss.min(rs), se.max(re))
     }
 }
 
@@ -112,28 +131,24 @@ impl Rect {
 
     #[inline]
     pub fn extend(&self, x: Float, y: Float) -> Rect {
-        self.extend_rect(&Rect::new(x, y))
+        Rect {
+            x: self.x.extend(x),
+            y: self.y.extend(y),
+        }
     }
 
     #[inline]
     pub fn extend_rect(&self, rect: &Rect) -> Rect {
-        let Rect {
-            x: FloatRange(sxa, sxe),
-            y: FloatRange(sya, sye),
-        } = *self;
-        let Rect {
-            x: FloatRange(rxa, rxe),
-            y: FloatRange(rya, rye),
-        } = *rect;
         Rect {
-            x: FloatRange(sxa.min(rxa), sxe.max(rxe)),
-            y: FloatRange(sya.min(rya), sye.max(rye)),
+            x: self.x.extend_range(&rect.x),
+            y: self.y.extend_range(&rect.y),
         }
     }
 
     #[inline]
     pub fn extend_vector(&self, v: &Vector2) -> Rect {
-        self.extend_rect(&Rect::from_vector(v))
+        let Vector2(x, y) = *v;
+        self.extend(x, y)
     }
 
     #[inline]
