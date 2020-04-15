@@ -24,6 +24,7 @@ struct TheTriangle {
 }
 
 impl TheTriangle {
+    #[inline]
     fn new(poly: (usize, usize, usize), scene: &Scene, actx: &AppContext) -> TheTriangle {
         let (i1, i2, i3) = poly;
 
@@ -44,6 +45,7 @@ impl TheTriangle {
         }
     }
 
+    #[inline]
     fn lines(&self) -> Vec<Line> {
         let Triangle(p1, p2, p3) = self.shape;
         vec![Line(p1, p2), Line(p2, p3), Line(p3, p1)]
@@ -51,20 +53,24 @@ impl TheTriangle {
 }
 
 impl Shape for TheTriangle {
+    #[inline]
     fn intersects(&self, r: &Rect) -> bool {
         self.shape.intersects(r)
     }
 
+    #[inline]
     fn contains(&self, v: &Vector2) -> bool {
         self.shape.contains(v)
     }
 
+    #[inline]
     fn bounds(&self) -> Rect {
         self.shape.bounds()
     }
 }
 
-pub fn draw(ctx: &mut dyn DrawContext, line: &Line, ranges: &RangeSet<Float>, color: Color) {
+#[inline]
+fn draw(ctx: &mut dyn DrawContext, line: &Line, ranges: &RangeSet<Float>, color: Color) {
     let mut last = 0.0;
     let RangeSet(ranges) = ranges;
     for range in ranges {
@@ -87,6 +93,7 @@ pub fn draw(ctx: &mut dyn DrawContext, line: &Line, ranges: &RangeSet<Float>, co
     }
 }
 
+#[inline]
 fn draw_line_range(ctx: &mut dyn DrawContext, line: &Line, l1: Float, l2: Float, color: Color) {
     let Line(a, e) = line;
     let Vector2(xa, ya) = a.mix(&e, l1);
@@ -224,6 +231,7 @@ fn intersect2(
     }
 }
 
+#[inline]
 fn intersect(
     actx: &AppContext,
     triangle: &TheTriangle,
