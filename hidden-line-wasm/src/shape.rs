@@ -1,13 +1,73 @@
 use crate::float::*;
-use crate::range::*;
+use crate::range::{RangeExt, RangeExtCopy};
 use crate::vec2::*;
-use std::ops::RangeInclusive;
-use std::ops::{Range, RangeBounds};
+use std::ops::{Bound, RangeBounds};
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Copy, Clone, Debug, PartialEq)]
+pub struct FloatRange(pub Float, pub Float);
+
+impl FloatRange {
+    #[inline]
+    pub fn epsilon_value(f: Float) -> Self {
+        Self(f, f).epsilon_range()
+    }
+
+    #[inline]
+    pub fn epsilon_range(&self) -> Self {
+        let Self(start, end) = self;
+        Self(start - EPSILON0, end + EPSILON0)
+    }
+
+    #[inline]
+    fn line_x(&self, a: &Vector2, e: &Vector2, x: Float) -> bool {
+        let Vector2(ax, ay) = *a;
+        let Vector2(ex, ey) = *e;
+        self.line_rect_border(ax, ay, ex, ey, x)
+    }
+
+    #[inline]
+    fn line_y(&self, a: &Vector2, e: &Vector2, y: Float) -> bool {
+        let Vector2(ax, ay) = *a;
+        let Vector2(ex, ey) = *e;
+        self.line_rect_border(ay, ax, ey, ex, y)
+    }
+
+    #[inline]
+    fn line_rect_border(&self, x1: Float, y1: Float, x2: Float, y2: Float, x: Float) -> bool {
+        let divisor = x2 - x1;
+        let s = x2 - x;
+        if s == divisor {
+            self.contains(&y2)
+        } else if s == 0.0 {
+            self.contains(&y1)
+        } else {
+            s.signum() == divisor.signum() && s.abs() < divisor.abs() && {
+                let t = divisor - s;
+                let y = (s * y1 + t * y2) / divisor;
+                self.contains(&y)
+            }
+        }
+    }
+}
+
+impl RangeBounds<Float> for FloatRange {
+    #[inline]
+    fn start_bound(&self) -> Bound<&Float> {
+        let Self(start, _) = self;
+        Bound::Included(start)
+    }
+
+    #[inline]
+    fn end_bound(&self) -> Bound<&Float> {
+        let Self(_, end) = self;
+        Bound::Included(end)
+    }
+}
+
+#[derive(Copy, Clone, Debug, PartialEq)]
 pub struct Rect {
-    pub x: RangeInclusive<Float>,
-    pub y: RangeInclusive<Float>,
+    pub x: FloatRange,
+    pub y: FloatRange,
 }
 
 pub trait Shape {
@@ -33,7 +93,10 @@ pub trait Shape {
 impl Rect {
     #[inline]
     pub fn new(x: Float, y: Float) -> Rect {
-        Rect { x: x..=x, y: y..=y }
+        Rect {
+            x: FloatRange(x, x),
+            y: FloatRange(y, y),
+        }
     }
 
     #[inline]
@@ -49,9 +112,17 @@ impl Rect {
 
     #[inline]
     pub fn extend_rect(&self, rect: &Rect) -> Rect {
+        let Rect {
+            x: FloatRange(sxa, sxe),
+            y: FloatRange(sya, sye),
+        } = *self;
+        let Rect {
+            x: FloatRange(rxa, rxe),
+            y: FloatRange(rya, rye),
+        } = *rect;
         Rect {
-            x: self.x.start().min(*rect.x.start())..=self.x.end().max(*rect.x.end()),
-            y: self.y.start().min(*rect.y.start())..=self.y.end().max(*rect.y.end()),
+            x: FloatRange(sxa.min(rxa), sxe.max(rxe)),
+            y: FloatRange(sya.min(rya), sye.max(rye)),
         }
     }
 
@@ -62,27 +133,56 @@ impl Rect {
 
     #[inline]
     pub fn top_left(&self) -> Vector2 {
-        Vector2(*self.x.start(), *self.y.end())
+        let Rect {
+            x: FloatRange(x, _),
+            y: FloatRange(_, y),
+        } = *self;
+        Vector2(x, y)
     }
 
     #[inline]
     pub fn top_right(&self) -> Vector2 {
-        Vector2(*self.x.end(), *self.y.end())
+        let Rect {
+            x: FloatRange(_, x),
+            y: FloatRange(_, y),
+        } = *self;
+        Vector2(x, y)
     }
 
     #[inline]
     pub fn bottom_left(&self) -> Vector2 {
-        Vector2(*self.x.start(), *self.y.start())
+        let Rect {
+            x: FloatRange(x, _),
+            y: FloatRange(y, _),
+        } = *self;
+        Vector2(x, y)
     }
 
     #[inline]
     pub fn bottom_right(&self) -> Vector2 {
-        Vector2(*self.x.end(), *self.y.start())
+        let Rect {
+            x: FloatRange(_, x),
+            y: FloatRange(y, _),
+        } = *self;
+        Vector2(x, y)
     }
 
     #[inline]
     pub fn contains_rect(&self, r: &Rect) -> bool {
         self.x.contains_range(&r.x) && self.y.contains_range(&r.y)
+    }
+
+    /// warning this method should be used only after r.contains(a) and r.contains(e) check
+    #[inline]
+    fn line_rect(&self, a: &Vector2, e: &Vector2) -> bool {
+        let Rect {
+            x: FloatRange(xa, xe),
+            y: FloatRange(ya, ye),
+        } = *self;
+        self.x.line_y(a, e, ya)
+            || self.x.line_y(a, e, ye)
+            || self.y.line_x(a, e, xa)
+            || self.y.line_x(a, e, xe)
     }
 }
 
@@ -99,102 +199,46 @@ impl Shape for Rect {
 
     #[inline]
     fn bounds(&self) -> Rect {
-        self.clone()
+        *self
     }
 }
 
 impl Shape for Vector2 {
+    #[inline]
     fn intersects(&self, r: &Rect) -> bool {
         r.contains(self)
     }
 
+    #[inline]
     fn contains(&self, v: &Vector2) -> bool {
         return self == v;
     }
 
+    #[inline]
     fn bounds(&self) -> Rect {
         Rect::from_vector(self)
     }
 }
 
-#[inline]
-fn line_rect_border<R: RangeBounds<Float>>(
-    x1: Float,
-    y1: Float,
-    x2: Float,
-    y2: Float,
-    x: Float,
-    y_range: &R,
-) -> bool {
-    let divisor = x2 - x1;
-    let s = x2 - x;
-    if s == divisor {
-        y_range.contains(&y2)
-    } else if s == 0.0 {
-        y_range.contains(&y1)
-    } else {
-        s.signum() == divisor.signum() && s.abs() < divisor.abs() && {
-            let t = divisor - s;
-            let y = (s * y1 + t * y2) / divisor;
-            y_range.contains(&y)
-        }
-    }
-}
-
-#[inline]
-fn line_x<R: RangeBounds<Float>>(a: &Vector2, e: &Vector2, x: Float, y_range: &R) -> bool {
-    let Vector2(ax, ay) = *a;
-    let Vector2(ex, ey) = *e;
-    line_rect_border(ax, ay, ex, ey, x, y_range)
-}
-
-#[inline]
-fn line_y<R: RangeBounds<Float>>(a: &Vector2, e: &Vector2, y: Float, x_range: &R) -> bool {
-    let Vector2(ax, ay) = *a;
-    let Vector2(ex, ey) = *e;
-    line_rect_border(ay, ax, ey, ex, y, x_range)
-}
-
-/// warning this method should be used only after r.contains(a) and r.contains(e) check
-#[inline]
-fn line_rect(a: &Vector2, e: &Vector2, r: &&Rect) -> bool {
-    line_y(a, e, *r.y.start(), &r.x)
-        || line_y(a, e, *r.y.end(), &r.x)
-        || line_x(a, e, *r.x.start(), &r.y)
-        || line_x(a, e, *r.x.end(), &r.y)
-}
-
 #[derive(Debug)]
 pub struct Line(pub Vector2, pub Vector2);
 
-#[inline]
-fn epsilon_value(f: Float) -> Range<Float> {
-    Range {
-        start: f - EPSILON0,
-        end: f + EPSILON0,
-    }
-}
-
-#[inline]
-fn epsilon_range(r: &Range<Float>) -> Range<Float> {
-    Range {
-        start: r.start - EPSILON0,
-        end: r.end + EPSILON0,
-    }
-}
-
 impl Shape for Line {
+    #[inline]
     fn intersects(&self, r: &Rect) -> bool {
         self.bounds_intersect(r) && {
-            r.contains(&self.0) || r.contains(&self.1) || line_rect(&self.0, &self.1, &r)
+            let Line(p1, p2) = self;
+            r.contains(&p1) || r.contains(&p2) || r.line_rect(&p1, &p2)
         }
     }
 
+    #[inline]
     fn contains(&self, v: &Vector2) -> bool {
         self.bounds_contains(v) && {
             let Line(a, e) = self;
             let Vector2(vx, vy) = *v;
-            line_x(a, e, vx, &epsilon_value(vy)) || line_y(a, e, vy, &epsilon_value(vx))
+            FloatRange::epsilon_value(vy).line_x(a, e, vx)
+                || FloatRange::epsilon_value(vx).line_y(a, e, vy)
         }
     }
 
@@ -217,14 +261,16 @@ fn sign(p: &Vector2, a: &Vector2, e: &Vector2) -> Float {
 }
 
 impl Shape for Triangle {
+    #[inline]
     fn intersects(&self, r: &Rect) -> bool {
         self.bounds_intersect(r) && {
-            r.contains(&self.0)
-                || r.contains(&self.1)
-                || r.contains(&self.2)
-                || line_rect(&self.0, &self.1, &r)
-                || line_rect(&self.1, &self.2, &r)
-                || line_rect(&self.2, &self.0, &r)
+            let Triangle(p1, p2, p3) = self;
+            r.contains(&p1)
+                || r.contains(&p2)
+                || r.contains(&p3)
+                || r.line_rect(&p1, &p2)
+                || r.line_rect(&p2, &p3)
+                || r.line_rect(&p3, &p1)
         }
     }
 
@@ -355,8 +401,8 @@ mod tests {
         assert_eq!(
             triangle.bounds(),
             Rect {
-                x: 1.0..=6.0,
-                y: 1.0..=4.0
+                x: FloatRange(1.0, 6.0),
+                y: FloatRange(1.0, 4.0)
             }
         )
     }
@@ -367,8 +413,8 @@ mod tests {
         assert_eq!(
             line.bounds(),
             Rect {
-                x: 1.0..=6.0,
-                y: 1.0..=2.0
+                x: FloatRange(1.0, 6.0),
+                y: FloatRange(1.0, 2.0)
             }
         )
     }
