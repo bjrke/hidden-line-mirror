@@ -38,7 +38,6 @@ mod vec2;
 mod vec3;
 
 use crate::appcontext::*;
-use crate::drawcontext::*;
 use crate::float::*;
 use crate::svgcontext::*;
 use js_sys;

@@ -1,6 +1,3 @@
-use crate::appcontext::*;
-use crate::calcctontext::*;
-use crate::drawcontext::*;
 use crate::dreidext::*;
 use crate::float::*;
 
@@ -33,7 +30,8 @@ pub fn init_scene<F: Fn(Float, Float) -> Float>(f: F) -> SceneBuilder {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::vec2::Vector2;
+    use crate::appcontext::AppContext;
+    use crate::drawcontext::*;
 
     struct TestDrawContext {
         lines: Vec<(Float, Float, Float, Float, Color)>,

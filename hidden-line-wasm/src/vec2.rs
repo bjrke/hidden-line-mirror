@@ -47,10 +47,10 @@ impl Add for &Vector2 {
 impl AddAssign for Vector2 {
     #[inline]
     fn add_assign(&mut self, rhs: Self) {
-        let Vector2(mut sx, mut sy) = self;
+        let Vector2(ref mut sx, ref mut sy) = self;
         let Vector2(rx, ry) = rhs;
-        sx += rx;
-        sy += ry;
+        *sx += rx;
+        *sy += ry;
     }
 }
 
@@ -79,10 +79,10 @@ impl Sub for &Vector2 {
 impl SubAssign for Vector2 {
     #[inline]
     fn sub_assign(&mut self, rhs: Self) {
-        let Vector2(mut sx, mut sy) = self;
+        let Vector2(ref mut sx, ref mut sy) = self;
         let Vector2(rx, ry) = rhs;
-        sx -= rx;
-        sy -= ry;
+        *sx -= rx;
+        *sy -= ry;
     }
 }
 
@@ -131,9 +131,9 @@ impl Mul<Float> for &Vector2 {
 impl MulAssign<Float> for Vector2 {
     #[inline]
     fn mul_assign(&mut self, rhs: Float) {
-        let Vector2(mut sx, mut sy) = self;
-        sx *= rhs;
-        sy *= rhs;
+        let Vector2(ref mut sx, ref mut sy) = self;
+        *sx *= rhs;
+        *sy *= rhs;
     }
 }
 
@@ -160,9 +160,9 @@ impl Div<Float> for &Vector2 {
 impl DivAssign<Float> for Vector2 {
     #[inline]
     fn div_assign(&mut self, rhs: Float) {
-        let Vector2(mut sx, mut sy) = self;
-        sx /= rhs;
-        sy /= rhs;
+        let Vector2(ref mut sx, ref mut sy) = self;
+        *sx /= rhs;
+        *sy /= rhs;
     }
 }
 

@@ -1,6 +1,5 @@
 use crate::shape::*;
 use crate::vec2::*;
-use std::collections::VecDeque;
 use std::fmt::Debug;
 
 const MAX_ELEMENTS: usize = 3;

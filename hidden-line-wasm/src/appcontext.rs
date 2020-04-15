@@ -34,16 +34,16 @@ impl AppContext {
     pub fn render(&mut self, dctx: &mut dyn DrawContext) {
         dctx.cls();
 
-        let unit_vec_len = (0.4 * self.view.len());
+        let unit_vec_len = 0.4 * self.view.len();
         self.iv = self.view.cross(&self.jv).normalize() * unit_vec_len;
         self.jv = self.iv.cross(&self.view).normalize() * unit_vec_len;
 
         let scene = Scene::new(&self);
 
-        println!("#polys: {}", scene.triangles.len());
-        println!("eye: {}", self.eye);
-        println!("view: {}", self.view);
-        println!("up {}", self.jv);
+        println!("#polys: {:?}", scene.triangles.len());
+        println!("eye: {:?}", self.eye);
+        println!("view: {:?}", self.view);
+        println!("up {:?}", self.jv);
 
         dctx.circle(0.99, 0.99, 0.01, 1.0);
         dctx.circle(0.99, -0.99, 0.01, 1.0);
@@ -109,13 +109,8 @@ fn rot_vec(to_rot1: &mut Vector3, to_rot2: &mut Vector3, t: Float) {
     let f1 = len1 / (len2 * rot_len);
     let f2 = -len2 / (len1 * rot_len);
 
-    to_rot1.x = rot_inc * copy1.x + copy2.x * f1;
-    to_rot1.y = rot_inc * copy1.y + copy2.y * f1;
-    to_rot1.z = rot_inc * copy1.z + copy2.z * f1;
-
-    to_rot2.x = f2 * copy1.x + rot_inc * copy2.x;
-    to_rot2.y = f2 * copy1.y + rot_inc * copy2.y;
-    to_rot2.z = f2 * copy1.z + rot_inc * copy2.z;
+    *to_rot1 = copy1 * rot_inc + copy2 * f1;
+    *to_rot2 = copy1 * f2 + copy2 * rot_inc;
 }
 
 pub struct Scene {

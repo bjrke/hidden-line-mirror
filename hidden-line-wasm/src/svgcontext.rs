@@ -1,6 +1,5 @@
 use crate::drawcontext::*;
 use crate::float::*;
-use crate::vec2::*;
 
 pub struct SvgContext {
     svg: web_sys::SvgElement,

@@ -1,5 +1,4 @@
 use crate::float::*;
-use crate::vec2::*;
 
 pub type Color = Float;
 

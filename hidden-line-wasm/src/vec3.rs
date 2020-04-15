@@ -1,31 +1,15 @@
 use crate::float::*;
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 
-#[derive(Clone, Copy, PartialEq, PartialOrd)]
-pub struct Vector3 {
-    pub x: Float,
-    pub y: Float,
-    pub z: Float,
-}
-
-#[inline]
-pub fn Vector3(x: Float, y: Float, z: Float) -> Vector3 {
-    Vector3 { x, y, z }
-}
+#[derive(Clone, Copy, PartialEq, PartialOrd, Debug)]
+pub struct Vector3(pub Float, pub Float, pub Float);
 
 impl Vector3 {
     #[inline]
-    pub fn new(x: Float, y: Float, z: Float) -> Self {
-        Vector3 { x, y, z }
-    }
-
-    #[inline]
-    pub fn cross(&self, v: &Self) -> Self {
-        Vector3(
-            self.y * v.z - self.z * v.y,
-            self.z * v.x - self.x * v.z,
-            self.x * v.y - self.y * v.x,
-        )
+    pub fn cross(&self, rhs: &Self) -> Self {
+        let Vector3(sx, sy, sz) = *self;
+        let Vector3(rx, ry, rz) = *rhs;
+        Vector3(sy * rz - sz * ry, sz * rx - sx * rz, sx * ry - sy * rx)
     }
 
     #[inline]
@@ -44,22 +28,14 @@ impl Vector3 {
     }
 }
 
-impl std::fmt::Debug for Vector3 {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_tuple("")
-            .field(&self.x)
-            .field(&self.y)
-            .field(&self.z)
-            .finish()
-    }
-}
-
 impl Add for Vector3 {
     type Output = Self;
 
     #[inline]
     fn add(self, rhs: Self) -> Self::Output {
-        Vector3(self.x + rhs.x, self.y + rhs.y, self.z + rhs.z)
+        let Vector3(sx, sy, sz) = self;
+        let Vector3(rx, ry, rz) = rhs;
+        Vector3(sx + rx, sy + ry, sz + rz)
     }
 }
 
@@ -68,16 +44,20 @@ impl Add for &Vector3 {
 
     #[inline]
     fn add(self, rhs: Self) -> Self::Output {
-        Vector3(self.x + rhs.x, self.y + rhs.y, self.z + rhs.z)
+        let Vector3(sx, sy, sz) = *self;
+        let Vector3(rx, ry, rz) = *rhs;
+        Vector3(sx + rx, sy + ry, sz + rz)
     }
 }
 
 impl AddAssign for Vector3 {
     #[inline]
     fn add_assign(&mut self, rhs: Self) {
-        self.x += rhs.x;
-        self.y += rhs.y;
-        self.z += rhs.z;
+        let Vector3(ref mut sx, ref mut sy, ref mut sz) = self;
+        let Vector3(rx, ry, rz) = rhs;
+        *sx += rx;
+        *sy += ry;
+        *sz += rz;
     }
 }
 
@@ -86,7 +66,9 @@ impl Sub for Vector3 {
 
     #[inline]
     fn sub(self, rhs: Self) -> Self::Output {
-        Vector3(self.x - rhs.x, self.y - rhs.y, self.z - rhs.z)
+        let Vector3(sx, sy, sz) = self;
+        let Vector3(rx, ry, rz) = rhs;
+        Vector3(sx - rx, sy - ry, sz - rz)
     }
 }
 
@@ -95,16 +77,20 @@ impl Sub for &Vector3 {
 
     #[inline]
     fn sub(self, rhs: Self) -> Self::Output {
-        Vector3(self.x - rhs.x, self.y - rhs.y, self.z - rhs.z)
+        let Vector3(sx, sy, sz) = *self;
+        let Vector3(rx, ry, rz) = *rhs;
+        Vector3(sx - rx, sy - ry, sz - rz)
     }
 }
 
 impl SubAssign for Vector3 {
     #[inline]
     fn sub_assign(&mut self, rhs: Self) {
-        self.x -= rhs.x;
-        self.y -= rhs.y;
-        self.z -= rhs.z;
+        let Vector3(ref mut sx, ref mut sy, ref mut sz) = self;
+        let Vector3(rx, ry, rz) = rhs;
+        *sx -= rx;
+        *sy -= ry;
+        *sz -= rz;
     }
 }
 
@@ -113,7 +99,9 @@ impl Mul for Vector3 {
 
     #[inline]
     fn mul(self, rhs: Self) -> Self::Output {
-        self.x * rhs.x + self.y * rhs.y + self.z * rhs.z
+        let Vector3(sx, sy, sz) = self;
+        let Vector3(rx, ry, rz) = rhs;
+        sx * rx + sy * ry + sz * rz
     }
 }
 
@@ -122,7 +110,9 @@ impl Mul for &Vector3 {
 
     #[inline]
     fn mul(self, rhs: Self) -> Self::Output {
-        self.x * rhs.x + self.y * rhs.y + self.z * rhs.z
+        let Vector3(sx, sy, sz) = *self;
+        let Vector3(rx, ry, rz) = *rhs;
+        sx * rx + sy * ry + sz * rz
     }
 }
 
@@ -131,7 +121,8 @@ impl Mul<Float> for Vector3 {
 
     #[inline]
     fn mul(self, rhs: Float) -> Self::Output {
-        Vector3(self.x * rhs, self.y * rhs, self.z * rhs)
+        let Vector3(sx, sy, sz) = self;
+        Vector3(sx * rhs, sy * rhs, sz * rhs)
     }
 }
 
@@ -140,16 +131,18 @@ impl Mul<Float> for &Vector3 {
 
     #[inline]
     fn mul(self, rhs: Float) -> Self::Output {
-        Vector3(self.x * rhs, self.y * rhs, self.z * rhs)
+        let Vector3(sx, sy, sz) = *self;
+        Vector3(sx * rhs, sy * rhs, sz * rhs)
     }
 }
 
 impl MulAssign<Float> for Vector3 {
     #[inline]
     fn mul_assign(&mut self, rhs: Float) {
-        self.x *= rhs;
-        self.y *= rhs;
-        self.z *= rhs;
+        let Vector3(ref mut sx, ref mut sy, ref mut sz) = self;
+        *sx *= rhs;
+        *sy *= rhs;
+        *sz *= rhs;
     }
 }
 
@@ -158,7 +151,8 @@ impl Div<Float> for Vector3 {
 
     #[inline]
     fn div(self, rhs: Float) -> Self::Output {
-        Vector3(self.x / rhs, self.y / rhs, self.z / rhs)
+        let Vector3(sx, sy, sz) = self;
+        Vector3(sx / rhs, sy / rhs, sz / rhs)
     }
 }
 
@@ -167,16 +161,18 @@ impl Div<Float> for &Vector3 {
 
     #[inline]
     fn div(self, rhs: Float) -> Self::Output {
-        Vector3(self.x / rhs, self.y / rhs, self.z / rhs)
+        let Vector3(sx, sy, sz) = *self;
+        Vector3(sx / rhs, sy / rhs, sz / rhs)
     }
 }
 
 impl DivAssign<Float> for Vector3 {
     #[inline]
     fn div_assign(&mut self, rhs: Float) {
-        self.x /= rhs;
-        self.y /= rhs;
-        self.z /= rhs;
+        let Vector3(ref mut sx, ref mut sy, ref mut sz) = self;
+        *sx /= rhs;
+        *sy /= rhs;
+        *sz /= rhs;
     }
 }
 
@@ -185,7 +181,8 @@ impl Neg for Vector3 {
 
     #[inline]
     fn neg(self) -> Self::Output {
-        Vector3(-self.x, -self.y, -self.z)
+        let Vector3(sx, sy, sz) = self;
+        Vector3(-sx, -sy, -sz)
     }
 }
 
@@ -194,12 +191,7 @@ impl Neg for &Vector3 {
 
     #[inline]
     fn neg(self) -> Self::Output {
-        Vector3(-self.x, -self.y, -self.z)
-    }
-}
-
-impl std::fmt::Display for Vector3 {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "({}, {}, {})", self.x, self.y, self.y)
+        let Vector3(sx, sy, sz) = *self;
+        Vector3(-sx, -sy, -sz)
     }
 }
