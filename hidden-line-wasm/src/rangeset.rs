@@ -5,26 +5,31 @@ use std::ops::{Bound, RangeBounds};
 pub struct RangeSet<T>(pub Vec<(Bound<T>, Bound<T>)>);
 
 impl<T: PartialOrd + Copy> RangeSet<T> {
+    #[inline]
     pub fn new() -> Self {
         Self(vec![])
     }
 
+    #[inline]
     pub fn from_range<R: RangeBounds<T>>(new_range: &R) -> Self {
         let mut result = Self::new();
         result.add(new_range);
         result
     }
 
+    #[inline]
     pub fn is_empty(&self) -> bool {
         let RangeSet(ranges) = self;
         ranges.is_empty()
     }
 
+    #[inline]
     pub fn contains(&self, idx: T) -> bool {
         let RangeSet(ranges) = self;
         ranges.iter().any(|r| r.contains(&idx))
     }
 
+    #[inline]
     pub fn add<R: RangeBounds<T>>(&mut self, new_range: &R) {
         let mut new_range: (Bound<T>, Bound<T>) = new_range.to_tuple();
         let RangeSet(ranges) = self;
@@ -40,10 +45,12 @@ impl<T: PartialOrd + Copy> RangeSet<T> {
         ranges.push(new_range);
     }
 
+    #[inline]
     pub fn merge(&mut self, rs: &Self) {
         rs.0.iter().for_each(|r| self.add(r));
     }
 
+    #[inline]
     pub fn remove<R: RangeBounds<T>>(&mut self, r: &R) {
         let RangeSet(ranges) = self;
         let mut n = vec![];
@@ -55,6 +62,7 @@ impl<T: PartialOrd + Copy> RangeSet<T> {
         }
     }
 
+    #[inline]
     pub fn diff(&mut self, rs: &Self) {
         let RangeSet(ranges) = rs;
         ranges.iter().for_each(|r| self.remove(r));
