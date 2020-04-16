@@ -51,7 +51,9 @@ impl FloatRange {
     fn contains_range(&self, rhs: &Self) -> bool {
         let Self(ss, se) = self;
         let Self(rs, re) = rhs;
-        ss <= se && (rs > re || ss <= rs && se >= re)
+        // assume it's non empty
+        // ss <= se && (rs > re || ss <= rs && se >= re)
+        ss <= rs && se >= re
     }
 
     #[inline]
@@ -64,7 +66,9 @@ impl FloatRange {
     fn range_overlap(&self, rhs: &Self) -> bool {
         let Self(ss, se) = self;
         let Self(rs, re) = rhs;
-        ss <= se && ss <= re && rs <= re && rs <= se
+        // assume it's non empty
+        // ss <= se && ss <= re && rs <= re && rs <= se
+        ss <= re && rs <= se
     }
 
     #[inline]
