@@ -119,7 +119,7 @@ pub fn hidden_line(mut scene: Scene, dctx: &mut dyn DrawContext, actx: &AppConte
     if let Some(screen) = screen {
         let mut tree = QuadTree::new(screen);
         for t in triangles {
-            tree.insert(t);
+            tree.insert(t.bounds(), t);
         }
 
         for (&(a, e), &color) in scene.lines.iter() {
