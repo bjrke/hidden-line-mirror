@@ -1,3 +1,4 @@
+use crate::range::*;
 use crate::shape::*;
 use crate::vec2::*;
 
@@ -40,7 +41,7 @@ impl<S> QuadTree<S> {
         self.insert2(QuadTreeLeave { bounds, value });
     }
 
-    pub fn insert2(&mut self, te: QuadTreeLeave<S>) {
+    fn insert2(&mut self, te: QuadTreeLeave<S>) {
         self.size += 1;
         if self.content.len() >= MAX_ELEMENTS && self.subtrees.is_empty() {
             self.create_subtree(&self.bounds.top_left());

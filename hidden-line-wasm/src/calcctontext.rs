@@ -1,11 +1,9 @@
-use std::ops::Bound;
-
 use crate::appcontext::*;
 use crate::drawcontext::*;
 use crate::float::*;
 use crate::matrix::Matrix2;
 use crate::quadtree::QuadTree;
-use crate::range::RangeExtCopy;
+use crate::range::*;
 use crate::rangeset::RangeSet;
 use crate::shape::{Line, Rect, Shape, Triangle};
 use crate::vec2::*;
@@ -70,23 +68,15 @@ impl Shape for TheTriangle {
 }
 
 #[inline]
-fn draw(ctx: &mut dyn DrawContext, line: &Line, ranges: &RangeSet<Float>, color: Color) {
+fn draw(ctx: &mut dyn DrawContext, line: &Line, ranges: &RangeSet, color: Color) {
     let mut last = 0.0;
     let RangeSet(ranges) = ranges;
-    for range in ranges {
-        match range {
-            (Bound::Included(l1), Bound::Included(l2))
-            | (Bound::Excluded(l1), Bound::Excluded(l2))
-            | (Bound::Included(l1), Bound::Excluded(l2))
-            | (Bound::Excluded(l1), Bound::Included(l2)) => {
-                if DEBUG && last < *l1 {
-                    draw_line_range(ctx, line, last, *l1, -MAX);
-                }
-                draw_line_range(ctx, line, *l1, *l2, color);
-                last = *l2;
-            }
-            _ => {}
+    for FloatRange(l1, l2) in ranges {
+        if DEBUG && last < *l1 {
+            draw_line_range(ctx, line, last, *l1, -MAX);
         }
+        draw_line_range(ctx, line, *l1, *l2, color);
+        last = *l2;
     }
     if DEBUG && last < 1.0 {
         draw_line_range(ctx, line, last, 1.0, -MAX);
@@ -126,7 +116,7 @@ pub fn hidden_line(mut scene: Scene, dctx: &mut dyn DrawContext, actx: &AppConte
             let line_shape = Line(scene.points[a], scene.points[e]);
 
             let bounds = line_shape.bounds();
-            let mut r: RangeSet<Float> = RangeSet::from_range(&(0.0..=1.0));
+            let mut r: RangeSet = RangeSet(vec![FloatRange(0.0, 1.0)]);
             let mut candidates = tree.elements_intersecting(&bounds);
             while let Some(next) = if r.is_empty() {
                 None
@@ -156,12 +146,12 @@ fn clip(
     c: Vector3,
     ref_point: Vector3,
     ref_point_visible: bool,
-) -> (Bound<Float>, Bound<Float>) {
+) -> FloatRange {
     let normal = (a - b).cross(&c).normalize();
 
     let ref_dist = ref_point * normal;
     if ref_dist.abs() < EPSILON0 {
-        return (Bound::Unbounded, Bound::Unbounded);
+        return FloatRange(MIN, MAX);
     }
 
     let ref_dist = if !ref_point_visible {
@@ -178,23 +168,23 @@ fn clip(
     let d = p2n - p1n;
 
     if d.abs() < EPSILON0 {
-        (Bound::Unbounded, Bound::Unbounded)
+        FloatRange(MIN, MAX)
     } else {
         let l = p2n / d;
 
         if l > 0.5 {
             if p2n.signum() == ref_dist {
                 // l == 0 visible
-                (Bound::Included(l), Bound::Unbounded)
+                FloatRange(l, MAX)
             } else {
-                (Bound::Unbounded, Bound::Included(l))
+                FloatRange(MIN, l)
             }
         } else {
             if p1n.signum() == ref_dist {
                 // l == 1 visible
-                (Bound::Unbounded, Bound::Included(l))
+                FloatRange(MIN, l)
             } else {
-                (Bound::Included(l), Bound::Unbounded)
+                FloatRange(l, MAX)
             }
         }
     }
@@ -205,7 +195,7 @@ fn intersect2(
     triangle: &TheTriangle,
     p1: Vector3,
     p2: Vector3,
-    range: &mut RangeSet<Float>,
+    range: &mut RangeSet,
 ) {
     let t1 = triangle.o1;
     let t2 = triangle.o2;
@@ -238,7 +228,7 @@ fn intersect(
     line_shape: &Line,
     o1: Vector3,
     o2: Vector3,
-    range: &mut RangeSet<Float>,
+    range: &mut RangeSet,
 ) {
     let t1 = triangle.o1;
     let t2 = triangle.o2;
@@ -354,6 +344,6 @@ fn intersect(
     }
 
     if let (Some(l), Some(r)) = (min, max) {
-        range.remove(&(Bound::Excluded(l), Bound::Excluded(r)));
+        range.remove(&FloatRange(l, r));
     }
 }

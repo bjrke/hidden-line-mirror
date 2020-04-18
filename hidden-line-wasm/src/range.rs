@@ -1,66 +1,107 @@
-use std::cmp::Ordering;
-use std::ops::Bound;
-use std::ops::RangeBounds;
+use crate::float::*;
+use crate::vec2::*;
 
-pub trait BoundExt<Idx> {
-    fn unwrap<'a>(&'a self, unbound: &'a Idx) -> &'a Idx;
-}
+#[derive(Copy, Clone, Debug, PartialEq)]
+pub struct FloatRange(pub Float, pub Float);
 
-impl<Idx> BoundExt<Idx> for Bound<Idx> {
-    fn unwrap<'a>(&'a self, unbound: &'a Idx) -> &'a Idx {
-        match self {
-            Bound::Unbounded => unbound,
-            Bound::Included(s) | Bound::Excluded(s) => s,
-        }
-    }
-}
-
-pub trait RangeExt<Idx: PartialOrd> {
-    fn is_empty_range(&self) -> bool;
-}
-
-pub trait RangeExtCopy<Idx: PartialOrd + Copy>: RangeExt<Idx> {
-    fn range_overlap<R: RangeBounds<Idx>>(&self, other: &R) -> bool;
-
-    fn intersect<R: RangeBounds<Idx>>(&self, other: &R) -> Option<(Bound<Idx>, Bound<Idx>)>;
-
-    fn union_no_check<R: RangeBounds<Idx>>(&self, other: &R) -> (Bound<Idx>, Bound<Idx>);
-
-    fn diff<R: RangeBounds<Idx>>(&self, other: &R) -> Vec<(Bound<Idx>, Bound<Idx>)>;
-
-    fn not(&self) -> Vec<(Bound<Idx>, Bound<Idx>)>;
-
-    fn start(&self) -> Bound<Idx>;
-
-    fn end(&self) -> Bound<Idx>;
-
-    fn to_tuple(&self) -> (Bound<Idx>, Bound<Idx>);
-}
-
-impl<Idx: PartialOrd<Idx>, T: RangeBounds<Idx>> RangeExt<Idx> for T {
-    fn is_empty_range(&self) -> bool {
-        match (self.start_bound(), self.end_bound()) {
-            (Bound::Unbounded, _) | (_, Bound::Unbounded) => false,
-            (Bound::Included(a), Bound::Included(e)) => a > e,
-            (Bound::Excluded(a), Bound::Excluded(e))
-            | (Bound::Included(a), Bound::Excluded(e))
-            | (Bound::Excluded(a), Bound::Included(e)) => a >= e,
-        }
-    }
-}
-
-impl<Idx: PartialOrd<Idx> + Copy, T: RangeBounds<Idx>> RangeExtCopy<Idx> for T {
+impl FloatRange {
     #[inline]
-    fn range_overlap<R: RangeBounds<Idx>>(&self, other: &R) -> bool {
-        self.intersect(other).is_some()
+    pub fn epsilon_value(f: Float) -> Self {
+        Self(f, f).epsilon_range()
     }
 
     #[inline]
-    fn intersect<R: RangeBounds<Idx>>(&self, other: &R) -> Option<(Bound<Idx>, Bound<Idx>)> {
-        let range = (
-            max(self.start(), other.start(), true),
-            min(self.end(), other.end(), false),
-        );
+    fn epsilon_range(&self) -> Self {
+        let Self(start, end) = self;
+        Self(start - EPSILON0, end + EPSILON0)
+    }
+
+    #[inline]
+    pub fn line_x(&self, a: &Vector2, e: &Vector2, x: Float) -> bool {
+        let Vector2(ax, ay) = *a;
+        let Vector2(ex, ey) = *e;
+        self.line_rect_border(ax, ay, ex, ey, x)
+    }
+
+    #[inline]
+    pub fn line_y(&self, a: &Vector2, e: &Vector2, y: Float) -> bool {
+        let Vector2(ax, ay) = *a;
+        let Vector2(ex, ey) = *e;
+        self.line_rect_border(ay, ax, ey, ex, y)
+    }
+
+    #[inline]
+    fn line_rect_border(&self, x1: Float, y1: Float, x2: Float, y2: Float, x: Float) -> bool {
+        let divisor = x2 - x1;
+        let s = x2 - x;
+        if s == divisor {
+            self.contains(&y2)
+        } else if s == 0.0 {
+            self.contains(&y1)
+        } else {
+            s.signum() == divisor.signum() && s.abs() < divisor.abs() && {
+                let t = divisor - s;
+                let y = (s * y1 + t * y2) / divisor;
+                self.contains(&y)
+            }
+        }
+    }
+
+    #[inline]
+    pub fn contains_range(&self, rhs: &Self) -> bool {
+        let Self(ss, se) = *self;
+        let Self(rs, re) = *rhs;
+        // assume it's non empty
+        // ss <= se && (rs > re || ss <= rs && se >= re)
+        ss <= rs && se >= re
+    }
+
+    #[inline]
+    pub fn contains(&self, item: &Float) -> bool {
+        let Self(start, end) = *self;
+        start <= *item && *item <= end
+    }
+
+    #[inline]
+    pub fn range_overlap(&self, rhs: &Self) -> bool {
+        let Self(ss, se) = *self;
+        let Self(rs, re) = *rhs;
+        // assume it's non empty
+        // ss <= se && ss <= re && rs <= re && rs <= se
+        ss <= re && rs <= se
+    }
+
+    #[inline]
+    pub fn union_no_check(&self, rhs: &Self) -> FloatRange {
+        let Self(ss, se) = *self;
+        let Self(rs, re) = *rhs;
+        FloatRange(ss.min(rs), se.max(re))
+    }
+
+    #[inline]
+    pub fn extend(&self, rhs: Float) -> Self {
+        let Self(ss, se) = *self;
+        if rhs < ss {
+            Self(rhs, se)
+        } else if rhs <= se {
+            *self
+        } else {
+            Self(ss, rhs)
+        }
+    }
+
+    #[inline]
+    pub fn extend_range(&self, rhs: &Self) -> Self {
+        let Self(ss, se) = *self;
+        let Self(rs, re) = *rhs;
+        Self(ss.min(rs), se.max(re))
+    }
+
+    #[inline]
+    pub fn intersect(&self, rhs: &Self) -> Option<FloatRange> {
+        let Self(ss, se) = *self;
+        let Self(rs, re) = *rhs;
+        let range = FloatRange(ss.max(rs), se.min(re));
 
         if range.is_empty_range() {
             None
@@ -69,156 +110,28 @@ impl<Idx: PartialOrd<Idx> + Copy, T: RangeBounds<Idx>> RangeExtCopy<Idx> for T {
         }
     }
 
-    #[inline]
-    fn union_no_check<R: RangeBounds<Idx>>(&self, other: &R) -> (Bound<Idx>, Bound<Idx>) {
-        (
-            min(self.start(), other.start(), true),
-            max(self.end(), other.end(), false),
-        )
+    fn is_empty_range(&self) -> bool {
+        let Self(start, end) = *self;
+        start > end
     }
 
-    fn diff<R: RangeBounds<Idx>>(&self, other: &R) -> Vec<(Bound<Idx>, Bound<Idx>)> {
-        other.not().iter().flat_map(|o| self.intersect(o)).collect()
-    }
-
-    #[inline]
-    fn not(&self) -> Vec<(Bound<Idx>, Bound<Idx>)> {
-        match self.to_tuple() {
-            (Bound::Unbounded, Bound::Unbounded) => vec![],
-            (Bound::Unbounded, Bound::Included(e)) => vec![(Bound::Excluded(e), Bound::Unbounded)],
-            (Bound::Unbounded, Bound::Excluded(e)) => vec![(Bound::Included(e), Bound::Unbounded)],
-            (Bound::Included(a), Bound::Unbounded) => vec![(Bound::Unbounded, Bound::Excluded(a))],
-            (Bound::Excluded(a), Bound::Unbounded) => vec![(Bound::Unbounded, Bound::Included(a))],
-            (Bound::Included(a), Bound::Included(e)) => {
-                if a > e {
-                    vec![(Bound::Unbounded, Bound::Unbounded)]
-                } else {
-                    vec![
-                        (Bound::Unbounded, Bound::Excluded(a)),
-                        (Bound::Excluded(e), Bound::Unbounded),
-                    ]
-                }
+    pub fn diff(&self, rhs: &Self) -> Vec<Self> {
+        let Self(ss, se) = *self;
+        let Self(rs, re) = *rhs;
+        if ss > se {
+            vec![]
+        } else if rs > re || re <= ss || se <= rs {
+            vec![FloatRange(ss, se)]
+        } else {
+            let mut result = vec![];
+            if rs > ss {
+                result.push(FloatRange(ss, rs))
             }
-            (Bound::Excluded(a), Bound::Excluded(e)) => {
-                if a >= e {
-                    vec![(Bound::Unbounded, Bound::Unbounded)]
-                } else {
-                    vec![
-                        (Bound::Unbounded, Bound::Included(a)),
-                        (Bound::Included(e), Bound::Unbounded),
-                    ]
-                }
+            if re < se {
+                result.push(FloatRange(re, se))
             }
-            (Bound::Included(a), Bound::Excluded(e)) => {
-                if a >= e {
-                    vec![(Bound::Unbounded, Bound::Unbounded)]
-                } else {
-                    vec![
-                        (Bound::Unbounded, Bound::Excluded(a)),
-                        (Bound::Included(e), Bound::Unbounded),
-                    ]
-                }
-            }
-
-            (Bound::Excluded(a), Bound::Included(e)) => {
-                if a >= e {
-                    vec![(Bound::Unbounded, Bound::Unbounded)]
-                } else {
-                    vec![
-                        (Bound::Unbounded, Bound::Included(a)),
-                        (Bound::Excluded(e), Bound::Unbounded),
-                    ]
-                }
-            }
+            result
         }
-    }
-
-    #[inline]
-    fn start(&self) -> Bound<Idx> {
-        de_ref_idx(self.start_bound())
-    }
-
-    #[inline]
-    fn end(&self) -> Bound<Idx> {
-        de_ref_idx(self.end_bound())
-    }
-
-    #[inline]
-    fn to_tuple(&self) -> (Bound<Idx>, Bound<Idx>) {
-        (self.start(), self.end())
-    }
-}
-
-#[inline]
-fn de_ref_idx<Idx: Copy>(b: Bound<&Idx>) -> Bound<Idx> {
-    match b {
-        Bound::Unbounded => Bound::Unbounded,
-        Bound::Included(&i) => Bound::Included(i),
-        Bound::Excluded(&e) => Bound::Excluded(e),
-    }
-}
-
-pub fn min<Idx: PartialOrd<Idx> + Copy>(
-    b1: Bound<Idx>,
-    b2: Bound<Idx>,
-    is_lower_bound: bool,
-) -> Bound<Idx> {
-    match (b1, b2) {
-        (Bound::Unbounded, _) | (_, Bound::Unbounded) if is_lower_bound => Bound::Unbounded,
-        (Bound::Unbounded, _) => b2,
-        (_, Bound::Unbounded) => b1,
-        (Bound::Excluded(v1), Bound::Excluded(v2)) | (Bound::Included(v1), Bound::Included(v2)) => {
-            if v1 < v2 {
-                b1
-            } else {
-                b2
-            }
-        }
-        (Bound::Excluded(exc), Bound::Included(inc))
-        | (Bound::Included(inc), Bound::Excluded(exc)) => match inc.partial_cmp(&exc) {
-            Some(Ordering::Less) => Bound::Included(inc),
-            Some(Ordering::Equal) => {
-                if is_lower_bound {
-                    Bound::Included(inc)
-                } else {
-                    Bound::Excluded(exc)
-                }
-            }
-            Some(Ordering::Greater) => Bound::Excluded(exc),
-            None => panic!(),
-        },
-    }
-}
-
-pub fn max<Idx: PartialOrd<Idx> + Copy>(
-    b1: Bound<Idx>,
-    b2: Bound<Idx>,
-    is_lower_bound: bool,
-) -> Bound<Idx> {
-    match (b1, b2) {
-        (Bound::Unbounded, _) | (_, Bound::Unbounded) if !is_lower_bound => Bound::Unbounded,
-        (Bound::Unbounded, _) => b2,
-        (_, Bound::Unbounded) => b1,
-        (Bound::Excluded(v1), Bound::Excluded(v2)) | (Bound::Included(v1), Bound::Included(v2)) => {
-            if v1 < v2 {
-                b2
-            } else {
-                b1
-            }
-        }
-        (Bound::Excluded(exc), Bound::Included(inc))
-        | (Bound::Included(inc), Bound::Excluded(exc)) => match inc.partial_cmp(&exc) {
-            Some(Ordering::Less) => Bound::Excluded(exc),
-            Some(Ordering::Equal) => {
-                if is_lower_bound {
-                    Bound::Excluded(exc)
-                } else {
-                    Bound::Included(inc)
-                }
-            }
-            Some(Ordering::Greater) => Bound::Included(inc),
-            None => panic!(),
-        },
     }
 }
 
@@ -229,70 +142,75 @@ mod tests {
 
     #[test]
     fn intersect_with_result() {
-        assert_eq!((1..3).intersect(&(2..4)), Some((2..3).to_tuple()));
-    }
-
-    #[test]
-    fn intersect_without_result() {
-        assert_eq!((1..2).intersect(&(3..4)), None);
-    }
-
-    #[test]
-    fn intersect_with_point_result() {
-        assert_eq!((1..=2).intersect(&(2..=3)), Some((2..=2).to_tuple()));
-    }
-
-    #[test]
-    fn intersect_unbound_left() {
-        assert_eq!((..2).intersect(&(1..3)), Some((1..2).to_tuple()));
-    }
-
-    #[test]
-    fn diff_left_only() {
-        assert_eq!((1..3).diff(&(2..4)), vec![(1..2).to_tuple()]);
-    }
-
-    #[test]
-    fn not_right_unbound() {
         assert_eq!(
-            (Bound::Included(2), Bound::Unbounded).not(),
-            vec![(..2).to_tuple()]
+            FloatRange(1.0, 3.0).intersect(&FloatRange(2.0, 4.0)),
+            Some(FloatRange(2.0, 3.0))
         );
     }
 
     #[test]
-    fn not_left_right() {
-        assert_eq!((1..2).not(), vec![(..1).to_tuple(), (2..).to_tuple()]);
+    fn intersect_without_result() {
+        assert_eq!(FloatRange(1.0, 2.0).intersect(&FloatRange(3.0, 4.0)), None);
+    }
+
+    #[test]
+    fn intersect_with_point_result() {
+        assert_eq!(
+            FloatRange(1.0, 2.0).intersect(&FloatRange(2.0, 3.0)),
+            Some(FloatRange(2.0, 2.0))
+        );
+    }
+
+    #[test]
+    fn intersect_unbound_left() {
+        assert_eq!(
+            FloatRange(MIN, 2.0).intersect(&FloatRange(1.0, 3.0)),
+            Some(FloatRange(1.0, 2.0))
+        );
+    }
+
+    #[test]
+    fn diff_left_only() {
+        assert_eq!(
+            FloatRange(1.0, 3.0).diff(&FloatRange(2.0, 4.0)),
+            vec![FloatRange(1.0, 2.0)]
+        );
     }
 
     #[test]
     fn diff_left_only_included() {
-        assert_eq!((1..3).diff(&(2..1000)), vec![(1..2).to_tuple()]);
+        assert_eq!(
+            FloatRange(1.0, 3.0).diff(&FloatRange(2.0, 1000.0)),
+            vec![FloatRange(1.0, 2.0)]
+        );
     }
 
     #[test]
     fn diff_left_only_excluded() {
         assert_eq!(
-            (1..3).diff(&(Bound::Excluded(2), Bound::Unbounded)),
-            vec![(1..=2).to_tuple()]
+            FloatRange(1.0, 3.0).diff(&FloatRange(2.0, MAX)),
+            vec![FloatRange(1.0, 2.0)]
         );
     }
 
     #[test]
     fn diff_right_only() {
-        assert_eq!((2..4).diff(&(1..3)), vec![(3..4).to_tuple()]);
+        assert_eq!(
+            FloatRange(2.0, 4.0).diff(&FloatRange(1.0, 3.0)),
+            vec![FloatRange(3.0, 4.0)]
+        );
     }
 
     #[test]
     fn diff_left_and_right() {
         assert_eq!(
-            (1..4).diff(&(2..3)),
-            vec![(1..2).to_tuple(), (3..4).to_tuple()]
+            FloatRange(1.0, 4.0).diff(&FloatRange(2.0, 3.0)),
+            vec![FloatRange(1.0, 2.0), FloatRange(3.0, 4.0)]
         );
     }
 
     #[test]
     fn range_should_not_overlap() {
-        assert!(!(2.0..3.0).range_overlap(&(1.0..=1.5)));
+        assert!(!FloatRange(2.0, 3.0).range_overlap(&FloatRange(1.0, 1.5)));
     }
 }
