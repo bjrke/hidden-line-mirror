@@ -74,25 +74,18 @@ impl<S> QuadTree<S> {
         ));
     }
 
-    pub fn elements_intersecting<'a>(
-        &'a self,
-        r: &'a Rect,
-    ) -> Box<dyn std::iter::Iterator<Item = &S> + 'a> {
-        if self.bounds.intersects(r) {
-            Box::new(
-                self.content
-                    .iter()
-                    .filter(move |c| c.bounds.intersects(r))
-                    .map(move |c| &c.value)
-                    .chain(
-                        self.subtrees
-                            .iter()
-                            .flat_map(move |t| t.elements_intersecting(r)),
-                    ),
-            )
-        } else {
-            Box::new(std::iter::empty())
+    pub fn elements_intersecting<F: FnMut(&S) -> bool>(&self, rect: &Rect, f: &mut F) -> bool {
+        for QuadTreeLeave { bounds, value } in self.content.iter() {
+            if bounds.intersects(rect) && f(&value) {
+                return true;
+            }
         }
+        for t in self.subtrees.iter() {
+            if t.bounds.intersects(rect) && t.elements_intersecting(rect, f) {
+                return true;
+            }
+        }
+        false
     }
 }
 
@@ -125,10 +118,15 @@ mod tests {
         tree.insert_shape(expected2);
 
         let rect = Rect::new(90.0, 90.0).extend(210.0, 210.0);
-        let elements: Vec<&Vector2> = tree.elements_intersecting(&rect).collect();
+
+        let mut elements = vec![];
+        tree.elements_intersecting(&rect, &mut |r| {
+            elements.push(*r);
+            false
+        });
 
         assert_eq!(elements.len(), 2);
-        assert!(elements.contains(&&expected1));
-        assert!(elements.contains(&&expected2));
+        assert!(elements.contains(&expected1));
+        assert!(elements.contains(&expected2));
     }
 }

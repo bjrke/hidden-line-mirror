@@ -117,21 +117,18 @@ pub fn hidden_line(mut scene: Scene, dctx: &mut dyn DrawContext, actx: &AppConte
 
             let bounds = line_shape.bounds();
             let mut r: RangeSet = RangeSet(vec![FloatRange(0.0, 1.0)]);
-            let mut candidates = tree.elements_intersecting(&bounds);
-            while let Some(next) = if r.is_empty() {
-                None
-            } else {
-                candidates.next()
-            } {
+
+            tree.elements_intersecting(&bounds, &mut |triangle| {
                 intersect(
                     actx,
-                    &next,
+                    &triangle,
                     &line_shape,
                     actx.scene_builder.points[a],
                     actx.scene_builder.points[e],
                     &mut r,
                 );
-            }
+                r.is_empty()
+            });
 
             draw(dctx, &line_shape, &r, color);
         }
