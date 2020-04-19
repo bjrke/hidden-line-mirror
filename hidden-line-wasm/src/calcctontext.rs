@@ -86,9 +86,9 @@ fn draw(ctx: &mut dyn DrawContext, line: &Line, ranges: &RangeSet, color: Color)
 #[inline]
 fn draw_line_range(ctx: &mut dyn DrawContext, line: &Line, l1: Float, l2: Float, color: Color) {
     let Line(a, e) = line;
-    let Vector2(xa, ya) = a.mix(&e, l1);
-    let Vector2(xe, ye) = a.mix(&e, l2);
-    ctx.line(xa, ya, xe, ye, color);
+    let start = a.mix(&e, l1);
+    let end = a.mix(&e, l2);
+    ctx.line(&start, &end, color);
 }
 
 pub fn hidden_line(mut scene: Scene, dctx: &mut dyn DrawContext, actx: &AppContext) {

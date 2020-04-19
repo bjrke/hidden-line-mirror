@@ -32,14 +32,15 @@ mod tests {
     use super::*;
     use crate::appcontext::AppContext;
     use crate::drawcontext::*;
+    use crate::vec2::Vector2;
 
     struct TestDrawContext {
-        lines: Vec<(Float, Float, Float, Float, Color)>,
+        lines: Vec<(Vector2, Vector2, Color)>,
     }
 
     impl DrawContext for TestDrawContext {
-        fn line(&mut self, xa: Float, ya: Float, xe: Float, ye: Float, c: Color) {
-            self.lines.push((xa, ya, xe, ye, c));
+        fn line(&mut self, start: &Vector2, end: &Vector2, c: f32) {
+            self.lines.push((*start, *end, c));
         }
 
         fn finish(&mut self) {}

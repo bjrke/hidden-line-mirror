@@ -46,14 +46,14 @@ impl AppContext {
         println!("view: {:?}", self.view);
         println!("up {:?}", self.jv);
 
-        dctx.line(0.99, 1.0, 1.0, 1.0, 1.0);
-        dctx.line(1.0, 0.99, 1.0, 1.0, 1.0);
-        dctx.line(0.99, -1.0, 1.0, -1.0, 1.0);
-        dctx.line(1.0, -0.99, 1.0, -1.0, 1.0);
-        dctx.line(-0.99, 1.0, -1.0, 1.0, 1.0);
-        dctx.line(-1.0, 0.99, -1.0, 1.0, 1.0);
-        dctx.line(-0.99, -1.0, -1.0, -1.0, 1.0);
-        dctx.line(-1.0, -0.99, -1.0, -1.0, 1.0);
+        dctx.line(&Vector2(0.99, 1.0), &Vector2(1.0, 1.0), 1.0);
+        dctx.line(&Vector2(1.0, 0.99), &Vector2(1.0, 1.0), 1.0);
+        dctx.line(&Vector2(0.99, -1.0), &Vector2(1.0, -1.0), 1.0);
+        dctx.line(&Vector2(1.0, -0.99), &Vector2(1.0, -1.0), 1.0);
+        dctx.line(&Vector2(-0.99, 1.0), &Vector2(-1.0, 1.0), 1.0);
+        dctx.line(&Vector2(-1.0, 0.99), &Vector2(-1.0, 1.0), 1.0);
+        dctx.line(&Vector2(-0.99, -1.0), &Vector2(-1.0, -1.0), 1.0);
+        dctx.line(&Vector2(-1.0, -0.99), &Vector2(-1.0, -1.0), 1.0);
 
         hidden_line(scene, dctx, self);
 
