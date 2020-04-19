@@ -171,13 +171,13 @@ impl Scene {
             {
                 result.triangles.push((t.p1, t.p2, t.p3));
 
-                if t.lset & 4 == 4 {
+                if t.lset & 1 == 1 {
                     result.push_line(t.p1, t.p2, cols);
                 }
-                if t.lset & 1 == 1 {
+                if t.lset & 2 == 2 {
                     result.push_line(t.p2, t.p3, cols);
                 }
-                if t.lset & 2 == 2 {
+                if t.lset & 4 == 4 {
                     result.push_line(t.p3, t.p1, cols);
                 }
             }
