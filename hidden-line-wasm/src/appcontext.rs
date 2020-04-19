@@ -40,7 +40,8 @@ impl AppContext {
 
         let scene = Scene::new(&self);
 
-        println!("#polys: {:?}", scene.triangles.len());
+        println!("#triangle: {:?}", scene.triangles.len());
+        println!("#lines: {:?}", scene.lines.len());
         println!("eye: {:?}", self.eye);
         println!("view: {:?}", self.view);
         println!("up {:?}", self.jv);

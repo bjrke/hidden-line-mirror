@@ -1,7 +1,22 @@
 pub type Float = f32;
+
+type IntPrecision = i64;
+
 pub const PI: Float = std::f32::consts::PI;
 pub const MAX: Float = std::f32::MAX;
 pub const MIN: Float = std::f32::MIN;
-pub const EPSILON0: Float = 0.0001;
+
+pub const PRECISION: Float = 65536.0;
+pub const EPSILON0: Float = 1.0 / PRECISION;
 pub const EPSILON1: Float = EPSILON0 * EPSILON0;
 pub const EPSILON2: Float = EPSILON1 * EPSILON1;
+
+pub trait FloatExt {
+    fn round_for_eq(&self) -> IntPrecision;
+}
+
+impl FloatExt for Float {
+    fn round_for_eq(&self) -> IntPrecision {
+        (self * PRECISION).round() as IntPrecision
+    }
+}

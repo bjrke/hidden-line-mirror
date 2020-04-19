@@ -1,5 +1,6 @@
 use crate::float::*;
 use crate::vec3::*;
+use std::collections::HashMap;
 
 pub struct SceneTriangle {
     pub p1: usize,
@@ -11,6 +12,7 @@ pub struct SceneTriangle {
 pub struct SceneBuilder {
     pub points: Vec<Vector3>,
     pub triangles: Vec<SceneTriangle>,
+    point_index: HashMap<Vector3, usize>,
 }
 
 impl SceneBuilder {
@@ -18,6 +20,7 @@ impl SceneBuilder {
         SceneBuilder {
             points: Vec::new(),
             triangles: Vec::new(),
+            point_index: HashMap::new(),
         }
     }
 
@@ -26,8 +29,15 @@ impl SceneBuilder {
     }
 
     pub fn push(&mut self, p: Vector3) -> usize {
-        self.points.push(p);
-        self.points.len() - 1
+        let index = self.points.len();
+        let Vector3(x, y, z) = p;
+
+        let result = *self.point_index.entry(p).or_insert(index);
+
+        if result == index {
+            self.points.push(p);
+        }
+        result
     }
 
     pub fn triangle(&mut self, p1: usize, p2: usize, p3: usize, lset: u8) -> usize {

@@ -5,7 +5,7 @@ use crate::vec3::*;
 
 pub fn init_scene<F: Fn(Float, Float) -> Float>(f: F) -> SceneBuilder {
     let ad = 1.0;
-    let sw = 0.04;
+    let sw = 1.0 / 50.0;
     let mut xx = -ad;
 
     let mut scene = SceneBuilder::new();
