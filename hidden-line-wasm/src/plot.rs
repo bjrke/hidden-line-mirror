@@ -38,11 +38,11 @@ mod tests {
     }
 
     impl DrawContext for TestDrawContext {
-        fn circle(&mut self, _x: Float, _y: Float, _r: Float, _c: Color) {}
-
         fn line(&mut self, xa: Float, ya: Float, xe: Float, ye: Float, c: Color) {
             self.lines.push((xa, ya, xe, ye, c));
         }
+
+        fn finish(&mut self) {}
 
         fn cls(&mut self) {}
     }

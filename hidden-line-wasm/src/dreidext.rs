@@ -30,7 +30,6 @@ impl SceneBuilder {
 
     pub fn push(&mut self, p: Vector3) -> usize {
         let index = self.points.len();
-        let Vector3(x, y, z) = p;
 
         let result = *self.point_index.entry(p).or_insert(index);
 

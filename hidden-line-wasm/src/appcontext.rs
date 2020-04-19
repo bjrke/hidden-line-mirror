@@ -46,12 +46,18 @@ impl AppContext {
         println!("view: {:?}", self.view);
         println!("up {:?}", self.jv);
 
-        dctx.circle(0.99, 0.99, 0.01, 1.0);
-        dctx.circle(0.99, -0.99, 0.01, 1.0);
-        dctx.circle(-0.99, 0.99, 0.01, 1.0);
-        dctx.circle(-0.99, -0.99, 0.01, 1.0);
+        dctx.line(0.99, 1.0, 1.0, 1.0, 1.0);
+        dctx.line(1.0, 0.99, 1.0, 1.0, 1.0);
+        dctx.line(0.99, -1.0, 1.0, -1.0, 1.0);
+        dctx.line(1.0, -0.99, 1.0, -1.0, 1.0);
+        dctx.line(-0.99, 1.0, -1.0, 1.0, 1.0);
+        dctx.line(-1.0, 0.99, -1.0, 1.0, 1.0);
+        dctx.line(-0.99, -1.0, -1.0, -1.0, 1.0);
+        dctx.line(-1.0, -0.99, -1.0, -1.0, 1.0);
 
         hidden_line(scene, dctx, self);
+
+        dctx.finish();
     }
 
     pub fn on_key(&mut self, ch: char) -> bool {
