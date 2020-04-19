@@ -3,12 +3,29 @@ use crate::float::*;
 use std::collections::HashMap;
 
 const SCALE: Float = 1000.0;
+type SvgInt = i32;
+
+struct SvgLine(SvgInt, SvgInt, SvgInt, SvgInt);
 
 pub struct SvgContext {
     svg: web_sys::SvgElement,
     document: web_sys::Document,
+    color_path: HashMap<u8, Vec<SvgLine>>,
+}
 
-    color_groups: HashMap<u8, web_sys::Element>,
+#[inline]
+fn scale(f: Float) -> SvgInt {
+    (SCALE * f).round() as SvgInt
+}
+
+#[inline]
+fn scale_x(f: Float) -> SvgInt {
+    scale(f)
+}
+
+#[inline]
+fn scale_y(f: Float) -> SvgInt {
+    scale(-f)
 }
 
 impl SvgContext {
@@ -17,79 +34,49 @@ impl SvgContext {
         SvgContext {
             svg,
             document,
-            color_groups: HashMap::new(),
+            color_path: HashMap::new(),
         }
-    }
-
-    #[inline]
-    fn append(&mut self, element: web_sys::Element, c: Color) {
-        let c = color_number(c);
-        let Self {
-            color_groups,
-            document,
-            ..
-        } = self;
-
-        color_groups
-            .entry(c)
-            .or_insert_with(move || {
-                let result = document
-                    .create_element_ns(Some("http://www.w3.org/2000/svg"), "g")
-                    .unwrap();
-                result.set_attribute("stroke", &html_color(c)).unwrap();
-                result
-            })
-            .append_child(&element)
-            .unwrap();
-    }
-
-    #[inline]
-    pub fn scale(&self, f: Float) -> i32 {
-        (SCALE * f).round() as i32
-    }
-
-    #[inline]
-    pub fn scale_x(&self, f: Float) -> i32 {
-        self.scale(f)
-    }
-
-    #[inline]
-    pub fn scale_y(&self, f: Float) -> i32 {
-        self.scale(-f)
     }
 }
 
 impl DrawContext for SvgContext {
     #[inline]
     fn line(&mut self, xa: Float, ya: Float, xe: Float, ye: Float, c: Color) {
-        let line = self
-            .document
-            .create_element_ns(Some("http://www.w3.org/2000/svg"), "polyline")
-            .unwrap();
-        line.set_attribute(
-            "points",
-            &format!(
-                "{},{} {},{}",
-                self.scale_x(xa),
-                self.scale_y(ya),
-                self.scale_x(xe),
-                self.scale_y(ye)
-            ),
-        )
-        .unwrap();
-        self.append(line, c);
+        self.color_path
+            .entry(color_number(c))
+            .or_insert(vec![])
+            .push(SvgLine(scale_x(xa), scale_y(ya), scale_x(xe), scale_y(ye)))
     }
 
     #[inline]
     fn finish(&mut self) {
-        for group in self.color_groups.values() {
-            self.svg.append_child(&group).unwrap();
+        let Self {
+            color_path, svg, ..
+        } = self;
+        for (&c, lines) in color_path {
+            let path = self
+                .document
+                .create_element_ns(Some("http://www.w3.org/2000/svg"), "path")
+                .unwrap();
+
+            path.set_attribute("stroke", &html_color(c)).unwrap();
+            path.set_attribute(
+                "d",
+                &lines
+                    .iter()
+                    .map(|&SvgLine(xa, ya, xe, ye)| format!("M{} {} L{} {}", xa, ya, xe, ye))
+                    .collect::<Vec<String>>()
+                    .join(" "),
+            )
+            .unwrap();
+
+            svg.append_child(&path).unwrap();
         }
     }
 
     #[inline]
     fn cls(&mut self) {
-        self.color_groups.clear();
+        self.color_path.clear();
         loop {
             match self.svg.last_child() {
                 Some(e) => {
