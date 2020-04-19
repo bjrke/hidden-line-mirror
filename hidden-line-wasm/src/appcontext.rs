@@ -167,7 +167,7 @@ impl Scene {
                 && actx.view * o3 > eye_view_plane_dist
                 && (!actx.back_face
                     || ((p3.0 - p1.0) * (p2.1 - p1.1) + EPSILON1 < (p3.1 - p1.1) * (p2.0 - p1.0)))
-                && !colinear(&p1, &p2, &p3)
+            // && !colinear(&p1, &p2, &p3)
             {
                 result.triangles.push((t.p1, t.p2, t.p3));
 
@@ -187,7 +187,9 @@ impl Scene {
     }
 
     fn push_line(&mut self, p1: usize, p2: usize, col: Color) {
-        let key = (p1.min(p2), p1.max(p2));
-        self.lines.insert(key, col);
+        self.lines
+            .entry((p1.min(p2), p1.max(p2)))
+            .and_modify(|e| *e = e.max(col))
+            .or_insert(col);
     }
 }
