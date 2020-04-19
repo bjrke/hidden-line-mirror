@@ -36,8 +36,18 @@ impl SceneBuilder {
     }
 
     pub fn quad(&mut self, p1: usize, p2: usize, p3: usize, p4: usize) {
-        self.triangle(p1, p2, p3, 3);
-        self.triangle(p3, p4, p1, 3);
+        let o1 = self.points[p1];
+        let o2 = self.points[p2];
+        let o3 = self.points[p3];
+        let o4 = self.points[p4];
+
+        if (o1 - o3).len_sq() < (o2 - o4).len_sq() {
+            self.triangle(p1, p2, p3, 3);
+            self.triangle(p3, p4, p1, 3);
+        } else {
+            self.triangle(p4, p1, p2, 3);
+            self.triangle(p2, p3, p4, 3);
+        }
     }
 }
 
