@@ -89,16 +89,16 @@ impl<S> QuadTree<S> {
     }
 }
 
-impl<S: Shape> QuadTree<S> {
-    #[inline]
-    pub fn insert_shape(&mut self, value: S) {
-        self.insert(value.bounds(), value);
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    impl<S: Shape> QuadTree<S> {
+        #[inline]
+        pub fn insert_shape(&mut self, value: S) {
+            self.insert(value.bounds(), value);
+        }
+    }
 
     #[test]
     fn tree() {

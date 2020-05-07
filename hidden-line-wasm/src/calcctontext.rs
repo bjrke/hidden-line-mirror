@@ -187,6 +187,7 @@ fn clip(
     }
 }
 
+#[allow(dead_code)]
 fn intersect2(
     actx: &AppContext,
     triangle: &TheTriangle,

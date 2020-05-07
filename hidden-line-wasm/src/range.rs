@@ -72,13 +72,6 @@ impl FloatRange {
     }
 
     #[inline]
-    pub fn union_no_check(&self, rhs: &Self) -> FloatRange {
-        let Self(ss, se) = *self;
-        let Self(rs, re) = *rhs;
-        FloatRange(ss.min(rs), se.max(re))
-    }
-
-    #[inline]
     pub fn extend(&self, rhs: Float) -> Self {
         let Self(ss, se) = *self;
         if rhs < ss {

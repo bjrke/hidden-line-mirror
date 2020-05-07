@@ -185,11 +185,3 @@ impl Neg for &Vector2 {
         Vector2(-sx, -sy)
     }
 }
-
-#[inline]
-pub fn colinear(p1: &Vector2, p2: &Vector2, p3: &Vector2) -> bool {
-    let Vector2(x1, y1) = *p1;
-    let Vector2(x2, y2) = *p2;
-    let Vector2(x3, y3) = *p3;
-    ((y1 - y2) * (x3 - x3) - (x1 - x2) * (y3 - y2)).abs() < EPSILON2
-}

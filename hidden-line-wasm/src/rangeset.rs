@@ -9,22 +9,6 @@ impl RangeSet {
     }
 
     #[inline]
-    pub fn add(&mut self, new_range: &FloatRange) {
-        let RangeSet(ranges) = self;
-
-        let mut new_range = *new_range;
-        ranges.retain(|r| {
-            let delete = new_range.range_overlap(r);
-            if delete {
-                new_range = new_range.union_no_check(r);
-            }
-            !delete
-        });
-
-        ranges.push(new_range);
-    }
-
-    #[inline]
     pub fn remove(&mut self, r: &FloatRange) {
         let RangeSet(ranges) = self;
         let mut n = vec![];
@@ -34,12 +18,6 @@ impl RangeSet {
                 ranges.push(d)
             }
         }
-    }
-
-    #[inline]
-    pub fn diff(&mut self, rs: &Self) {
-        let RangeSet(ranges) = rs;
-        ranges.iter().for_each(|r| self.remove(r));
     }
 }
 
@@ -71,42 +49,11 @@ mod tests {
     }
 
     #[test]
-    fn add_should_merge() {
-        let mut set = set1(FloatRange(1.0, 3.0));
-        set.add(&FloatRange(2.0, 4.0));
-
-        assert_eq!(set.0, vec![FloatRange(1.0, 4.0)]);
-    }
-
-    #[test]
-    fn add_should_not_merge() {
-        let mut set = set1(FloatRange(1.0, 2.0));
-        set.add(&FloatRange(3.0, 4.0));
-
-        assert_eq!(set.0, vec![FloatRange(1.0, 2.0), FloatRange(3.0, 4.0)]);
-    }
-
-    #[test]
     fn remove_should_work() {
         let mut set = set2(FloatRange(1.0, 3.0), FloatRange(4.0, 8.0));
         set.remove(&FloatRange(2.0, 6.0));
 
         assert_eq!(set.0, vec![FloatRange(1.0, 2.0), FloatRange(6.0, 8.0)]);
-    }
-
-    #[test]
-    fn diff_should_work() {
-        let mut s1 = set2(FloatRange(1.0, 3.0), FloatRange(4.0, 12.0));
-        s1.diff(&set2(FloatRange(2.0, 6.0), FloatRange(7.0, 8.0)));
-
-        assert_eq!(
-            s1.0,
-            vec![
-                FloatRange(1.0, 2.0),
-                FloatRange(6.0, 7.0),
-                FloatRange(8.0, 12.0)
-            ]
-        );
     }
 
     #[test]
