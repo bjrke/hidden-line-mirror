@@ -34,13 +34,13 @@ impl FloatRange {
     fn line_rect_border(&self, x1: Float, y1: Float, x2: Float, y2: Float, x: Float) -> bool {
         let divisor = x2 - x1;
         let s = x2 - x;
-        if s == divisor {
+        let t = divisor - s;
+        if t.abs() < EPSILON0 {
             self.contains(&y2)
         } else if s == 0.0 {
             self.contains(&y1)
         } else {
-            s.signum() == divisor.signum() && s.abs() < divisor.abs() && {
-                let t = divisor - s;
+            s.sign() == divisor.sign() && s.abs() < divisor.abs() && {
                 let y = (s * y1 + t * y2) / divisor;
                 self.contains(&y)
             }

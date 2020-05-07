@@ -138,13 +138,13 @@ pub fn hidden_line(mut scene: Scene, dctx: &mut dyn DrawContext, actx: &AppConte
 fn clip(
     p1: Vector3,
     p2: Vector3,
-    a: Vector3,
-    b: Vector3,
-    c: Vector3,
+    v1: Vector3,
+    v2: Vector3,
+    v3: Vector3,
     ref_point: Vector3,
     ref_point_visible: bool,
 ) -> FloatRange {
-    let normal = (a - b).cross(&c).normalize();
+    let normal = (v1 - v2).cross(&v3).normalize();
 
     let ref_dist = ref_point * normal;
     if ref_dist.abs() < EPSILON0 {
@@ -152,9 +152,9 @@ fn clip(
     }
 
     let ref_dist = if !ref_point_visible {
-        ref_dist.signum()
+        ref_dist.sign()
     } else {
-        -ref_dist.signum()
+        !ref_dist.sign()
     };
 
     //https://quickmath.com/webMathematica3/quickmath/equations/solve/advanced.jsp#c=solve_advancedsolveequations&v1=lx_1%2Bmx_2%253Dp%250Aly_1%2Bmy_2%253Dq%250Alz_1%2Bmz_2%253Dr%250Al%2Bm%253D1%250Apx%2Bqy%2Brz%253D0%250A&v2=l%250Am%250A%250A&v5=1&v6=p%250Aq%250Ar
@@ -170,19 +170,17 @@ fn clip(
         let l = p2n / d;
 
         if l > 0.5 {
-            if p2n.signum() == ref_dist {
+            if p2n.sign() == ref_dist {
                 // l == 0 visible
                 FloatRange(l, MAX)
             } else {
                 FloatRange(MIN, l)
             }
+        } else if p1n.sign() == ref_dist {
+            // l == 1 visible
+            FloatRange(MIN, l)
         } else {
-            if p1n.signum() == ref_dist {
-                // l == 1 visible
-                FloatRange(MIN, l)
-            } else {
-                FloatRange(l, MAX)
-            }
+            FloatRange(l, MAX)
         }
     }
 }
@@ -318,25 +316,25 @@ fn intersect(
         let fx4 = p4.0 * d21.1;
         let fy4 = p4.1 * d21.0;
 
-        let d = fx2 - fy2 + fy1 - fx1;
+        let divisor = fx2 - fy2 + fy1 - fx1;
 
         let k21 = Matrix2(b1, b2).determinant();
 
-        let n = -(fx4 - fy4 - k21) / d;
-        let o = (fx3 - fy3 - k21) / d;
+        let nn = -(fx4 - fy4 - k21) / divisor;
+        let oo = (fx3 - fy3 - k21) / divisor;
 
-        if n > -EPSILON0 && o > -EPSILON0 {
+        if nn > -EPSILON0 && oo > -EPSILON0 {
             let k43 = Matrix2(p3, p4).determinant();
-            let l = (fx2 - fy2 - k43) / d;
+            let l1 = (fx2 - fy2 - k43) / divisor;
 
             match min {
-                None => min = Some(l),
-                Some(r) => min = Some(l.min(r)),
+                None => min = Some(l1),
+                Some(l2) => min = Some(l1.min(l2)),
             }
 
             match max {
-                None => max = Some(l),
-                Some(r) => max = Some(l.max(r)),
+                None => max = Some(l1),
+                Some(l2) => max = Some(l1.max(l2)),
             }
         }
     }

@@ -18,9 +18,9 @@ pub fn init_scene<F: Fn(Float, Float) -> Float>(f: F) -> SceneBuilder {
                 Vector3(xx, yy, f(xx, yy)),
                 Vector3(xx + sw, yy, f(xx + sw, yy)),
             );
-            yy = yy + sw;
+            yy += sw;
         }
-        xx = xx + sw;
+        xx += sw;
         scene = qs.build();
     }
 

@@ -93,7 +93,7 @@ impl DrawContext for SvgContext {
     fn line(&mut self, start: &Vector2, end: &Vector2, c: Color) {
         self.color_path
             .entry(color_number(c))
-            .or_insert_with(|| ColorGroup::new())
+            .or_insert_with(ColorGroup::new)
             .push(SvgPoint::new(start), SvgPoint::new(end));
     }
 

@@ -13,10 +13,18 @@ pub const EPSILON2: Float = EPSILON1 * EPSILON1;
 
 pub trait FloatExt {
     fn round_for_eq(&self) -> IntPrecision;
+
+    fn sign(&self) -> bool;
 }
 
 impl FloatExt for Float {
+    #[inline]
     fn round_for_eq(&self) -> IntPrecision {
         (self * PRECISION).round() as IntPrecision
+    }
+
+    #[inline]
+    fn sign(&self) -> bool {
+        self.is_sign_negative()
     }
 }

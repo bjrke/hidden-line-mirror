@@ -146,7 +146,7 @@ impl Shape for Vector2 {
 
     #[inline]
     fn contains(&self, v: &Vector2) -> bool {
-        return self == v;
+        self == v
     }
 
     #[inline]
@@ -188,11 +188,11 @@ impl Shape for Line {
 pub struct Triangle(pub Vector2, pub Vector2, pub Vector2);
 
 #[inline]
-fn sign(p: &Vector2, a: &Vector2, e: &Vector2) -> Float {
+fn sign(p: &Vector2, a: &Vector2, e: &Vector2) -> bool {
     let Vector2(px, py) = *p;
     let Vector2(ax, ay) = *a;
     let Vector2(ex, ey) = *e;
-    ((px - ex) * (ay - ey) - (ax - ex) * (py - ey)).signum()
+    ((px - ex) * (ay - ey) - (ax - ex) * (py - ey)).sign()
 }
 
 impl Shape for Triangle {
@@ -305,7 +305,7 @@ mod tests {
     }
 
     #[test]
-    fn triangle_should_contain() {
+    fn triangle_should_contain_point_on_line() {
         let triangle = Triangle(Vector2(1.0, 1.0), Vector2(6.0, 2.0), Vector2(4.0, 4.0));
 
         assert!(triangle.contains(&Vector2(3.0, 3.0)))
