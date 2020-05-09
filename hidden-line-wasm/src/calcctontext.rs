@@ -21,9 +21,7 @@ struct TheTriangle {
 
 impl TheTriangle {
     #[inline]
-    fn new(poly: (usize, usize, usize), scene: &Scene, actx: &AppContext) -> TheTriangle {
-        let (i1, i2, i3) = poly;
-
+    fn new(actx: &AppContext, scene: &Scene, i1: usize, i2: usize, i3: usize) -> TheTriangle {
         let o1 = actx.scene_builder.points[i1];
         let o2 = actx.scene_builder.points[i2];
         let o3 = actx.scene_builder.points[i3];
@@ -81,34 +79,45 @@ fn draw_line_range(ctx: &mut dyn DrawContext, line: &Line, l1: Float, l2: Float,
     ctx.line(&start, &end, color);
 }
 
-pub fn hidden_line(mut scene: Scene, dctx: &mut dyn DrawContext, actx: &AppContext) {
-    let mut triangles = vec![];
-    while let Some(poly) = scene.triangles.pop() {
-        triangles.push(TheTriangle::new(poly, &scene, &actx));
-    }
+pub struct CalcContext {
+    tree: QuadTree<TheTriangle>,
+}
 
-    let screen = triangles.iter().fold(None, |acc: Option<Rect>, t| {
-        let bound = t.bounds();
-        if let Some(existing) = acc {
-            Some(existing.extend_rect(&bound))
-        } else {
-            Some(bound)
+impl CalcContext {
+    pub fn new(scene: &Scene, actx: &AppContext) -> CalcContext {
+        let mut triangles = vec![];
+        for poly in scene.triangles.iter() {
+            let (i1, i2, i3) = *poly;
+            triangles.push(TheTriangle::new(actx, scene, i1, i2, i3));
         }
-    });
 
-    if let Some(screen) = screen {
+        let screen = triangles
+            .iter()
+            .fold(None, |acc: Option<Rect>, t| {
+                let bound = t.bounds();
+                if let Some(existing) = acc {
+                    Some(existing.extend_rect(&bound))
+                } else {
+                    Some(bound)
+                }
+            })
+            .unwrap_or_else(|| Rect::new(0.0, 0.0));
+
         let mut tree = QuadTree::new(screen);
         for t in triangles {
             tree.insert(t.bounds(), t);
         }
+        CalcContext { tree }
+    }
 
+    pub fn hidden_line(&self, scene: &Scene, dctx: &mut dyn DrawContext, actx: &AppContext) {
         for (&(a, e), &color) in scene.lines.iter() {
             let line_shape = Line(scene.points[a], scene.points[e]);
 
             let bounds = line_shape.bounds();
             let mut r: RangeSet = RangeSet(vec![FloatRange(0.0, 1.0)]);
 
-            tree.elements_intersecting(&bounds, &mut |triangle| {
+            self.tree.elements_intersecting(&bounds, &mut |triangle| {
                 intersect(
                     actx,
                     &triangle,

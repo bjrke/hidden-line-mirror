@@ -1,4 +1,4 @@
-use crate::calcctontext::hidden_line;
+use crate::calcctontext::*;
 use crate::drawcontext::*;
 use crate::dreidext::*;
 use crate::float::*;
@@ -46,7 +46,9 @@ impl AppContext {
         println!("view: {:?}", self.view);
         println!("up {:?}", self.jv);
 
-        hidden_line(scene, dctx, self);
+        let cctx = CalcContext::new(&scene, &self);
+
+        cctx.hidden_line(&scene, dctx, &self);
 
         dctx.finish();
     }
