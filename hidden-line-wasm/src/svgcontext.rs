@@ -92,7 +92,7 @@ impl DrawContext for SvgContext {
     #[inline]
     fn line(&mut self, start: &Vector2, end: &Vector2, c: Color) {
         self.color_path
-            .entry(color_number(c))
+            .entry(c)
             .or_insert_with(ColorGroup::new)
             .push(SvgPoint::new(start), SvgPoint::new(end));
     }
@@ -151,15 +151,4 @@ impl DrawContext for SvgContext {
 #[inline]
 fn html_color(x: u8) -> String {
     format!("#{:02x}{:02x}{:02x}", x, x, x)
-}
-
-#[inline]
-fn color_number(c: f32) -> u8 {
-    if c >= 1.0 {
-        255
-    } else if c <= 0.0 {
-        0
-    } else {
-        (c * 255.0).round() as u8
-    }
 }

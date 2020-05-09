@@ -39,7 +39,7 @@ mod tests {
     }
 
     impl DrawContext for TestDrawContext {
-        fn line(&mut self, start: &Vector2, end: &Vector2, c: f32) {
+        fn line(&mut self, start: &Vector2, end: &Vector2, c: Color) {
             self.lines.push((*start, *end, c));
         }
 

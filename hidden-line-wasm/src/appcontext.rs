@@ -1,5 +1,5 @@
 use crate::calcctontext::hidden_line;
-use crate::drawcontext::{Color, DrawContext};
+use crate::drawcontext::{float_to_color, Color, DrawContext, WHITE};
 use crate::dreidext::*;
 use crate::float::*;
 use crate::matrix::*;
@@ -46,14 +46,14 @@ impl AppContext {
         println!("view: {:?}", self.view);
         println!("up {:?}", self.jv);
 
-        dctx.line(&Vector2(0.99, 1.0), &Vector2(1.0, 1.0), 1.0);
-        dctx.line(&Vector2(1.0, 0.99), &Vector2(1.0, 1.0), 1.0);
-        dctx.line(&Vector2(0.99, -1.0), &Vector2(1.0, -1.0), 1.0);
-        dctx.line(&Vector2(1.0, -0.99), &Vector2(1.0, -1.0), 1.0);
-        dctx.line(&Vector2(-0.99, 1.0), &Vector2(-1.0, 1.0), 1.0);
-        dctx.line(&Vector2(-1.0, 0.99), &Vector2(-1.0, 1.0), 1.0);
-        dctx.line(&Vector2(-0.99, -1.0), &Vector2(-1.0, -1.0), 1.0);
-        dctx.line(&Vector2(-1.0, -0.99), &Vector2(-1.0, -1.0), 1.0);
+        dctx.line(&Vector2(0.99, 1.0), &Vector2(1.0, 1.0), WHITE);
+        dctx.line(&Vector2(1.0, 0.99), &Vector2(1.0, 1.0), WHITE);
+        dctx.line(&Vector2(0.99, -1.0), &Vector2(1.0, -1.0), WHITE);
+        dctx.line(&Vector2(1.0, -0.99), &Vector2(1.0, -1.0), WHITE);
+        dctx.line(&Vector2(-0.99, 1.0), &Vector2(-1.0, 1.0), WHITE);
+        dctx.line(&Vector2(-1.0, 0.99), &Vector2(-1.0, 1.0), WHITE);
+        dctx.line(&Vector2(-0.99, -1.0), &Vector2(-1.0, -1.0), WHITE);
+        dctx.line(&Vector2(-1.0, -0.99), &Vector2(-1.0, -1.0), WHITE);
 
         hidden_line(scene, dctx, self);
 
@@ -164,7 +164,7 @@ impl Scene {
             let p3 = result.points[t.p3];
 
             let c = (o1 - o2).cross(&(o3 - o2));
-            let cols = (actx.view.normalize() * c.normalize()).abs();
+            let cols = float_to_color((actx.view.normalize() * c.normalize()).abs());
 
             let eye_view_plane_dist = actx.view * actx.eye + EPSILON1;
 
@@ -196,7 +196,11 @@ impl Scene {
     fn push_line(&mut self, p1: usize, p2: usize, col: Color) {
         self.lines
             .entry((p1.min(p2), p1.max(p2)))
-            .and_modify(|e| *e = e.max(col))
+            .and_modify(|e| {
+                if col > *e {
+                    *e = col
+                }
+            })
             .or_insert(col);
     }
 }
