@@ -9,8 +9,6 @@ use crate::shape::{Line, Rect, Shape, Triangle};
 use crate::vec2::*;
 use crate::vec3::*;
 
-const DEBUG: bool = false;
-
 #[derive(Debug)]
 struct TheTriangle {
     shape: Triangle,
@@ -69,17 +67,9 @@ impl Shape for TheTriangle {
 
 #[inline]
 fn draw(ctx: &mut dyn DrawContext, line: &Line, ranges: &RangeSet, color: Color) {
-    let mut last = 0.0;
     let RangeSet(ranges) = ranges;
     for FloatRange(l1, l2) in ranges {
-        if DEBUG && last < *l1 {
-            draw_line_range(ctx, line, last, *l1, -MAX);
-        }
         draw_line_range(ctx, line, *l1, *l2, color);
-        last = *l2;
-    }
-    if DEBUG && last < 1.0 {
-        draw_line_range(ctx, line, last, 1.0, -MAX);
     }
 }
 
@@ -226,10 +216,6 @@ fn intersect(
     o2: Vector3,
     range: &mut RangeSet,
 ) {
-    let t1 = triangle.o1;
-    let t2 = triangle.o2;
-    let t3 = triangle.o3;
-
     let nv = triangle.plane_norm;
     let pd = triangle.plane_dist;
 
@@ -247,9 +233,6 @@ fn intersect(
     let p2_on_tri = p2_dist.abs() < EPSILON0;
     if p1_on_tri && p2_on_tri {
         // the lies on the triangle and is there fore visible
-        if DEBUG {
-            println!("p1_on_tri && p2_on_tri");
-        }
         return;
     }
 
@@ -258,18 +241,7 @@ fn intersect(
 
     if p1_visible && p2_visible {
         // both points of the line are on the same side of the triangle like the eye, so it is always visible even if it intersects
-        if DEBUG {
-            println!("p1_visible && p2_visible");
-        }
         return;
-    }
-
-    if DEBUG {
-        println!("t {:?} {:?} {:?} l {:?} {:?}", t1, t2, t3, o1, o2);
-        println!(
-            "eye_dist {:?} p1_dist {:?} p2_dist {:?}",
-            eye_dist, p1_dist, p2_dist
-        );
     }
 
     if p1_visible != p2_visible {
@@ -277,24 +249,6 @@ fn intersect(
     }
 
     let Line(b1, b2) = *line_shape;
-
-    if DEBUG {
-        let Triangle(Vector2(ax, ay), Vector2(bx, by), Vector2(cx, cy)) = triangle.shape;
-        println!("<path style=\"fill:#fff;stroke:#000000;stroke-width: 0.01px;\" d=\"M {:?},{:?} {:?},{:?} {:?},{:?} Z\" />",
-                     ax,
-                     -ay,
-                    bx,
-                     -by,
-                    cx,
-                     -cy);
-
-        let Vector2(b1x, b1y) = b1;
-        let Vector2(b2x, b2y) = b1;
-        println!(
-            "<path style=\"stroke:#000000;stroke-width: 0.01px;\" d=\"M {:?},{:?} {:?},{:?} \"/>",
-            b1x, -b1y, b2x, -b2y
-        );
-    }
 
     let d21 = b2 - b1;
     let mut min = None;
