@@ -3,8 +3,6 @@ use crate::vec2::Vector2;
 
 pub type Color = u8;
 
-pub const WHITE: Color = 255;
-
 pub trait DrawContext {
     fn line(&mut self, start: &Vector2, end: &Vector2, c: Color);
 

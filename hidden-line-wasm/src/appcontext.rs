@@ -1,5 +1,5 @@
 use crate::calcctontext::hidden_line;
-use crate::drawcontext::{float_to_color, Color, DrawContext, WHITE};
+use crate::drawcontext::*;
 use crate::dreidext::*;
 use crate::float::*;
 use crate::matrix::*;
@@ -45,15 +45,6 @@ impl AppContext {
         println!("eye: {:?}", self.eye);
         println!("view: {:?}", self.view);
         println!("up {:?}", self.jv);
-
-        dctx.line(&Vector2(0.99, 1.0), &Vector2(1.0, 1.0), WHITE);
-        dctx.line(&Vector2(1.0, 0.99), &Vector2(1.0, 1.0), WHITE);
-        dctx.line(&Vector2(0.99, -1.0), &Vector2(1.0, -1.0), WHITE);
-        dctx.line(&Vector2(1.0, -0.99), &Vector2(1.0, -1.0), WHITE);
-        dctx.line(&Vector2(-0.99, 1.0), &Vector2(-1.0, 1.0), WHITE);
-        dctx.line(&Vector2(-1.0, 0.99), &Vector2(-1.0, 1.0), WHITE);
-        dctx.line(&Vector2(-0.99, -1.0), &Vector2(-1.0, -1.0), WHITE);
-        dctx.line(&Vector2(-1.0, -0.99), &Vector2(-1.0, -1.0), WHITE);
 
         hidden_line(scene, dctx, self);
 
