@@ -11,27 +11,49 @@ struct SvgPoint(SvgInt, SvgInt);
 
 impl SvgPoint {
     #[inline]
-    fn new(v: &Vector2) -> Self {
-        let &Vector2(x, y) = v;
+    fn new(v: Vector2) -> Self {
+        let Vector2(x, y) = v;
         Self(scale_x(x), scale_y(y))
     }
 }
-struct ColorGroup {
+
+pub struct ColorGroup {
     front: HashMap<SvgPoint, usize>,
     back: HashMap<SvgPoint, usize>,
     queues: Vec<VecDeque<SvgPoint>>,
+    color: Color,
 }
 
 impl ColorGroup {
-    fn new() -> Self {
+    fn new(color: Color) -> Self {
         Self {
             front: HashMap::new(),
             back: HashMap::new(),
             queues: vec![],
+            color,
         }
     }
 
-    fn push(&mut self, p1: SvgPoint, p2: SvgPoint) {
+    fn path_attribute(&mut self) -> String {
+        let mut path_attribute = String::new();
+
+        for queue in self.queues.iter_mut() {
+            if let Some(SvgPoint(x, y)) = queue.pop_front() {
+                path_attribute.push_str(&format!(" M{},{}", x, y));
+                while let Some(SvgPoint(x, y)) = queue.pop_front() {
+                    path_attribute.push_str(&format!(" L{},{}", x, y));
+                }
+            }
+        }
+        path_attribute
+    }
+}
+
+impl ColorContext for ColorGroup {
+    fn line(&mut self, p1: Vector2, p2: Vector2) {
+        let p1 = SvgPoint::new(p1);
+        let p2 = SvgPoint::new(p2);
+
         if let Some(q) = self.front.remove(&p1) {
             self.queues[q].push_front(p2);
             self.front.insert(p2, q);
@@ -59,7 +81,7 @@ impl ColorGroup {
 pub struct SvgContext {
     svg: web_sys::SvgElement,
     document: web_sys::Document,
-    color_path: HashMap<u8, ColorGroup>,
+    group: web_sys::Element,
 }
 
 #[inline]
@@ -80,67 +102,20 @@ fn scale_y(f: Float) -> SvgInt {
 impl SvgContext {
     pub fn new(svg: web_sys::SvgElement) -> SvgContext {
         let document = svg.owner_document().unwrap();
+        let group = create_group(&document);
         SvgContext {
             svg,
             document,
-            color_path: HashMap::new(),
+            group,
         }
     }
-}
 
-impl DrawContext for SvgContext {
-    #[inline]
-    fn line(&mut self, start: &Vector2, end: &Vector2, c: Color) {
-        self.color_path
-            .entry(c)
-            .or_insert_with(ColorGroup::new)
-            .push(SvgPoint::new(start), SvgPoint::new(end));
-    }
-
-    #[inline]
-    fn finish(&mut self) {
-        let Self {
-            color_path, svg, ..
-        } = self;
-
-        let group = self
-            .document
-            .create_element_ns(Some("http://www.w3.org/2000/svg"), "g")
-            .unwrap();
-        group.set_attribute("fill", &"none").unwrap();
-
-        for (&c, ColorGroup { queues, .. }) in color_path {
-            let path = self
-                .document
-                .create_element_ns(Some("http://www.w3.org/2000/svg"), "path")
-                .unwrap();
-            path.set_attribute("stroke", &html_color(c)).unwrap();
-
-            let mut path_attribute = String::new();
-
-            for queue in queues {
-                if let Some(SvgPoint(x, y)) = queue.pop_front() {
-                    path_attribute.push_str(&format!(" M{},{}", x, y));
-                    while let Some(SvgPoint(x, y)) = queue.pop_front() {
-                        path_attribute.push_str(&format!(" L{},{}", x, y));
-                    }
-                }
-            }
-
-            path.set_attribute("d", &path_attribute).unwrap();
-
-            group.append_child(&path).unwrap();
-        }
-        svg.append_child(&group).unwrap();
-    }
-
-    #[inline]
     fn cls(&mut self) {
-        self.color_path.clear();
+        let Self { svg, .. } = self;
         loop {
-            match self.svg.last_child() {
+            match svg.last_child() {
                 Some(e) => {
-                    self.svg.remove_child(&e).unwrap();
+                    svg.remove_child(&e).unwrap();
                 }
                 _ => return,
             }
@@ -148,7 +123,41 @@ impl DrawContext for SvgContext {
     }
 }
 
+impl DrawContext<ColorGroup> for SvgContext {
+    fn draw(&mut self, mut lctx: ColorGroup) {
+        let path = self
+            .document
+            .create_element_ns(Some("http://www.w3.org/2000/svg"), "path")
+            .unwrap();
+        path.set_attribute("stroke", &html_color(lctx.color))
+            .unwrap();
+
+        path.set_attribute("d", &lctx.path_attribute()).unwrap();
+
+        self.group.append_child(&path).unwrap();
+    }
+
+    #[inline]
+    fn finish(&mut self) {
+        self.cls();
+        self.svg.append_child(&self.group).unwrap();
+        self.group = create_group(&self.document);
+    }
+
+    fn color_context(&mut self, color: u8) -> ColorGroup {
+        ColorGroup::new(color)
+    }
+}
+
 #[inline]
 fn html_color(x: u8) -> String {
     format!("#{:02x}{:02x}{:02x}", x, x, x)
+}
+
+fn create_group(document: &web_sys::Document) -> web_sys::Element {
+    let group = document
+        .create_element_ns(Some("http://www.w3.org/2000/svg"), "g")
+        .unwrap();
+    group.set_attribute("fill", &"none").unwrap();
+    group
 }

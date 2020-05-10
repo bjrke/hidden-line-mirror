@@ -98,9 +98,8 @@ pub fn hidden_line(
     tree: &QuadTree<TreeTriangle>,
     scene3: &Scene3,
     scene2: &Scene2,
-    dctx: &mut dyn DrawContext,
-    color: u8,
     lines: &Vec<(usize, usize)>,
+    color_context: &mut dyn ColorContext,
 ) {
     for &(a, e) in lines.iter() {
         let pa = scene2.points[a];
@@ -126,7 +125,7 @@ pub fn hidden_line(
         for FloatRange(l1, l2) in ranges {
             let start = pa.mix(&pe, l1);
             let end = pa.mix(&pe, l2);
-            dctx.line(&start, &end, color);
+            color_context.line(start, end);
         }
     }
 }

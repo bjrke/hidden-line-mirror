@@ -31,9 +31,7 @@ impl AppContext {
         }
     }
 
-    pub fn render(&mut self, dctx: &mut dyn DrawContext) {
-        dctx.cls();
-
+    pub fn render<C: ColorContext, D: DrawContext<C>>(&mut self, dctx: &mut D) {
         let unit_vec_len = 0.4 * self.view.len();
         self.iv = self.view.cross(&self.jv).normalize() * unit_vec_len;
         self.jv = self.iv.cross(&self.view).normalize() * unit_vec_len;
@@ -49,7 +47,9 @@ impl AppContext {
         let tree = create_tree(&self.scene3, &scene2);
 
         for (&color, lines) in scene2.lines.iter() {
-            hidden_line(&tree, &self.scene3, &scene2, dctx, color, lines)
+            let mut color_context = dctx.color_context(color);
+            hidden_line(&tree, &self.scene3, &scene2, lines, &mut color_context);
+            dctx.draw(color_context);
         }
 
         dctx.finish();

@@ -46,14 +46,32 @@ mod tests {
         lines: Vec<(Vector2, Vector2, Color)>,
     }
 
-    impl DrawContext for TestDrawContext {
-        fn line(&mut self, start: &Vector2, end: &Vector2, c: Color) {
-            self.lines.push((*start, *end, c));
+    struct TestColorContext {
+        lines: Vec<(Vector2, Vector2)>,
+        color: Color,
+    }
+
+    impl ColorContext for TestColorContext {
+        fn line(&mut self, p1: Vector2, p2: Vector2) {
+            self.lines.push((p1, p2));
+        }
+    }
+
+    impl DrawContext<TestColorContext> for TestDrawContext {
+        fn draw(&mut self, color_ctx: TestColorContext) {
+            for (a, e) in color_ctx.lines {
+                self.lines.push((a, e, color_ctx.color));
+            }
         }
 
         fn finish(&mut self) {}
 
-        fn cls(&mut self) {}
+        fn color_context(&mut self, color: u8) -> TestColorContext {
+            TestColorContext {
+                lines: vec![],
+                color,
+            }
+        }
     }
 
     impl TestDrawContext {
