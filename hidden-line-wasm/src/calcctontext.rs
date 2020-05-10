@@ -68,22 +68,6 @@ impl Shape for TreeTriangle {
     }
 }
 
-#[inline]
-fn draw(ctx: &mut dyn DrawContext, line: &Line, ranges: &RangeSet, color: Color) {
-    let RangeSet(ranges) = ranges;
-    for FloatRange(l1, l2) in ranges {
-        draw_line_range(ctx, line, *l1, *l2, color);
-    }
-}
-
-#[inline]
-fn draw_line_range(ctx: &mut dyn DrawContext, line: &Line, l1: Float, l2: Float, color: Color) {
-    let Line(a, e) = line;
-    let start = a.mix(&e, l1);
-    let end = a.mix(&e, l2);
-    ctx.line(&start, &end, color);
-}
-
 pub fn create_tree(scene3: &Scene3, scene2: &Scene2) -> QuadTree<TreeTriangle> {
     let mut triangles = vec![];
     for poly in scene2.triangles.iter() {
@@ -119,10 +103,12 @@ pub fn hidden_line(
     lines: &Vec<(usize, usize)>,
 ) {
     for &(a, e) in lines.iter() {
-        let line_shape = Line(scene2.points[a], scene2.points[e]);
+        let pa = scene2.points[a];
+        let pe = scene2.points[e];
+        let line_shape = Line(pa, pe);
 
         let bounds = line_shape.bounds();
-        let mut r: RangeSet = RangeSet(vec![FloatRange(0.0, 1.0)]);
+        let mut ranges: RangeSet = RangeSet(vec![FloatRange(0.0, 1.0)]);
 
         tree.elements_intersecting(&bounds, &mut |triangle| {
             intersect(
@@ -131,12 +117,17 @@ pub fn hidden_line(
                 scene2.eye,
                 scene3.points[a],
                 scene3.points[e],
-                &mut r,
+                &mut ranges,
             );
-            r.is_empty()
+            ranges.is_empty()
         });
 
-        draw(dctx, &line_shape, &r, color);
+        let RangeSet(ranges) = ranges;
+        for FloatRange(l1, l2) in ranges {
+            let start = pa.mix(&pe, l1);
+            let end = pa.mix(&pe, l2);
+            dctx.line(&start, &end, color);
+        }
     }
 }
 
