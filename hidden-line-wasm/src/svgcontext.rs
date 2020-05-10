@@ -78,10 +78,15 @@ impl ColorContext for ColorGroup {
     }
 }
 
+struct PathFrame {
+    path: web_sys::Element,
+    clear: bool,
+}
+
 pub struct SvgContext {
-    svg: web_sys::SvgElement,
     document: web_sys::Document,
     group: web_sys::Element,
+    paths: HashMap<Color, PathFrame>,
 }
 
 #[inline]
@@ -102,46 +107,58 @@ fn scale_y(f: Float) -> SvgInt {
 impl SvgContext {
     pub fn new(svg: web_sys::SvgElement) -> SvgContext {
         let document = svg.owner_document().unwrap();
-        let group = create_group(&document);
+
+        let group = document
+            .create_element_ns(Some("http://www.w3.org/2000/svg"), "g")
+            .unwrap();
+        group.set_attribute("fill", "none").unwrap();
+
+        svg.append_child(&group).unwrap();
         SvgContext {
-            svg,
             document,
             group,
-        }
-    }
-
-    fn cls(&mut self) {
-        let Self { svg, .. } = self;
-        loop {
-            match svg.last_child() {
-                Some(e) => {
-                    svg.remove_child(&e).unwrap();
-                }
-                _ => return,
-            }
+            paths: HashMap::new(),
         }
     }
 }
 
 impl DrawContext<ColorGroup> for SvgContext {
-    fn draw(&mut self, mut lctx: ColorGroup) {
-        let path = self
-            .document
-            .create_element_ns(Some("http://www.w3.org/2000/svg"), "path")
-            .unwrap();
-        path.set_attribute("stroke", &html_color(lctx.color))
-            .unwrap();
+    fn draw(&mut self, mut color_context: ColorGroup) {
+        let Self {
+            paths,
+            document,
+            group,
+            ..
+        } = self;
 
-        path.set_attribute("d", &lctx.path_attribute()).unwrap();
+        let color = color_context.color;
 
-        self.group.append_child(&path).unwrap();
+        let path_frame = paths.entry(color).or_insert_with(move || {
+            let path = document
+                .create_element_ns(Some("http://www.w3.org/2000/svg"), "path")
+                .unwrap();
+            path.set_attribute("stroke", &html_color(color)).unwrap();
+            group.append_child(&path).unwrap();
+
+            PathFrame { clear: false, path }
+        });
+
+        path_frame
+            .path
+            .set_attribute("d", &color_context.path_attribute())
+            .unwrap();
+        path_frame.clear = false
     }
 
     #[inline]
     fn finish(&mut self) {
-        self.cls();
-        self.svg.append_child(&self.group).unwrap();
-        self.group = create_group(&self.document);
+        for (_, pf) in self.paths.iter_mut() {
+            if pf.clear {
+                pf.path.set_attribute("d", "").unwrap();
+            } else {
+                pf.clear = true
+            }
+        }
     }
 
     fn color_context(&mut self, color: u8) -> ColorGroup {
@@ -152,12 +169,4 @@ impl DrawContext<ColorGroup> for SvgContext {
 #[inline]
 fn html_color(x: u8) -> String {
     format!("#{:02x}{:02x}{:02x}", x, x, x)
-}
-
-fn create_group(document: &web_sys::Document) -> web_sys::Element {
-    let group = document
-        .create_element_ns(Some("http://www.w3.org/2000/svg"), "g")
-        .unwrap();
-    group.set_attribute("fill", &"none").unwrap();
-    group
 }
