@@ -46,7 +46,7 @@ impl AppContext {
         println!("view: {:?}", self.view);
         println!("up {:?}", self.jv);
 
-        let tree = createTree(&self.scene3, &scene2);
+        let tree = create_tree(&self.scene3, &scene2);
 
         hidden_line(&tree, &self.scene3, &scene2, dctx);
 

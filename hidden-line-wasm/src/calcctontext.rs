@@ -84,7 +84,7 @@ fn draw_line_range(ctx: &mut dyn DrawContext, line: &Line, l1: Float, l2: Float,
     ctx.line(&start, &end, color);
 }
 
-pub fn createTree(scene3: &Scene3, scene2: &Scene2) -> QuadTree<TreeTriangle> {
+pub fn create_tree(scene3: &Scene3, scene2: &Scene2) -> QuadTree<TreeTriangle> {
     let mut triangles = vec![];
     for poly in scene2.triangles.iter() {
         let (i1, i2, i3) = *poly;

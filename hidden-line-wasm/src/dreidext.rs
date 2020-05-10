@@ -66,12 +66,12 @@ impl SceneBuilder {
 pub struct QuadStrip {
     l1: usize,
     l2: usize,
-    scene: SceneBuilder,
+    scene_builder: SceneBuilder,
 }
 
 impl QuadStrip {
     pub fn init(
-        scene: SceneBuilder,
+        scene_builder: SceneBuilder,
         ax: Float,
         ay: Float,
         az: Float,
@@ -79,26 +79,30 @@ impl QuadStrip {
         by: Float,
         bz: Float,
     ) -> QuadStrip {
-        QuadStrip::new(scene, Vector3(ax, ay, az), Vector3(bx, by, bz))
+        QuadStrip::new(scene_builder, Vector3(ax, ay, az), Vector3(bx, by, bz))
     }
 
-    pub fn new(mut scene: SceneBuilder, a: Vector3, b: Vector3) -> QuadStrip {
-        let l2 = scene.push(a);
-        let l1 = scene.push(b);
-        QuadStrip { l1, l2, scene }
+    pub fn new(mut scene_builder: SceneBuilder, a: Vector3, b: Vector3) -> QuadStrip {
+        let l2 = scene_builder.push(a);
+        let l1 = scene_builder.push(b);
+        QuadStrip {
+            l1,
+            l2,
+            scene_builder,
+        }
     }
 
     pub fn add(&mut self, b: Vector3, a: Vector3) {
-        let h1 = self.scene.push(a);
-        let h2 = self.scene.push(b);
+        let h1 = self.scene_builder.push(a);
+        let h2 = self.scene_builder.push(b);
 
-        self.scene.quad(self.l2, self.l1, h1, h2);
+        self.scene_builder.quad(self.l2, self.l1, h1, h2);
 
         self.l1 = h1;
         self.l2 = h2;
     }
 
     pub fn build(self) -> SceneBuilder {
-        self.scene
+        self.scene_builder
     }
 }
