@@ -115,8 +115,10 @@ pub fn hidden_line(
     scene3: &Scene3,
     scene2: &Scene2,
     dctx: &mut dyn DrawContext,
+    color: u8,
+    lines: &Vec<(usize, usize)>,
 ) {
-    for (&(a, e), &color) in scene2.lines.iter() {
+    for &(a, e) in lines.iter() {
         let line_shape = Line(scene2.points[a], scene2.points[e]);
 
         let bounds = line_shape.bounds();

@@ -48,7 +48,9 @@ impl AppContext {
 
         let tree = create_tree(&self.scene3, &scene2);
 
-        hidden_line(&tree, &self.scene3, &scene2, dctx);
+        for (&color, lines) in scene2.lines.iter() {
+            hidden_line(&tree, &self.scene3, &scene2, dctx, color, lines)
+        }
 
         dctx.finish();
     }
@@ -116,7 +118,7 @@ fn rot_vec(to_rot1: &mut Vector3, to_rot2: &mut Vector3, t: Float) {
 pub struct Scene2 {
     pub points: Vec<Vector2>,
     pub triangles: Vec<(usize, usize, usize)>,
-    pub lines: HashMap<(usize, usize), Color>,
+    pub lines: HashMap<Color, Vec<(usize, usize)>>,
     pub eye: Vector3,
 }
 
@@ -138,30 +140,29 @@ fn perspektive(actx: &AppContext, o: &Vector3) -> Vector2 {
 
 impl Scene2 {
     pub fn new(actx: &AppContext, scene3: &Scene3) -> Scene2 {
-        let mut result = Scene2 {
-            points: Vec::new(),
-            triangles: Vec::new(),
-            lines: HashMap::new(),
-            eye: actx.eye,
-        };
+        let mut points = Vec::new();
+        let mut triangles = Vec::new();
 
         for p in scene3.points.iter() {
-            result.points.push(perspektive(&actx, &p));
+            points.push(perspektive(&actx, &p));
         }
 
+        let mut lines_by_index = HashMap::new();
+
+        let eye = actx.eye;
         for t in scene3.triangles.iter() {
             let o1 = scene3.points[t.p1];
             let o2 = scene3.points[t.p2];
             let o3 = scene3.points[t.p3];
 
-            let p1 = result.points[t.p1];
-            let p2 = result.points[t.p2];
-            let p3 = result.points[t.p3];
+            let p1 = points[t.p1];
+            let p2 = points[t.p2];
+            let p3 = points[t.p3];
 
             let c = (o1 - o2).cross(&(o3 - o2));
             let cols = float_to_color((actx.view.normalize() * c.normalize()).abs());
 
-            let eye_view_plane_dist = actx.view * actx.eye + EPSILON1;
+            let eye_view_plane_dist = actx.view * eye + EPSILON1;
 
             // test if not behind view plane
             if actx.view * o1 > eye_view_plane_dist
@@ -171,31 +172,45 @@ impl Scene2 {
                     || ((p3.0 - p1.0) * (p2.1 - p1.1) + EPSILON1 < (p3.1 - p1.1) * (p2.0 - p1.0)))
             // && !colinear(&p1, &p2, &p3)
             {
-                result.triangles.push((t.p1, t.p2, t.p3));
+                triangles.push((t.p1, t.p2, t.p3));
 
                 if t.lset & 1 == 1 {
-                    result.push_line(t.p1, t.p2, cols);
+                    push_line(&mut lines_by_index, t.p1, t.p2, cols);
                 }
                 if t.lset & 2 == 2 {
-                    result.push_line(t.p2, t.p3, cols);
+                    push_line(&mut lines_by_index, t.p2, t.p3, cols);
                 }
                 if t.lset & 4 == 4 {
-                    result.push_line(t.p3, t.p1, cols);
+                    push_line(&mut lines_by_index, t.p3, t.p1, cols);
                 }
             }
         }
 
-        result
-    }
+        let mut lines: HashMap<Color, Vec<(usize, usize)>> = HashMap::new();
 
-    fn push_line(&mut self, p1: usize, p2: usize, col: Color) {
-        self.lines
-            .entry((p1.min(p2), p1.max(p2)))
-            .and_modify(|e| {
-                if col > *e {
-                    *e = col
-                }
-            })
-            .or_insert(col);
+        for (&(a, e), &color) in lines_by_index.iter() {
+            lines
+                .entry(color)
+                .and_modify(|v| v.push((a, e)))
+                .or_insert(vec![(a, e)]);
+        }
+
+        Scene2 {
+            points,
+            triangles,
+            lines,
+            eye,
+        }
     }
+}
+
+fn push_line(lines: &mut HashMap<(usize, usize), Color>, p1: usize, p2: usize, col: Color) {
+    lines
+        .entry((p1.min(p2), p1.max(p2)))
+        .and_modify(|e| {
+            if col > *e {
+                *e = col
+            }
+        })
+        .or_insert(col);
 }
