@@ -80,7 +80,7 @@ impl ColorContext for ColorGroup {
 
 struct PathFrame {
     path: web_sys::Element,
-    clear: bool,
+    frame: u32,
 }
 
 pub struct SvgContext {
@@ -123,7 +123,7 @@ impl SvgContext {
 }
 
 impl DrawContext<ColorGroup> for SvgContext {
-    fn draw(&mut self, mut color_context: ColorGroup) {
+    fn draw(&mut self, frame: Frame, mut color_context: ColorGroup) {
         let Self {
             paths,
             document,
@@ -140,23 +140,21 @@ impl DrawContext<ColorGroup> for SvgContext {
             path.set_attribute("stroke", &html_color(color)).unwrap();
             group.append_child(&path).unwrap();
 
-            PathFrame { clear: false, path }
+            PathFrame { frame, path }
         });
 
         path_frame
             .path
             .set_attribute("d", &color_context.path_attribute())
             .unwrap();
-        path_frame.clear = false
+        path_frame.frame = frame
     }
 
     #[inline]
-    fn finish(&mut self) {
+    fn finish(&mut self, frame: Frame) {
         for (_, pf) in self.paths.iter_mut() {
-            if pf.clear {
+            if pf.frame < frame {
                 pf.path.set_attribute("d", "").unwrap();
-            } else {
-                pf.clear = true
             }
         }
     }

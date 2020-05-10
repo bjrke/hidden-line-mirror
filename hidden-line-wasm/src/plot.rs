@@ -58,13 +58,11 @@ mod tests {
     }
 
     impl DrawContext<TestColorContext> for TestDrawContext {
-        fn draw(&mut self, color_ctx: TestColorContext) {
+        fn draw(&mut self, _frame: Frame, color_ctx: TestColorContext) {
             for (a, e) in color_ctx.lines {
                 self.lines.push((a, e, color_ctx.color));
             }
         }
-
-        fn finish(&mut self) {}
 
         fn color_context(&mut self, color: u8) -> TestColorContext {
             TestColorContext {
@@ -97,7 +95,6 @@ mod tests {
             }
             h / 10.0
         });
-        actx.back_face = false;
 
         let mut dctx = TestDrawContext::new();
         actx.render(&mut dctx);

@@ -58,14 +58,14 @@ pub fn main_js() -> Result<(), JsValue> {
 #[wasm_bindgen]
 pub fn lets_go(svg: web_sys::SvgElement) -> HiddenLine {
     HiddenLine {
-        svgcontext: SvgContext::new(svg),
+        svg_ctx: SvgContext::new(svg),
         app_ctx: AppContext::new(),
     }
 }
 
 #[wasm_bindgen]
 pub struct HiddenLine {
-    svgcontext: SvgContext,
+    svg_ctx: SvgContext,
     app_ctx: AppContext,
 }
 
@@ -89,6 +89,6 @@ impl HiddenLine {
     }
 
     fn draw(&mut self) {
-        self.app_ctx.render(&mut self.svgcontext);
+        self.app_ctx.render(&mut self.svg_ctx);
     }
 }

@@ -8,12 +8,13 @@ use crate::vec3::*;
 use std::collections::HashMap;
 
 pub struct AppContext {
-    pub eye: Vector3,
-    pub view: Vector3,
-    pub iv: Vector3,
-    pub jv: Vector3,
+    eye: Vector3,
+    view: Vector3,
+    iv: Vector3,
+    jv: Vector3,
     pub scene3: Scene3,
-    pub back_face: bool,
+    back_face: bool,
+    frame: Frame,
 }
 
 impl AppContext {
@@ -28,6 +29,7 @@ impl AppContext {
             iv: Vector3(1.0, 0.0, 0.0),
             jv: Vector3(0.0, 0.0, 1.0),
             back_face: false,
+            frame: 0,
         }
     }
 
@@ -49,10 +51,10 @@ impl AppContext {
         for (&color, lines) in scene2.lines.iter() {
             let mut color_context = dctx.color_context(color);
             hidden_line(&tree, &self.scene3, &scene2, lines, &mut color_context);
-            dctx.draw(color_context);
+            dctx.draw(self.frame, color_context);
         }
 
-        dctx.finish();
+        dctx.finish(self.frame);
     }
 
     pub fn on_key(&mut self, ch: char) -> bool {

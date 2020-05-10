@@ -3,10 +3,12 @@ use crate::vec2::Vector2;
 
 pub type Color = u8;
 
-pub trait DrawContext<C: ColorContext> {
-    fn draw(&mut self, color_ctx: C);
+pub type Frame = u32;
 
-    fn finish(&mut self);
+pub trait DrawContext<C: ColorContext> {
+    fn draw(&mut self, _frame: Frame, _color_ctx: C) {}
+
+    fn finish(&mut self, _frame: Frame) {}
 
     fn color_context(&mut self, color: Color) -> C;
 }
