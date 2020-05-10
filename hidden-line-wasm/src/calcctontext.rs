@@ -1,16 +1,17 @@
 use crate::appcontext::*;
 use crate::drawcontext::*;
+use crate::dreidext::Scene3;
 use crate::float::*;
 use crate::matrix::Matrix2;
 use crate::quadtree::QuadTree;
 use crate::range::*;
 use crate::rangeset::RangeSet;
-use crate::shape::{Line, Rect, Shape, Triangle};
+use crate::shape::*;
 use crate::vec2::*;
 use crate::vec3::*;
 
 #[derive(Debug)]
-struct TheTriangle {
+pub struct TreeTriangle {
     shape: Triangle,
     plane_norm: Vector3,
     plane_dist: Float,
@@ -19,18 +20,22 @@ struct TheTriangle {
     o3: Vector3,
 }
 
-impl TheTriangle {
+impl TreeTriangle {
     #[inline]
-    fn new(actx: &AppContext, scene: &Scene, i1: usize, i2: usize, i3: usize) -> TheTriangle {
-        let o1 = actx.scene_builder.points[i1];
-        let o2 = actx.scene_builder.points[i2];
-        let o3 = actx.scene_builder.points[i3];
+    fn new(scene: &Scene3, rendered: &Scene2, i1: usize, i2: usize, i3: usize) -> TreeTriangle {
+        let o1 = scene.points[i1];
+        let o2 = scene.points[i2];
+        let o3 = scene.points[i3];
 
         let plane_norm = (o2 - o1).cross(&(o3 - o1)).normalize();
         let plane_dist = plane_norm * o1;
 
-        TheTriangle {
-            shape: Triangle(scene.points[i1], scene.points[i2], scene.points[i3]),
+        TreeTriangle {
+            shape: Triangle(
+                rendered.points[i1],
+                rendered.points[i2],
+                rendered.points[i3],
+            ),
             plane_norm,
             plane_dist,
             o1,
@@ -46,7 +51,7 @@ impl TheTriangle {
     }
 }
 
-impl Shape for TheTriangle {
+impl Shape for TreeTriangle {
     #[inline]
     fn intersects(&self, r: &Rect) -> bool {
         self.shape.intersects(r)
@@ -79,58 +84,57 @@ fn draw_line_range(ctx: &mut dyn DrawContext, line: &Line, l1: Float, l2: Float,
     ctx.line(&start, &end, color);
 }
 
-pub struct CalcContext {
-    tree: QuadTree<TheTriangle>,
-}
-
-impl CalcContext {
-    pub fn new(scene: &Scene, actx: &AppContext) -> CalcContext {
-        let mut triangles = vec![];
-        for poly in scene.triangles.iter() {
-            let (i1, i2, i3) = *poly;
-            triangles.push(TheTriangle::new(actx, scene, i1, i2, i3));
-        }
-
-        let screen = triangles
-            .iter()
-            .fold(None, |acc: Option<Rect>, t| {
-                let bound = t.bounds();
-                if let Some(existing) = acc {
-                    Some(existing.extend_rect(&bound))
-                } else {
-                    Some(bound)
-                }
-            })
-            .unwrap_or_else(|| Rect::new(0.0, 0.0));
-
-        let mut tree = QuadTree::new(screen);
-        for t in triangles {
-            tree.insert(t.bounds(), t);
-        }
-        CalcContext { tree }
+pub fn createTree(scene3: &Scene3, scene2: &Scene2) -> QuadTree<TreeTriangle> {
+    let mut triangles = vec![];
+    for poly in scene2.triangles.iter() {
+        let (i1, i2, i3) = *poly;
+        triangles.push(TreeTriangle::new(scene3, scene2, i1, i2, i3));
     }
 
-    pub fn hidden_line(&self, scene: &Scene, dctx: &mut dyn DrawContext, actx: &AppContext) {
-        for (&(a, e), &color) in scene.lines.iter() {
-            let line_shape = Line(scene.points[a], scene.points[e]);
+    let screen = triangles
+        .iter()
+        .fold(None, |acc: Option<Rect>, t| {
+            let bound = t.bounds();
+            if let Some(existing) = acc {
+                Some(existing.extend_rect(&bound))
+            } else {
+                Some(bound)
+            }
+        })
+        .unwrap_or_else(|| Rect::new(0.0, 0.0));
 
-            let bounds = line_shape.bounds();
-            let mut r: RangeSet = RangeSet(vec![FloatRange(0.0, 1.0)]);
+    let mut tree = QuadTree::new(screen);
+    for t in triangles {
+        tree.insert(t.bounds(), t);
+    }
+    tree
+}
 
-            self.tree.elements_intersecting(&bounds, &mut |triangle| {
-                intersect(
-                    actx,
-                    &triangle,
-                    &line_shape,
-                    actx.scene_builder.points[a],
-                    actx.scene_builder.points[e],
-                    &mut r,
-                );
-                r.is_empty()
-            });
+pub fn hidden_line(
+    tree: &QuadTree<TreeTriangle>,
+    scene3: &Scene3,
+    scene2: &Scene2,
+    dctx: &mut dyn DrawContext,
+) {
+    for (&(a, e), &color) in scene2.lines.iter() {
+        let line_shape = Line(scene2.points[a], scene2.points[e]);
 
-            draw(dctx, &line_shape, &r, color);
-        }
+        let bounds = line_shape.bounds();
+        let mut r: RangeSet = RangeSet(vec![FloatRange(0.0, 1.0)]);
+
+        tree.elements_intersecting(&bounds, &mut |triangle| {
+            intersect(
+                &triangle,
+                &line_shape,
+                scene2.eye,
+                scene3.points[a],
+                scene3.points[e],
+                &mut r,
+            );
+            r.is_empty()
+        });
+
+        draw(dctx, &line_shape, &r, color);
     }
 }
 
@@ -186,8 +190,8 @@ fn clip(
 
 #[allow(dead_code)]
 fn intersect2(
-    actx: &AppContext,
-    triangle: &TheTriangle,
+    eye: Vector3,
+    triangle: &TreeTriangle,
     p1: Vector3,
     p2: Vector3,
     range: &mut RangeSet,
@@ -195,7 +199,6 @@ fn intersect2(
     let t1 = triangle.o1;
     let t2 = triangle.o2;
     let t3 = triangle.o3;
-    let eye = actx.eye;
 
     let reye = clip(p1, p2, t1, t2, t3, eye, true);
     let rt1 = clip(p1, p2, eye, t2, t3, t1, false);
@@ -218,9 +221,9 @@ fn intersect2(
 
 #[inline]
 fn intersect(
-    actx: &AppContext,
-    triangle: &TheTriangle,
+    triangle: &TreeTriangle,
     line_shape: &Line,
+    eye: Vector3,
     o1: Vector3,
     o2: Vector3,
     range: &mut RangeSet,
@@ -228,7 +231,7 @@ fn intersect(
     let nv = triangle.plane_norm;
     let pd = triangle.plane_dist;
 
-    let eye_dist = nv * actx.eye - pd;
+    let eye_dist = nv * eye - pd;
 
     if eye_dist.abs() < EPSILON0 {
         // assume we are on the triangle and can see everything else

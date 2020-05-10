@@ -9,42 +9,49 @@ pub struct SceneTriangle {
     pub lset: u8,
 }
 
-pub struct SceneBuilder {
+pub struct Scene3 {
     pub points: Vec<Vector3>,
     pub triangles: Vec<SceneTriangle>,
+}
+pub struct SceneBuilder {
+    pub scene3: Scene3,
     point_index: HashMap<Vector3, usize>,
 }
 
 impl SceneBuilder {
     pub fn new() -> SceneBuilder {
         SceneBuilder {
-            points: Vec::new(),
-            triangles: Vec::new(),
+            scene3: Scene3 {
+                points: Vec::new(),
+                triangles: Vec::new(),
+            },
             point_index: HashMap::new(),
         }
     }
 
     pub fn push(&mut self, p: Vector3) -> usize {
-        let index = self.points.len();
+        let index = self.scene3.points.len();
 
         let result = *self.point_index.entry(p).or_insert(index);
 
         if result == index {
-            self.points.push(p);
+            self.scene3.points.push(p);
         }
         result
     }
 
     pub fn triangle(&mut self, p1: usize, p2: usize, p3: usize, lset: u8) -> usize {
-        self.triangles.push(SceneTriangle { p1, p2, p3, lset });
-        self.triangles.len() - 1
+        self.scene3
+            .triangles
+            .push(SceneTriangle { p1, p2, p3, lset });
+        self.scene3.triangles.len() - 1
     }
 
     pub fn quad(&mut self, p1: usize, p2: usize, p3: usize, p4: usize) {
-        let o1 = self.points[p1];
-        let o2 = self.points[p2];
-        let o3 = self.points[p3];
-        let o4 = self.points[p4];
+        let o1 = self.scene3.points[p1];
+        let o2 = self.scene3.points[p2];
+        let o3 = self.scene3.points[p3];
+        let o4 = self.scene3.points[p4];
 
         if (o1 - o3).len_sq() < (o2 - o4).len_sq() {
             self.triangle(p1, p2, p3, 3);

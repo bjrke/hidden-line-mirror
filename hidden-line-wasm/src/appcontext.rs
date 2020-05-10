@@ -12,7 +12,7 @@ pub struct AppContext {
     pub view: Vector3,
     pub iv: Vector3,
     pub jv: Vector3,
-    pub scene_builder: SceneBuilder,
+    pub scene3: Scene3,
     pub back_face: bool,
 }
 
@@ -22,7 +22,7 @@ impl AppContext {
         let view = eye / -2.0;
 
         AppContext {
-            scene_builder: SceneBuilder::new(),
+            scene3: SceneBuilder::new().scene3,
             eye,
             view,
             iv: Vector3(1.0, 0.0, 0.0),
@@ -38,17 +38,17 @@ impl AppContext {
         self.iv = self.view.cross(&self.jv).normalize() * unit_vec_len;
         self.jv = self.iv.cross(&self.view).normalize() * unit_vec_len;
 
-        let scene = Scene::new(&self);
+        let scene2 = Scene2::new(&self, &self.scene3);
 
-        println!("#triangle: {:?}", scene.triangles.len());
-        println!("#lines: {:?}", scene.lines.len());
+        println!("#triangle: {:?}", scene2.triangles.len());
+        println!("#lines: {:?}", scene2.lines.len());
         println!("eye: {:?}", self.eye);
         println!("view: {:?}", self.view);
         println!("up {:?}", self.jv);
 
-        let cctx = CalcContext::new(&scene, &self);
+        let tree = createTree(&self.scene3, &scene2);
 
-        cctx.hidden_line(&scene, dctx, &self);
+        hidden_line(&tree, &self.scene3, &scene2, dctx);
 
         dctx.finish();
     }
@@ -113,10 +113,11 @@ fn rot_vec(to_rot1: &mut Vector3, to_rot2: &mut Vector3, t: Float) {
     *to_rot2 = copy1 * f2 + copy2 * rot_inc;
 }
 
-pub struct Scene {
+pub struct Scene2 {
     pub points: Vec<Vector2>,
     pub triangles: Vec<(usize, usize, usize)>,
     pub lines: HashMap<(usize, usize), Color>,
+    pub eye: Vector3,
 }
 
 fn perspektive(actx: &AppContext, o: &Vector3) -> Vector2 {
@@ -135,22 +136,23 @@ fn perspektive(actx: &AppContext, o: &Vector3) -> Vector2 {
     }
 }
 
-impl Scene {
-    pub fn new(actx: &AppContext) -> Scene {
-        let mut result = Scene {
+impl Scene2 {
+    pub fn new(actx: &AppContext, scene3: &Scene3) -> Scene2 {
+        let mut result = Scene2 {
             points: Vec::new(),
             triangles: Vec::new(),
             lines: HashMap::new(),
+            eye: actx.eye,
         };
 
-        for p in actx.scene_builder.points.iter() {
+        for p in scene3.points.iter() {
             result.points.push(perspektive(&actx, &p));
         }
 
-        for t in actx.scene_builder.triangles.iter() {
-            let o1 = actx.scene_builder.points[t.p1];
-            let o2 = actx.scene_builder.points[t.p2];
-            let o3 = actx.scene_builder.points[t.p3];
+        for t in scene3.triangles.iter() {
+            let o1 = scene3.points[t.p1];
+            let o2 = scene3.points[t.p2];
+            let o3 = scene3.points[t.p3];
 
             let p1 = result.points[t.p1];
             let p2 = result.points[t.p2];

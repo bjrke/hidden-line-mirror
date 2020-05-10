@@ -3,14 +3,22 @@ use crate::float::*;
 
 use crate::vec3::*;
 
-pub fn init_scene<F: Fn(Float, Float) -> Float>(f: F) -> SceneBuilder {
+pub fn init_scene<F: Fn(Float, Float) -> Float>(f: F) -> Scene3 {
     let ad = 1.0;
     let sw = 1.0 / 50.0;
     let mut xx = -ad;
 
-    let mut scene = SceneBuilder::new();
+    let mut scene_builder = SceneBuilder::new();
     while xx < ad {
-        let mut qs = QuadStrip::init(scene, xx, -ad, f(xx, -ad), xx + sw, -ad, f(xx + sw, -ad));
+        let mut qs = QuadStrip::init(
+            scene_builder,
+            xx,
+            -ad,
+            f(xx, -ad),
+            xx + sw,
+            -ad,
+            f(xx + sw, -ad),
+        );
 
         let mut yy = -ad + sw;
         while yy <= ad {
@@ -21,10 +29,10 @@ pub fn init_scene<F: Fn(Float, Float) -> Float>(f: F) -> SceneBuilder {
             yy += sw;
         }
         xx += sw;
-        scene = qs.build();
+        scene_builder = qs.build();
     }
 
-    scene
+    scene_builder.scene3
 }
 
 #[cfg(test)]
@@ -57,7 +65,7 @@ mod tests {
     fn integration() {
         let mut actx = AppContext::new();
 
-        actx.scene_builder = init_scene(|x, y| {
+        actx.scene3 = init_scene(|x, y| {
             let mut h = 0.0;
             let step = PI / 36.0;
             let mut a = 0.0;
