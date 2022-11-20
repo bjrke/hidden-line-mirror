@@ -49,7 +49,7 @@ pages:
     - main
 
 docker_rust_wasm_npm:
-  stage: deploy
+  stage: .pre
   image: docker:latest
   services:
     - docker:dind
