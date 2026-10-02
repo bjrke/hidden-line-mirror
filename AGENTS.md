@@ -40,7 +40,7 @@ Never leave the working tree dirty at the end of a task.
 
 ## Gotchas
 
-- `src/*.rs` uses an older Rust idiom set (e.g. `impl Add for Vector2 { type Output = Vector2; ... Self::Output }`, `ref mut` pattern bindings, comma-separated tuple-structs `pub struct X(pub A, pub B);`). It compiles and formats fine with the pinned `rust:1.85` toolchain. Do NOT "normalize" it into more modern Rust — preserve the existing syntax and idioms. (Historically this note claimed the code did not compile with stock rustc; that is no longer true.)
+- The math structs (`Vector2`, `Vector3`, `Matrix2/3`, `FloatRange`, `Line`, `Triangle`, `RangeSet`, `SvgPoint`) use named fields for readability, but are deliberately equipped with positional `new(x, y, ...)` constructors and `From`/`Into` tuple conversions so they can still be built and decomposed positionally (`Vector2::new(x, y)`, `let (x, y) = v.into();`). Keep the constructors and tuple `From` impls in sync with the fields.
 - `pkg/` (wasm-bindgen output) and `dist/` (webpack output) are generated build artifacts, gitignored.
 - The root `Cargo.lock` is committed so CI builds are deterministic; do not delete it. `hidden-line-wasm/Cargo.toml` sets `rust-version = "1.85"` and `.cargo/config.toml` sets `resolver.incompatible-rust-version-fallback = false`, so a `cargo update` refuses to pick deps that need a newer rustc than the pinned `rust:1.85-slim` image (`rust_wasm_npm`). Bump both the `Dockerfile` and `rust-version` together.
 - `opencode.json` is gitignored (local-only config).

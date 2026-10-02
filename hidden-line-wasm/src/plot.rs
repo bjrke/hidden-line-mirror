@@ -23,8 +23,8 @@ pub fn init_scene<F: Fn(Float, Float) -> Float>(f: F) -> Scene3 {
         let mut yy = -ad + sw;
         while yy <= ad {
             qs.add(
-                Vector3(xx, yy, f(xx, yy)),
-                Vector3(xx + sw, yy, f(xx + sw, yy)),
+                Vector3::new(xx, yy, f(xx, yy)),
+                Vector3::new(xx + sw, yy, f(xx + sw, yy)),
             );
             yy += sw;
         }
@@ -101,8 +101,8 @@ mod tests {
 
         assert!(!dctx.lines.is_empty());
         for &(a, e, _color) in dctx.lines.iter() {
-            assert!(a.0.is_finite() && a.1.is_finite());
-            assert!(e.0.is_finite() && e.1.is_finite());
+            assert!(a.x.is_finite() && a.y.is_finite());
+            assert!(e.x.is_finite() && e.y.is_finite());
         }
     }
 
@@ -116,8 +116,8 @@ mod tests {
 
         assert!(!dctx.lines.is_empty());
         for &(a, e, _color) in dctx.lines.iter() {
-            assert!(a.0.is_finite() && a.1.is_finite());
-            assert!(e.0.is_finite() && e.1.is_finite());
+            assert!(a.x.is_finite() && a.y.is_finite());
+            assert!(e.x.is_finite() && e.y.is_finite());
         }
     }
 }

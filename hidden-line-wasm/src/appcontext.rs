@@ -19,15 +19,15 @@ pub struct AppContext {
 
 impl AppContext {
     pub fn new() -> AppContext {
-        let eye = Vector3(1.5, 2.0, 2.5);
+        let eye = Vector3::new(1.5, 2.0, 2.5);
         let view = eye / -2.0;
 
         AppContext {
             scene3: SceneBuilder::new().scene3,
             eye,
             view,
-            iv: Vector3(1.0, 0.0, 0.0),
-            jv: Vector3(0.0, 0.0, 1.0),
+            iv: Vector3::new(1.0, 0.0, 0.0),
+            jv: Vector3::new(0.0, 0.0, 1.0),
             back_face: false,
             frame: 0,
         }
@@ -125,18 +125,18 @@ pub struct Scene2 {
 }
 
 fn perspektive(actx: &AppContext, o: &Vector3) -> Vector2 {
-    let mut k = Matrix3(actx.iv, actx.jv, actx.eye - *o);
+    let mut k = Matrix3::new(actx.iv, actx.jv, actx.eye - *o);
 
     let kd = k.determinant();
     if kd.abs() > EPSILON2 {
-        k.0 = -actx.view;
+        k.a = -actx.view;
         let x = k.determinant() / kd;
-        k.1 = k.0;
-        k.0 = actx.iv;
+        k.b = k.a;
+        k.a = actx.iv;
         let y = k.determinant() / kd;
-        Vector2(x, y)
+        Vector2::new(x, y)
     } else {
-        Vector2(0.0, 0.0)
+        Vector2::new(0.0, 0.0)
     }
 }
 
@@ -171,7 +171,7 @@ impl Scene2 {
                 && actx.view * o2 > eye_view_plane_dist
                 && actx.view * o3 > eye_view_plane_dist
                 && (!actx.back_face
-                    || ((p3.0 - p1.0) * (p2.1 - p1.1) + EPSILON1 < (p3.1 - p1.1) * (p2.0 - p1.0)))
+                    || ((p3.x - p1.x) * (p2.y - p1.y) + EPSILON1 < (p3.y - p1.y) * (p2.x - p1.x)))
             // && !colinear(&p1, &p2, &p3)
             {
                 triangles.push((t.p1, t.p2, t.p3));
@@ -252,8 +252,8 @@ mod tests {
 
     #[test]
     fn rot_vec_preserves_lengths_and_orthogonality() {
-        let mut u = Vector3(1.0, 0.0, 0.0);
-        let mut v = Vector3(0.0, 1.0, 0.0);
+        let mut u = Vector3::new(1.0, 0.0, 0.0);
+        let mut v = Vector3::new(0.0, 1.0, 0.0);
 
         rot_vec(&mut u, &mut v, 10.0);
 
@@ -264,8 +264,8 @@ mod tests {
 
     #[test]
     fn rot_vec_small_angle_keeps_vectors_close() {
-        let mut u = Vector3(1.0, 0.0, 0.0);
-        let mut v = Vector3(0.0, 1.0, 0.0);
+        let mut u = Vector3::new(1.0, 0.0, 0.0);
+        let mut v = Vector3::new(0.0, 1.0, 0.0);
         let u0 = u;
         let v0 = v;
 
@@ -286,19 +286,19 @@ mod tests {
 
         let scene2 = Scene2::new(&actx, &actx.scene3);
 
-        assert_eq!(scene2.points, vec![Vector2(0.0, 0.0)]);
+        assert_eq!(scene2.points, vec![Vector2::new(0.0, 0.0)]);
     }
 
     #[test]
     fn scene2_projects_off_axis_point() {
         let mut actx = AppContext::new();
         actx.scene3 = Scene3 {
-            points: vec![Vector3(1.0, 0.0, 0.0)],
+            points: vec![Vector3::new(1.0, 0.0, 0.0)],
             triangles: vec![],
         };
 
         let scene2 = Scene2::new(&actx, &actx.scene3);
 
-        assert_eq!(scene2.points, vec![Vector2(0.5, 0.0)]);
+        assert_eq!(scene2.points, vec![Vector2::new(0.5, 0.0)]);
     }
 }

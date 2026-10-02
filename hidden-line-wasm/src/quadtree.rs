@@ -1,4 +1,3 @@
-use crate::range::*;
 use crate::shape::*;
 use crate::vec2::*;
 
@@ -23,11 +22,9 @@ fn create_content_array<T>() -> Vec<QuadTreeLeave<T>> {
 
 impl<S> QuadTree<S> {
     pub fn new(bounds: Rect) -> QuadTree<S> {
-        let Rect {
-            x: FloatRange(xs, xe),
-            y: FloatRange(ys, ye),
-        } = bounds;
-        let center = Vector2((xs + xe) / 2.0, (ys + ye) / 2.0);
+        let (xs, xe) = bounds.x.into();
+        let (ys, ye) = bounds.y.into();
+        let center = Vector2::new((xs + xe) / 2.0, (ys + ye) / 2.0);
         QuadTree {
             content: create_content_array(),
             subtrees: Vec::with_capacity(4),
@@ -104,17 +101,17 @@ mod tests {
     fn tree() {
         let mut tree = QuadTree::new(Rect::new(-1000.0, -1000.0).extend(1000.0, 1000.0));
 
-        let expected1 = Vector2(100.0, 100.0);
+        let expected1 = Vector2::new(100.0, 100.0);
         tree.insert_shape(expected1);
 
-        tree.insert_shape(Vector2(-100.0, 100.0));
-        tree.insert_shape(Vector2(-200.0, 200.0));
-        tree.insert_shape(Vector2(100.0, -100.0));
-        tree.insert_shape(Vector2(200.0, -200.0));
-        tree.insert_shape(Vector2(-100.0, -100.0));
-        tree.insert_shape(Vector2(-200.0, -200.0));
+        tree.insert_shape(Vector2::new(-100.0, 100.0));
+        tree.insert_shape(Vector2::new(-200.0, 200.0));
+        tree.insert_shape(Vector2::new(100.0, -100.0));
+        tree.insert_shape(Vector2::new(200.0, -200.0));
+        tree.insert_shape(Vector2::new(-100.0, -100.0));
+        tree.insert_shape(Vector2::new(-200.0, -200.0));
 
-        let expected2 = Vector2(200.0, 200.0);
+        let expected2 = Vector2::new(200.0, 200.0);
         tree.insert_shape(expected2);
 
         let rect = Rect::new(90.0, 90.0).extend(210.0, 210.0);

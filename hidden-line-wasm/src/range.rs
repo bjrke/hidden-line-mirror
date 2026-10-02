@@ -2,31 +2,39 @@ use crate::float::*;
 use crate::vec2::*;
 
 #[derive(Copy, Clone, Debug, PartialEq)]
-pub struct FloatRange(pub Float, pub Float);
+pub struct FloatRange {
+    pub start: Float,
+    pub end: Float,
+}
 
 impl FloatRange {
     #[inline]
+    pub const fn new(start: Float, end: Float) -> FloatRange {
+        FloatRange { start, end }
+    }
+
+    #[inline]
     pub fn epsilon_value(f: Float) -> Self {
-        Self(f, f).epsilon_range()
+        Self::new(f, f).epsilon_range()
     }
 
     #[inline]
     fn epsilon_range(&self) -> Self {
-        let Self(start, end) = self;
-        Self(start - EPSILON0, end + EPSILON0)
+        let (start, end) = (*self).into();
+        Self::new(start - EPSILON0, end + EPSILON0)
     }
 
     #[inline]
     pub fn line_x(&self, a: &Vector2, e: &Vector2, x: Float) -> bool {
-        let Vector2(ax, ay) = *a;
-        let Vector2(ex, ey) = *e;
+        let (ax, ay) = (*a).into();
+        let (ex, ey) = (*e).into();
         self.line_rect_border(ax, ay, ex, ey, x)
     }
 
     #[inline]
     pub fn line_y(&self, a: &Vector2, e: &Vector2, y: Float) -> bool {
-        let Vector2(ax, ay) = *a;
-        let Vector2(ex, ey) = *e;
+        let (ax, ay) = (*a).into();
+        let (ex, ey) = (*e).into();
         self.line_rect_border(ay, ax, ey, ex, y)
     }
 
@@ -49,8 +57,8 @@ impl FloatRange {
 
     #[inline]
     pub fn contains_range(&self, rhs: &Self) -> bool {
-        let Self(ss, se) = *self;
-        let Self(rs, re) = *rhs;
+        let (ss, se) = (*self).into();
+        let (rs, re) = (*rhs).into();
         // assume it's non empty
         // ss <= se && (rs > re || ss <= rs && se >= re)
         ss <= rs && se >= re
@@ -58,14 +66,14 @@ impl FloatRange {
 
     #[inline]
     pub fn contains(&self, item: &Float) -> bool {
-        let Self(start, end) = *self;
+        let (start, end) = (*self).into();
         start <= *item && *item <= end
     }
 
     #[inline]
     pub fn range_overlap(&self, rhs: &Self) -> bool {
-        let Self(ss, se) = *self;
-        let Self(rs, re) = *rhs;
+        let (ss, se) = (*self).into();
+        let (rs, re) = (*rhs).into();
         // assume it's non empty
         // ss <= se && ss <= re && rs <= re && rs <= se
         ss <= re && rs <= se
@@ -73,28 +81,28 @@ impl FloatRange {
 
     #[inline]
     pub fn extend(&self, rhs: Float) -> Self {
-        let Self(ss, se) = *self;
+        let (ss, se) = (*self).into();
         if rhs < ss {
-            Self(rhs, se)
+            Self::new(rhs, se)
         } else if rhs <= se {
             *self
         } else {
-            Self(ss, rhs)
+            Self::new(ss, rhs)
         }
     }
 
     #[inline]
     pub fn extend_range(&self, rhs: &Self) -> Self {
-        let Self(ss, se) = *self;
-        let Self(rs, re) = *rhs;
-        Self(ss.min(rs), se.max(re))
+        let (ss, se) = (*self).into();
+        let (rs, re) = (*rhs).into();
+        Self::new(ss.min(rs), se.max(re))
     }
 
     #[inline]
     pub fn intersect(&self, rhs: &Self) -> Option<FloatRange> {
-        let Self(ss, se) = *self;
-        let Self(rs, re) = *rhs;
-        let range = FloatRange(ss.max(rs), se.min(re));
+        let (ss, se) = (*self).into();
+        let (rs, re) = (*rhs).into();
+        let range = FloatRange::new(ss.max(rs), se.min(re));
 
         if range.is_empty_range() {
             None
@@ -104,27 +112,41 @@ impl FloatRange {
     }
 
     fn is_empty_range(&self) -> bool {
-        let Self(start, end) = *self;
+        let (start, end) = (*self).into();
         start > end
     }
 
     pub fn diff(&self, rhs: &Self) -> Vec<Self> {
-        let Self(ss, se) = *self;
-        let Self(rs, re) = *rhs;
+        let (ss, se) = (*self).into();
+        let (rs, re) = (*rhs).into();
         if ss > se {
             vec![]
         } else if rs > re || re <= ss || se <= rs {
-            vec![FloatRange(ss, se)]
+            vec![FloatRange::new(ss, se)]
         } else {
             let mut result = vec![];
             if rs > ss {
-                result.push(FloatRange(ss, rs))
+                result.push(FloatRange::new(ss, rs))
             }
             if re < se {
-                result.push(FloatRange(re, se))
+                result.push(FloatRange::new(re, se))
             }
             result
         }
+    }
+}
+
+impl From<(Float, Float)> for FloatRange {
+    #[inline]
+    fn from((start, end): (Float, Float)) -> FloatRange {
+        FloatRange::new(start, end)
+    }
+}
+
+impl From<FloatRange> for (Float, Float) {
+    #[inline]
+    fn from(r: FloatRange) -> (Float, Float) {
+        (r.start, r.end)
     }
 }
 
@@ -136,74 +158,77 @@ mod tests {
     #[test]
     fn intersect_with_result() {
         assert_eq!(
-            FloatRange(1.0, 3.0).intersect(&FloatRange(2.0, 4.0)),
-            Some(FloatRange(2.0, 3.0))
+            FloatRange::new(1.0, 3.0).intersect(&FloatRange::new(2.0, 4.0)),
+            Some(FloatRange::new(2.0, 3.0))
         );
     }
 
     #[test]
     fn intersect_without_result() {
-        assert_eq!(FloatRange(1.0, 2.0).intersect(&FloatRange(3.0, 4.0)), None);
+        assert_eq!(
+            FloatRange::new(1.0, 2.0).intersect(&FloatRange::new(3.0, 4.0)),
+            None
+        );
     }
 
     #[test]
     fn intersect_with_point_result() {
         assert_eq!(
-            FloatRange(1.0, 2.0).intersect(&FloatRange(2.0, 3.0)),
-            Some(FloatRange(2.0, 2.0))
+            FloatRange::new(1.0, 2.0).intersect(&FloatRange::new(2.0, 3.0)),
+            Some(FloatRange::new(2.0, 2.0))
         );
     }
 
     #[test]
     fn intersect_unbound_left() {
         assert_eq!(
-            FloatRange(MIN, 2.0).intersect(&FloatRange(1.0, 3.0)),
-            Some(FloatRange(1.0, 2.0))
+            FloatRange::new(MIN, 2.0).intersect(&FloatRange::new(1.0, 3.0)),
+            Some(FloatRange::new(1.0, 2.0))
         );
     }
 
     #[test]
     fn diff_left_only() {
         assert_eq!(
-            FloatRange(1.0, 3.0).diff(&FloatRange(2.0, 4.0)),
-            vec![FloatRange(1.0, 2.0)]
+            FloatRange::new(1.0, 3.0).diff(&FloatRange::new(2.0, 4.0)),
+            vec![FloatRange::new(1.0, 2.0)]
         );
     }
 
     #[test]
     fn diff_left_only_included() {
         assert_eq!(
-            FloatRange(1.0, 3.0).diff(&FloatRange(2.0, 1000.0)),
-            vec![FloatRange(1.0, 2.0)]
+            FloatRange::new(1.0, 3.0).diff(&FloatRange::new(2.0, 1000.0)),
+            vec![FloatRange::new(1.0, 2.0)]
         );
     }
 
     #[test]
     fn diff_left_only_excluded() {
         assert_eq!(
-            FloatRange(1.0, 3.0).diff(&FloatRange(2.0, MAX)),
-            vec![FloatRange(1.0, 2.0)]
+            FloatRange::new(1.0, 3.0).diff(&FloatRange::new(2.0, MAX)),
+            vec![FloatRange::new(1.0, 2.0)]
         );
     }
 
     #[test]
     fn diff_right_only() {
         assert_eq!(
-            FloatRange(2.0, 4.0).diff(&FloatRange(1.0, 3.0)),
-            vec![FloatRange(3.0, 4.0)]
+            FloatRange::new(2.0, 4.0).diff(&FloatRange::new(1.0, 3.0)),
+            vec![FloatRange::new(3.0, 4.0)]
         );
     }
 
     #[test]
     fn diff_left_and_right() {
         assert_eq!(
-            FloatRange(1.0, 4.0).diff(&FloatRange(2.0, 3.0)),
-            vec![FloatRange(1.0, 2.0), FloatRange(3.0, 4.0)]
+            FloatRange::new(1.0, 4.0).diff(&FloatRange::new(2.0, 3.0)),
+            vec![FloatRange::new(1.0, 2.0), FloatRange::new(3.0, 4.0)]
         );
     }
 
     #[test]
     fn range_should_not_overlap() {
-        assert!(!FloatRange(2.0, 3.0).range_overlap(&FloatRange(1.0, 1.5)));
+        assert!(!FloatRange::new(2.0, 3.0).range_overlap(&FloatRange::new(1.0, 1.5)));
     }
 }

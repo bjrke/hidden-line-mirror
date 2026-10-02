@@ -7,13 +7,21 @@ const SCALE: Float = 1000.0;
 type SvgInt = i32;
 
 #[derive(Clone, Copy, PartialEq, Hash, Eq)]
-struct SvgPoint(SvgInt, SvgInt);
+struct SvgPoint {
+    x: SvgInt,
+    y: SvgInt,
+}
 
 impl SvgPoint {
     #[inline]
-    fn new(v: Vector2) -> Self {
-        let Vector2(x, y) = v;
-        Self(scale_x(x), scale_y(y))
+    fn new(x: SvgInt, y: SvgInt) -> Self {
+        SvgPoint { x, y }
+    }
+
+    #[inline]
+    fn from_vector(v: Vector2) -> Self {
+        let (x, y) = v.into();
+        SvgPoint::new(scale_x(x), scale_y(y))
     }
 }
 
@@ -38,9 +46,9 @@ impl ColorGroup {
         let mut path_attribute = String::new();
 
         for queue in self.queues.iter_mut() {
-            if let Some(SvgPoint(x, y)) = queue.pop_front() {
+            if let Some(SvgPoint { x, y }) = queue.pop_front() {
                 path_attribute.push_str(&format!(" M{},{}", x, y));
-                while let Some(SvgPoint(x, y)) = queue.pop_front() {
+                while let Some(SvgPoint { x, y }) = queue.pop_front() {
                     path_attribute.push_str(&format!(" L{},{}", x, y));
                 }
             }
@@ -51,8 +59,8 @@ impl ColorGroup {
 
 impl ColorContext for ColorGroup {
     fn line(&mut self, p1: Vector2, p2: Vector2) {
-        let p1 = SvgPoint::new(p1);
-        let p2 = SvgPoint::new(p2);
+        let p1 = SvgPoint::from_vector(p1);
+        let p2 = SvgPoint::from_vector(p2);
 
         if let Some(q) = self.front.remove(&p1) {
             self.queues[q].push_front(p2);

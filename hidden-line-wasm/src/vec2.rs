@@ -1,11 +1,18 @@
 use crate::float::*;
-use std::cmp::*;
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 
 #[derive(Clone, Copy, PartialEq, PartialOrd, Debug)]
-pub struct Vector2(pub Float, pub Float);
+pub struct Vector2 {
+    pub x: Float,
+    pub y: Float,
+}
 
 impl Vector2 {
+    #[inline]
+    pub const fn new(x: Float, y: Float) -> Vector2 {
+        Vector2 { x, y }
+    }
+
     #[inline]
     pub fn len(&self) -> Float {
         self.len_sq().sqrt()
@@ -22,14 +29,26 @@ impl Vector2 {
     }
 }
 
+impl From<(Float, Float)> for Vector2 {
+    #[inline]
+    fn from((x, y): (Float, Float)) -> Vector2 {
+        Vector2::new(x, y)
+    }
+}
+
+impl From<Vector2> for (Float, Float) {
+    #[inline]
+    fn from(v: Vector2) -> (Float, Float) {
+        (v.x, v.y)
+    }
+}
+
 impl Add for Vector2 {
     type Output = Vector2;
 
     #[inline]
-    fn add(self, rhs: Self) -> Self::Output {
-        let Vector2(sx, sy) = self;
-        let Vector2(rx, ry) = rhs;
-        Vector2(sx + rx, sy + ry)
+    fn add(self, rhs: Vector2) -> Vector2 {
+        Vector2::new(self.x + rhs.x, self.y + rhs.y)
     }
 }
 
@@ -37,20 +56,16 @@ impl Add for &Vector2 {
     type Output = Vector2;
 
     #[inline]
-    fn add(self, rhs: Self) -> Self::Output {
-        let Vector2(sx, sy) = *self;
-        let Vector2(rx, ry) = *rhs;
-        Vector2(sx + rx, sy + ry)
+    fn add(self, rhs: &Vector2) -> Vector2 {
+        Vector2::new(self.x + rhs.x, self.y + rhs.y)
     }
 }
 
 impl AddAssign for Vector2 {
     #[inline]
-    fn add_assign(&mut self, rhs: Self) {
-        let Vector2(ref mut sx, ref mut sy) = self;
-        let Vector2(rx, ry) = rhs;
-        *sx += rx;
-        *sy += ry;
+    fn add_assign(&mut self, rhs: Vector2) {
+        self.x += rhs.x;
+        self.y += rhs.y;
     }
 }
 
@@ -58,10 +73,8 @@ impl Sub for Vector2 {
     type Output = Vector2;
 
     #[inline]
-    fn sub(self, rhs: Self) -> Self::Output {
-        let Vector2(sx, sy) = self;
-        let Vector2(rx, ry) = rhs;
-        Vector2(sx - rx, sy - ry)
+    fn sub(self, rhs: Vector2) -> Vector2 {
+        Vector2::new(self.x - rhs.x, self.y - rhs.y)
     }
 }
 
@@ -69,20 +82,16 @@ impl Sub for &Vector2 {
     type Output = Vector2;
 
     #[inline]
-    fn sub(self, rhs: Self) -> Self::Output {
-        let Vector2(sx, sy) = *self;
-        let Vector2(rx, ry) = *rhs;
-        Vector2(sx - rx, sy - ry)
+    fn sub(self, rhs: &Vector2) -> Vector2 {
+        Vector2::new(self.x - rhs.x, self.y - rhs.y)
     }
 }
 
 impl SubAssign for Vector2 {
     #[inline]
-    fn sub_assign(&mut self, rhs: Self) {
-        let Vector2(ref mut sx, ref mut sy) = self;
-        let Vector2(rx, ry) = rhs;
-        *sx -= rx;
-        *sy -= ry;
+    fn sub_assign(&mut self, rhs: Vector2) {
+        self.x -= rhs.x;
+        self.y -= rhs.y;
     }
 }
 
@@ -90,10 +99,8 @@ impl Mul for Vector2 {
     type Output = Float;
 
     #[inline]
-    fn mul(self, rhs: Self) -> Self::Output {
-        let Vector2(sx, sy) = self;
-        let Vector2(rx, ry) = rhs;
-        sx * rx + sy * ry
+    fn mul(self, rhs: Vector2) -> Float {
+        self.x * rhs.x + self.y * rhs.y
     }
 }
 
@@ -101,10 +108,8 @@ impl Mul for &Vector2 {
     type Output = Float;
 
     #[inline]
-    fn mul(self, rhs: Self) -> Self::Output {
-        let Vector2(sx, sy) = *self;
-        let Vector2(rx, ry) = *rhs;
-        sx * rx + sy * ry
+    fn mul(self, rhs: &Vector2) -> Float {
+        self.x * rhs.x + self.y * rhs.y
     }
 }
 
@@ -112,9 +117,8 @@ impl Mul<Float> for Vector2 {
     type Output = Vector2;
 
     #[inline]
-    fn mul(self, rhs: Float) -> Self::Output {
-        let Vector2(sx, sy) = self;
-        Vector2(sx * rhs, sy * rhs)
+    fn mul(self, rhs: Float) -> Vector2 {
+        Vector2::new(self.x * rhs, self.y * rhs)
     }
 }
 
@@ -122,18 +126,16 @@ impl Mul<Float> for &Vector2 {
     type Output = Vector2;
 
     #[inline]
-    fn mul(self, rhs: Float) -> Self::Output {
-        let Vector2(sx, sy) = *self;
-        Vector2(sx * rhs, sy * rhs)
+    fn mul(self, rhs: Float) -> Vector2 {
+        Vector2::new(self.x * rhs, self.y * rhs)
     }
 }
 
 impl MulAssign<Float> for Vector2 {
     #[inline]
     fn mul_assign(&mut self, rhs: Float) {
-        let Vector2(ref mut sx, ref mut sy) = self;
-        *sx *= rhs;
-        *sy *= rhs;
+        self.x *= rhs;
+        self.y *= rhs;
     }
 }
 
@@ -141,9 +143,8 @@ impl Div<Float> for Vector2 {
     type Output = Vector2;
 
     #[inline]
-    fn div(self, rhs: Float) -> Self::Output {
-        let Vector2(sx, sy) = self;
-        Vector2(sx / rhs, sy / rhs)
+    fn div(self, rhs: Float) -> Vector2 {
+        Vector2::new(self.x / rhs, self.y / rhs)
     }
 }
 
@@ -151,18 +152,16 @@ impl Div<Float> for &Vector2 {
     type Output = Vector2;
 
     #[inline]
-    fn div(self, rhs: Float) -> Self::Output {
-        let Vector2(sx, sy) = *self;
-        Vector2(sx / rhs, sy / rhs)
+    fn div(self, rhs: Float) -> Vector2 {
+        Vector2::new(self.x / rhs, self.y / rhs)
     }
 }
 
 impl DivAssign<Float> for Vector2 {
     #[inline]
     fn div_assign(&mut self, rhs: Float) {
-        let Vector2(ref mut sx, ref mut sy) = self;
-        *sx /= rhs;
-        *sy /= rhs;
+        self.x /= rhs;
+        self.y /= rhs;
     }
 }
 
@@ -170,9 +169,8 @@ impl Neg for Vector2 {
     type Output = Vector2;
 
     #[inline]
-    fn neg(self) -> Self::Output {
-        let Vector2(sx, sy) = self;
-        Vector2(-sx, -sy)
+    fn neg(self) -> Vector2 {
+        Vector2::new(-self.x, -self.y)
     }
 }
 
@@ -180,9 +178,8 @@ impl Neg for &Vector2 {
     type Output = Vector2;
 
     #[inline]
-    fn neg(self) -> Self::Output {
-        let Vector2(sx, sy) = *self;
-        Vector2(-sx, -sy)
+    fn neg(self) -> Vector2 {
+        Vector2::new(-self.x, -self.y)
     }
 }
 
@@ -193,80 +190,92 @@ mod tests {
 
     #[test]
     fn len_sq() {
-        assert_eq!(Vector2(3.0, 4.0).len_sq(), 25.0);
+        assert_eq!(Vector2::new(3.0, 4.0).len_sq(), 25.0);
     }
 
     #[test]
     fn len() {
-        assert_eq!(Vector2(3.0, 4.0).len(), 5.0);
+        assert_eq!(Vector2::new(3.0, 4.0).len(), 5.0);
     }
 
     #[test]
     fn mix_midpoint() {
         assert_eq!(
-            Vector2(0.0, 0.0).mix(&Vector2(10.0, 20.0), 0.5),
-            Vector2(5.0, 10.0)
+            Vector2::new(0.0, 0.0).mix(&Vector2::new(10.0, 20.0), 0.5),
+            Vector2::new(5.0, 10.0)
         );
     }
 
     #[test]
     fn mix_at_start() {
         assert_eq!(
-            Vector2(0.0, 0.0).mix(&Vector2(10.0, 20.0), 0.0),
-            Vector2(10.0, 20.0)
+            Vector2::new(0.0, 0.0).mix(&Vector2::new(10.0, 20.0), 0.0),
+            Vector2::new(10.0, 20.0)
         );
     }
 
     #[test]
     fn mix_at_end() {
         assert_eq!(
-            Vector2(0.0, 0.0).mix(&Vector2(10.0, 20.0), 1.0),
-            Vector2(0.0, 0.0)
+            Vector2::new(0.0, 0.0).mix(&Vector2::new(10.0, 20.0), 1.0),
+            Vector2::new(0.0, 0.0)
         );
     }
 
     #[test]
     fn add() {
-        assert_eq!(Vector2(1.0, 2.0) + Vector2(3.0, 4.0), Vector2(4.0, 6.0));
+        assert_eq!(
+            Vector2::new(1.0, 2.0) + Vector2::new(3.0, 4.0),
+            Vector2::new(4.0, 6.0)
+        );
     }
 
     #[test]
     fn add_ref() {
-        assert_eq!(&Vector2(1.0, 2.0) + &Vector2(3.0, 4.0), Vector2(4.0, 6.0));
+        assert_eq!(
+            &Vector2::new(1.0, 2.0) + &Vector2::new(3.0, 4.0),
+            Vector2::new(4.0, 6.0)
+        );
     }
 
     #[test]
     fn sub() {
-        assert_eq!(Vector2(1.0, 2.0) - Vector2(3.0, 5.0), Vector2(-2.0, -3.0));
+        assert_eq!(
+            Vector2::new(1.0, 2.0) - Vector2::new(3.0, 5.0),
+            Vector2::new(-2.0, -3.0)
+        );
     }
 
     #[test]
     fn sub_ref() {
-        assert_eq!(&Vector2(1.0, 2.0) - &Vector2(3.0, 5.0), Vector2(-2.0, -3.0));
+        assert_eq!(
+            &Vector2::new(1.0, 2.0) - &Vector2::new(3.0, 5.0),
+            Vector2::new(-2.0, -3.0)
+        );
     }
 
     #[test]
     fn dot() {
-        assert_eq!(Vector2(1.0, 2.0) * Vector2(3.0, 4.0), 11.0);
+        assert_eq!(Vector2::new(1.0, 2.0) * Vector2::new(3.0, 4.0), 11.0);
     }
 
     #[test]
     fn mul_scalar() {
-        assert_eq!(Vector2(1.0, 2.0) * 2.0, Vector2(2.0, 4.0));
+        assert_eq!(Vector2::new(1.0, 2.0) * 2.0, Vector2::new(2.0, 4.0));
     }
 
     #[test]
     fn div_scalar() {
-        assert_eq!(Vector2(2.0, 4.0) / 2.0, Vector2(1.0, 2.0));
+        assert_eq!(Vector2::new(2.0, 4.0) / 2.0, Vector2::new(1.0, 2.0));
     }
 
     #[test]
     fn neg() {
-        assert_eq!(-Vector2(1.0, -2.0), Vector2(-1.0, 2.0));
+        assert_eq!(-Vector2::new(1.0, -2.0), Vector2::new(-1.0, 2.0));
     }
 
     #[test]
     fn neg_ref() {
-        assert_eq!(-&Vector2(1.0, -2.0), Vector2(-1.0, 2.0));
+        assert_eq!(-&Vector2::new(1.0, -2.0), Vector2::new(-1.0, 2.0));
     }
 }

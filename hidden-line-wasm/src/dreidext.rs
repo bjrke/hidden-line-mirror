@@ -79,7 +79,11 @@ impl QuadStrip {
         by: Float,
         bz: Float,
     ) -> QuadStrip {
-        QuadStrip::new(scene_builder, Vector3(ax, ay, az), Vector3(bx, by, bz))
+        QuadStrip::new(
+            scene_builder,
+            Vector3::new(ax, ay, az),
+            Vector3::new(bx, by, bz),
+        )
     }
 
     pub fn new(mut scene_builder: SceneBuilder, a: Vector3, b: Vector3) -> QuadStrip {
@@ -116,9 +120,9 @@ mod tests {
     fn push_deduplicates_points() {
         let mut builder = SceneBuilder::new();
 
-        let i1 = builder.push(Vector3(1.0, 2.0, 3.0));
-        let i2 = builder.push(Vector3(1.0, 2.0, 3.0));
-        let i3 = builder.push(Vector3(4.0, 5.0, 6.0));
+        let i1 = builder.push(Vector3::new(1.0, 2.0, 3.0));
+        let i2 = builder.push(Vector3::new(1.0, 2.0, 3.0));
+        let i3 = builder.push(Vector3::new(4.0, 5.0, 6.0));
 
         assert_eq!(i1, i2);
         assert_eq!(builder.scene3.points.len(), 2);
@@ -128,9 +132,9 @@ mod tests {
     #[test]
     fn triangle_appends_to_scene() {
         let mut builder = SceneBuilder::new();
-        let a = builder.push(Vector3(0.0, 0.0, 0.0));
-        let b = builder.push(Vector3(1.0, 0.0, 0.0));
-        let c = builder.push(Vector3(0.0, 1.0, 0.0));
+        let a = builder.push(Vector3::new(0.0, 0.0, 0.0));
+        let b = builder.push(Vector3::new(1.0, 0.0, 0.0));
+        let c = builder.push(Vector3::new(0.0, 1.0, 0.0));
 
         let t = builder.triangle(a, b, c, 7);
 
@@ -142,10 +146,10 @@ mod tests {
     #[test]
     fn quad_splits_along_short_diagonal() {
         let mut builder = SceneBuilder::new();
-        let p1 = builder.push(Vector3(0.0, 0.0, 0.0));
-        let p2 = builder.push(Vector3(2.0, 0.0, 0.0));
-        let p3 = builder.push(Vector3(2.0, 1.0, 0.0));
-        let p4 = builder.push(Vector3(0.0, 3.0, 0.0));
+        let p1 = builder.push(Vector3::new(0.0, 0.0, 0.0));
+        let p2 = builder.push(Vector3::new(2.0, 0.0, 0.0));
+        let p3 = builder.push(Vector3::new(2.0, 1.0, 0.0));
+        let p4 = builder.push(Vector3::new(0.0, 3.0, 0.0));
 
         builder.quad(p1, p2, p3, p4);
 
@@ -163,10 +167,10 @@ mod tests {
     #[test]
     fn quad_splits_along_other_diagonal() {
         let mut builder = SceneBuilder::new();
-        let p1 = builder.push(Vector3(0.0, 0.0, 0.0));
-        let p2 = builder.push(Vector3(1.0, 0.0, 0.0));
-        let p3 = builder.push(Vector3(2.0, 1.0, 0.0));
-        let p4 = builder.push(Vector3(0.0, 1.0, 0.0));
+        let p1 = builder.push(Vector3::new(0.0, 0.0, 0.0));
+        let p2 = builder.push(Vector3::new(1.0, 0.0, 0.0));
+        let p3 = builder.push(Vector3::new(2.0, 1.0, 0.0));
+        let p4 = builder.push(Vector3::new(0.0, 1.0, 0.0));
 
         builder.quad(p1, p2, p3, p4);
 
@@ -183,9 +187,13 @@ mod tests {
     #[test]
     fn quad_strip_builds_single_quad() {
         let builder = SceneBuilder::new();
-        let mut strip = QuadStrip::new(builder, Vector3(0.0, 0.0, 0.0), Vector3(1.0, 0.0, 0.0));
+        let mut strip = QuadStrip::new(
+            builder,
+            Vector3::new(0.0, 0.0, 0.0),
+            Vector3::new(1.0, 0.0, 0.0),
+        );
 
-        strip.add(Vector3(0.0, 1.0, 0.0), Vector3(1.0, 1.0, 0.0));
+        strip.add(Vector3::new(0.0, 1.0, 0.0), Vector3::new(1.0, 1.0, 0.0));
 
         let builder = strip.build();
 

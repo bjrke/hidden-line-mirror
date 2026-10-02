@@ -31,7 +31,7 @@ impl TreeTriangle {
         let plane_dist = plane_norm * o1;
 
         TreeTriangle {
-            shape: Triangle(
+            shape: Triangle::new(
                 rendered.points[i1],
                 rendered.points[i2],
                 rendered.points[i3],
@@ -46,8 +46,8 @@ impl TreeTriangle {
 
     #[inline]
     fn lines(&self) -> Vec<Line> {
-        let Triangle(p1, p2, p3) = self.shape;
-        vec![Line(p1, p2), Line(p2, p3), Line(p3, p1)]
+        let (p1, p2, p3) = self.shape.into();
+        vec![Line::new(p1, p2), Line::new(p2, p3), Line::new(p3, p1)]
     }
 }
 
@@ -104,10 +104,10 @@ pub fn hidden_line(
     for &(a, e) in lines.iter() {
         let pa = scene2.points[a];
         let pe = scene2.points[e];
-        let line_shape = Line(pa, pe);
+        let line_shape = Line::new(pa, pe);
 
         let bounds = line_shape.bounds();
-        let mut ranges: RangeSet = RangeSet(vec![FloatRange(0.0, 1.0)]);
+        let mut ranges: RangeSet = RangeSet::new(vec![FloatRange::new(0.0, 1.0)]);
 
         tree.elements_intersecting(&bounds, &mut |triangle| {
             intersect(
@@ -121,8 +121,8 @@ pub fn hidden_line(
             ranges.is_empty()
         });
 
-        let RangeSet(ranges) = ranges;
-        for FloatRange(l1, l2) in ranges {
+        let RangeSet { ranges } = ranges;
+        for FloatRange { start: l1, end: l2 } in ranges {
             let start = pa.mix(&pe, l1);
             let end = pa.mix(&pe, l2);
             color_context.line(start, end);
@@ -143,7 +143,7 @@ fn clip(
 
     let ref_dist = ref_point * normal;
     if ref_dist.abs() < EPSILON0 {
-        return FloatRange(MIN, MAX);
+        return FloatRange::new(MIN, MAX);
     }
 
     let ref_dist = if !ref_point_visible {
@@ -160,22 +160,22 @@ fn clip(
     let d = p2n - p1n;
 
     if d.abs() < EPSILON0 {
-        FloatRange(MIN, MAX)
+        FloatRange::new(MIN, MAX)
     } else {
         let l = p2n / d;
 
         if l > 0.5 {
             if p2n.sign() == ref_dist {
                 // l == 0 visible
-                FloatRange(l, MAX)
+                FloatRange::new(l, MAX)
             } else {
-                FloatRange(MIN, l)
+                FloatRange::new(MIN, l)
             }
         } else if p1n.sign() == ref_dist {
             // l == 1 visible
-            FloatRange(MIN, l)
+            FloatRange::new(MIN, l)
         } else {
-            FloatRange(l, MAX)
+            FloatRange::new(l, MAX)
         }
     }
 }
@@ -252,37 +252,37 @@ fn intersect(
         // range.remove(&(..));
     }
 
-    let Line(b1, b2) = *line_shape;
+    let (b1, b2) = (*line_shape).into();
 
     let d21 = b2 - b1;
     let mut min = None;
     let mut max = None;
-    for Line(p3, p4) in triangle.lines() {
+    for Line { a: p3, e: p4 } in triangle.lines() {
         //https://quickmath.com/webMathematica3/quickmath/equations/solve/advanced.jsp#c=solve_advancedsolveequations&v1=lx_1%2Bmx_2%253Dp%250Aly_1%2Bmy_2%253Dq%250Al%2Bm%253D1%250Anx_3%2Box_4%253Dp%250Any_3%2Boy_4%253Dq%250An%2Bo%253D1%250A&v2=l%250Am%250An%250Ao%250Ap%250Aq%250A&v5=1
 
         let d43 = p4 - p3;
 
-        let fx1 = b1.0 * d43.1;
-        let fy1 = b1.1 * d43.0;
+        let fx1 = b1.x * d43.y;
+        let fy1 = b1.y * d43.x;
 
-        let fx2 = b2.0 * d43.1;
-        let fy2 = b2.1 * d43.0;
+        let fx2 = b2.x * d43.y;
+        let fy2 = b2.y * d43.x;
 
-        let fx3 = p3.0 * d21.1;
-        let fy3 = p3.1 * d21.0;
+        let fx3 = p3.x * d21.y;
+        let fy3 = p3.y * d21.x;
 
-        let fx4 = p4.0 * d21.1;
-        let fy4 = p4.1 * d21.0;
+        let fx4 = p4.x * d21.y;
+        let fy4 = p4.y * d21.x;
 
         let divisor = fx2 - fy2 + fy1 - fx1;
 
-        let k21 = Matrix2(b1, b2).determinant();
+        let k21 = Matrix2::new(b1, b2).determinant();
 
         let nn = -(fx4 - fy4 - k21) / divisor;
         let oo = (fx3 - fy3 - k21) / divisor;
 
         if nn > -EPSILON0 && oo > -EPSILON0 {
-            let k43 = Matrix2(p3, p4).determinant();
+            let k43 = Matrix2::new(p3, p4).determinant();
             let l1 = (fx2 - fy2 - k43) / divisor;
 
             match min {
@@ -298,7 +298,7 @@ fn intersect(
     }
 
     if let (Some(l), Some(r)) = (min, max) {
-        range.remove(&FloatRange(l, r));
+        range.remove(&FloatRange::new(l, r));
     }
 }
 
@@ -309,19 +309,23 @@ mod tests {
     use crate::dreidext::SceneTriangle;
     use std::collections::HashMap;
 
-    const EYE: Vector3 = Vector3(0.5, 0.5, 2.0);
+    const EYE: Vector3 = Vector3::new(0.5, 0.5, 2.0);
 
     fn test_triangle() -> TreeTriangle {
         let scene3 = Scene3 {
             points: vec![
-                Vector3(0.0, 0.0, 0.0),
-                Vector3(1.0, 0.0, 0.0),
-                Vector3(0.0, 1.0, 0.0),
+                Vector3::new(0.0, 0.0, 0.0),
+                Vector3::new(1.0, 0.0, 0.0),
+                Vector3::new(0.0, 1.0, 0.0),
             ],
             triangles: vec![],
         };
         let scene2 = Scene2 {
-            points: vec![Vector2(0.0, 0.0), Vector2(1.0, 0.0), Vector2(0.0, 1.0)],
+            points: vec![
+                Vector2::new(0.0, 0.0),
+                Vector2::new(1.0, 0.0),
+                Vector2::new(0.0, 1.0),
+            ],
             triangles: vec![(0, 1, 2)],
             lines: HashMap::new(),
             eye: EYE,
@@ -330,135 +334,138 @@ mod tests {
     }
 
     fn full_range() -> RangeSet {
-        RangeSet(vec![FloatRange(0.0, 1.0)])
+        RangeSet::new(vec![FloatRange::new(0.0, 1.0)])
     }
 
     #[test]
     fn clip_returns_full_range_when_ref_point_on_plane() {
-        let v1 = Vector3(1.0, 0.0, 0.0);
-        let v2 = Vector3(0.0, 1.0, 0.0);
-        let v3 = Vector3(1.0, 1.0, 0.0);
-        let p1 = Vector3(0.0, 0.0, 5.0);
-        let p2 = Vector3(0.0, 0.0, -1.0);
+        let v1 = Vector3::new(1.0, 0.0, 0.0);
+        let v2 = Vector3::new(0.0, 1.0, 0.0);
+        let v3 = Vector3::new(1.0, 1.0, 0.0);
+        let p1 = Vector3::new(0.0, 0.0, 5.0);
+        let p2 = Vector3::new(0.0, 0.0, -1.0);
 
         assert_eq!(
-            clip(p1, p2, v1, v2, v3, Vector3(0.0, 0.0, 0.0), true),
-            FloatRange(MIN, MAX)
+            clip(p1, p2, v1, v2, v3, Vector3::new(0.0, 0.0, 0.0), true),
+            FloatRange::new(MIN, MAX)
         );
     }
 
     #[test]
     fn clip_returns_full_range_when_points_parallel() {
-        let v1 = Vector3(1.0, 0.0, 0.0);
-        let v2 = Vector3(0.0, 1.0, 0.0);
-        let v3 = Vector3(1.0, 1.0, 0.0);
-        let p1 = Vector3(0.0, 0.0, 1.0);
-        let p2 = Vector3(0.0, 0.0, 1.0);
+        let v1 = Vector3::new(1.0, 0.0, 0.0);
+        let v2 = Vector3::new(0.0, 1.0, 0.0);
+        let v3 = Vector3::new(1.0, 1.0, 0.0);
+        let p1 = Vector3::new(0.0, 0.0, 1.0);
+        let p2 = Vector3::new(0.0, 0.0, 1.0);
 
         assert_eq!(
-            clip(p1, p2, v1, v2, v3, Vector3(0.0, 0.0, 1.0), true),
-            FloatRange(MIN, MAX)
+            clip(p1, p2, v1, v2, v3, Vector3::new(0.0, 0.0, 1.0), true),
+            FloatRange::new(MIN, MAX)
         );
     }
 
     #[test]
     fn clip_visible_ref_point() {
-        let v1 = Vector3(1.0, 0.0, 0.0);
-        let v2 = Vector3(0.0, 1.0, 0.0);
-        let v3 = Vector3(1.0, 1.0, 0.0);
-        let p1 = Vector3(0.0, 0.0, 5.0);
-        let p2 = Vector3(0.0, 0.0, -1.0);
+        let v1 = Vector3::new(1.0, 0.0, 0.0);
+        let v2 = Vector3::new(0.0, 1.0, 0.0);
+        let v3 = Vector3::new(1.0, 1.0, 0.0);
+        let p1 = Vector3::new(0.0, 0.0, 5.0);
+        let p2 = Vector3::new(0.0, 0.0, -1.0);
 
         assert_eq!(
-            clip(p1, p2, v1, v2, v3, Vector3(0.0, 0.0, 1.0), true),
-            FloatRange(0.16666667, MAX)
+            clip(p1, p2, v1, v2, v3, Vector3::new(0.0, 0.0, 1.0), true),
+            FloatRange::new(0.16666667, MAX)
         );
     }
 
     #[test]
     fn clip_hidden_ref_point() {
-        let v1 = Vector3(1.0, 0.0, 0.0);
-        let v2 = Vector3(0.0, 1.0, 0.0);
-        let v3 = Vector3(1.0, 1.0, 0.0);
-        let p1 = Vector3(0.0, 0.0, 5.0);
-        let p2 = Vector3(0.0, 0.0, -1.0);
+        let v1 = Vector3::new(1.0, 0.0, 0.0);
+        let v2 = Vector3::new(0.0, 1.0, 0.0);
+        let v3 = Vector3::new(1.0, 1.0, 0.0);
+        let p1 = Vector3::new(0.0, 0.0, 5.0);
+        let p2 = Vector3::new(0.0, 0.0, -1.0);
 
         assert_eq!(
-            clip(p1, p2, v1, v2, v3, Vector3(0.0, 0.0, 1.0), false),
-            FloatRange(MIN, 0.16666667)
+            clip(p1, p2, v1, v2, v3, Vector3::new(0.0, 0.0, 1.0), false),
+            FloatRange::new(MIN, 0.16666667)
         );
     }
 
     #[test]
     fn intersect_keeps_range_when_line_is_on_eye_side() {
         let triangle = test_triangle();
-        let line_shape = Line(Vector2(0.25, 0.5), Vector2(0.25, 1.0));
+        let line_shape = Line::new(Vector2::new(0.25, 0.5), Vector2::new(0.25, 1.0));
 
         let mut range = full_range();
         intersect(
             &triangle,
             &line_shape,
             EYE,
-            Vector3(0.25, 0.25, 0.5),
-            Vector3(0.25, 0.25, 1.0),
+            Vector3::new(0.25, 0.25, 0.5),
+            Vector3::new(0.25, 0.25, 1.0),
             &mut range,
         );
 
-        assert_eq!(range.0, vec![FloatRange(0.0, 1.0)]);
+        assert_eq!(range.ranges, vec![FloatRange::new(0.0, 1.0)]);
     }
 
     #[test]
     fn intersect_keeps_range_when_eye_is_on_plane() {
         let triangle = test_triangle();
-        let line_shape = Line(Vector2(0.25, -1.0), Vector2(0.25, 1.0));
+        let line_shape = Line::new(Vector2::new(0.25, -1.0), Vector2::new(0.25, 1.0));
 
         let mut range = full_range();
         intersect(
             &triangle,
             &line_shape,
-            Vector3(0.5, 0.5, 0.0),
-            Vector3(0.25, 0.25, -1.0),
-            Vector3(0.25, 0.25, 1.0),
+            Vector3::new(0.5, 0.5, 0.0),
+            Vector3::new(0.25, 0.25, -1.0),
+            Vector3::new(0.25, 0.25, 1.0),
             &mut range,
         );
 
-        assert_eq!(range.0, vec![FloatRange(0.0, 1.0)]);
+        assert_eq!(range.ranges, vec![FloatRange::new(0.0, 1.0)]);
     }
 
     #[test]
     fn intersect_keeps_range_when_line_lies_on_triangle() {
         let triangle = test_triangle();
-        let line_shape = Line(Vector2(0.25, 0.25), Vector2(0.75, 0.25));
+        let line_shape = Line::new(Vector2::new(0.25, 0.25), Vector2::new(0.75, 0.25));
 
         let mut range = full_range();
         intersect(
             &triangle,
             &line_shape,
             EYE,
-            Vector3(0.25, 0.25, 0.0),
-            Vector3(0.75, 0.25, 0.0),
+            Vector3::new(0.25, 0.25, 0.0),
+            Vector3::new(0.75, 0.25, 0.0),
             &mut range,
         );
 
-        assert_eq!(range.0, vec![FloatRange(0.0, 1.0)]);
+        assert_eq!(range.ranges, vec![FloatRange::new(0.0, 1.0)]);
     }
 
     #[test]
     fn intersect_removes_occluded_middle() {
         let triangle = test_triangle();
-        let line_shape = Line(Vector2(0.25, -1.0), Vector2(0.25, 1.0));
+        let line_shape = Line::new(Vector2::new(0.25, -1.0), Vector2::new(0.25, 1.0));
 
         let mut range = full_range();
         intersect(
             &triangle,
             &line_shape,
             EYE,
-            Vector3(0.25, 0.25, -1.0),
-            Vector3(0.25, 0.25, 1.0),
+            Vector3::new(0.25, 0.25, -1.0),
+            Vector3::new(0.25, 0.25, 1.0),
             &mut range,
         );
 
-        assert_eq!(range.0, vec![FloatRange(0.0, 0.125), FloatRange(0.5, 1.0)]);
+        assert_eq!(
+            range.ranges,
+            vec![FloatRange::new(0.0, 0.125), FloatRange::new(0.5, 1.0)]
+        );
     }
 
     struct CollectContext {
@@ -475,11 +482,11 @@ mod tests {
     fn hidden_line_occludes_middle_of_crossing_line() {
         let scene3 = Scene3 {
             points: vec![
-                Vector3(0.0, 0.0, 0.0),
-                Vector3(1.0, 0.0, 0.0),
-                Vector3(0.0, 1.0, 0.0),
-                Vector3(0.25, 0.25, -1.0),
-                Vector3(0.25, 0.25, 1.0),
+                Vector3::new(0.0, 0.0, 0.0),
+                Vector3::new(1.0, 0.0, 0.0),
+                Vector3::new(0.0, 1.0, 0.0),
+                Vector3::new(0.25, 0.25, -1.0),
+                Vector3::new(0.25, 0.25, 1.0),
             ],
             triangles: vec![SceneTriangle {
                 p1: 0,
@@ -490,11 +497,11 @@ mod tests {
         };
         let scene2 = Scene2 {
             points: vec![
-                Vector2(0.0, 0.0),
-                Vector2(1.0, 0.0),
-                Vector2(0.0, 1.0),
-                Vector2(0.25, -1.0),
-                Vector2(0.25, 1.0),
+                Vector2::new(0.0, 0.0),
+                Vector2::new(1.0, 0.0),
+                Vector2::new(0.0, 1.0),
+                Vector2::new(0.25, -1.0),
+                Vector2::new(0.25, 1.0),
             ],
             triangles: vec![(0, 1, 2)],
             lines: HashMap::new(),
@@ -508,8 +515,8 @@ mod tests {
         assert_eq!(
             ctx.lines,
             vec![
-                (Vector2(0.25, 1.0), Vector2(0.25, 0.75)),
-                (Vector2(0.25, 0.0), Vector2(0.25, -1.0)),
+                (Vector2::new(0.25, 1.0), Vector2::new(0.25, 0.75)),
+                (Vector2::new(0.25, 0.0), Vector2::new(0.25, -1.0)),
             ]
         );
     }
