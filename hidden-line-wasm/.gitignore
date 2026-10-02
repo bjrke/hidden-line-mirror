@@ -4,5 +4,4 @@ node_modules
 /pkg
 /wasm-pack.log
 .vscode
-Cargo.lock
 **/*.rs.bk

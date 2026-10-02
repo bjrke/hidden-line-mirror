@@ -2,4 +2,4 @@
 .idea
 *.iml
 target
-Cargo.lock
+opencode.json

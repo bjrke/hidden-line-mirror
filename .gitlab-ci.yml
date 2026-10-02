@@ -58,5 +58,3 @@ docker_rust_wasm_npm:
     - docker build --pull -t "$CI_REGISTRY_IMAGE/rust_wasm_npm" .
     - docker push "$CI_REGISTRY_IMAGE/rust_wasm_npm"
   when: manual
-  only:
-    - main
