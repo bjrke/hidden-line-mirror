@@ -24,12 +24,17 @@ CI (GitLab, `.gitlab-ci.yml`) mirrors this: `cargo test --all`, then in `hidden-
 - JS entry is `hidden-line-wasm/js/index.js` (webpack entry). It `eval`s the formula into an `(x, y) => z` function, calls `wasm.lets_go(svg)`, then `hiddenLine.set_function(f)`.
 - Rust entry is `hidden-line-wasm/src/lib.rs`, using the old `wasm-bindgen` 0.2.60 API (not modern `wasm-bindgen`): `lets_go(svg) -> HiddenLine`, with `on_key` / `set_function` methods. It defines its own `print!`/`println!`/`eprint!`/`eprintln!` macros.
 - Pipeline: `plot::init_scene` samples the surface into a triangle mesh (`Scene3` in `dreidext.rs`) → `AppContext` (keyboard state) → `CalcContext` (`calcctontext.rs`, the hidden-line elimination core using `QuadTree` + `RangeSet`) → `DrawContext` trait (`drawcontext.rs`) → `SvgContext` (`svgcontext.rs`) writes SVG paths.
-- `float.rs` sets `pub type Float = f32`; all geometry math is single-precision. `mat2.rs` is empty/dead.
+- `float.rs` sets `pub type Float = f32`; all geometry math is single-precision.
 
 ## Workflow
 
-- If not already on a branch, branch off `main` before making changes.
-- After finishing work, commit with a headline at most 50 chars and a body wrapped at 72 chars.
+Committing is a required part of every task — never finish without it.
+
+1. Before making any changes: if not already on a branch, create one off `main` (e.g. `git checkout -b <short-description>`).
+2. Make and verify your changes.
+3. Before telling the user you are done, commit: `git add` the intended files (check `git status` and `git diff` first), then commit with a headline at most 50 chars and a body wrapped at 72 chars.
+
+Never leave the working tree dirty at the end of a task.
 
 ## Gotchas
 
