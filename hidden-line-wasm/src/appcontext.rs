@@ -216,3 +216,89 @@ fn push_line(lines: &mut HashMap<(usize, usize), Color>, p1: usize, p2: usize, c
         })
         .or_insert(col);
 }
+
+#[cfg(test)]
+mod tests {
+
+    use super::*;
+
+    #[test]
+    fn on_key_known_keys_return_true() {
+        let mut actx = AppContext::new();
+        let keys = [
+            'a', 'A', 'y', 'z', 'Y', 'Z', 'k', 'K', 'l', 'L', 's', 'S', 'x', 'X', 'd', 'D', 'c',
+            'C', ',', ';', '<', '.', ':', '>', 'o', 'O', 'i', 'I', 'b', 'B',
+        ];
+        for k in keys.iter() {
+            assert!(actx.on_key(*k), "key {:?} should be handled", k);
+        }
+    }
+
+    #[test]
+    fn on_key_unknown_keys_return_false() {
+        let mut actx = AppContext::new();
+        assert!(!actx.on_key('1'));
+        assert!(!actx.on_key(' '));
+        assert!(!actx.on_key('\n'));
+    }
+
+    #[test]
+    fn on_key_a_moves_eye() {
+        let mut actx = AppContext::new();
+        let before = actx.eye;
+        assert!(actx.on_key('a'));
+        assert!(actx.eye != before);
+    }
+
+    #[test]
+    fn rot_vec_preserves_lengths_and_orthogonality() {
+        let mut u = Vector3(1.0, 0.0, 0.0);
+        let mut v = Vector3(0.0, 1.0, 0.0);
+
+        rot_vec(&mut u, &mut v, 10.0);
+
+        assert!((u.len() - 1.0).abs() < 1.0e-5);
+        assert!((v.len() - 1.0).abs() < 1.0e-5);
+        assert!(u * v < 1.0e-5);
+    }
+
+    #[test]
+    fn rot_vec_small_angle_keeps_vectors_close() {
+        let mut u = Vector3(1.0, 0.0, 0.0);
+        let mut v = Vector3(0.0, 1.0, 0.0);
+        let u0 = u;
+        let v0 = v;
+
+        rot_vec(&mut u, &mut v, 1.0);
+
+        assert!(u.cross(&u0).len() < 0.1);
+        assert!(v.cross(&v0).len() < 0.1);
+    }
+
+    #[test]
+    fn scene2_projects_axis_point_to_origin() {
+        let mut actx = AppContext::new();
+        let on_axis = actx.eye - actx.view;
+        actx.scene3 = Scene3 {
+            points: vec![on_axis],
+            triangles: vec![],
+        };
+
+        let scene2 = Scene2::new(&actx, &actx.scene3);
+
+        assert_eq!(scene2.points, vec![Vector2(0.0, 0.0)]);
+    }
+
+    #[test]
+    fn scene2_projects_off_axis_point() {
+        let mut actx = AppContext::new();
+        actx.scene3 = Scene3 {
+            points: vec![Vector3(1.0, 0.0, 0.0)],
+            triangles: vec![],
+        };
+
+        let scene2 = Scene2::new(&actx, &actx.scene3);
+
+        assert_eq!(scene2.points, vec![Vector2(0.5, 0.0)]);
+    }
+}

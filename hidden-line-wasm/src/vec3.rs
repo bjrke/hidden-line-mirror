@@ -217,3 +217,121 @@ impl Neg for &Vector3 {
         Vector3(-sx, -sy, -sz)
     }
 }
+
+#[cfg(test)]
+mod tests {
+
+    use super::*;
+    use std::collections::hash_map::DefaultHasher;
+
+    fn hash_of(v: &Vector3) -> u64 {
+        let mut hasher = DefaultHasher::new();
+        v.hash(&mut hasher);
+        hasher.finish()
+    }
+
+    #[test]
+    fn cross_of_basis_vectors() {
+        assert_eq!(
+            Vector3(1.0, 0.0, 0.0).cross(&Vector3(0.0, 1.0, 0.0)),
+            Vector3(0.0, 0.0, 1.0)
+        );
+    }
+
+    #[test]
+    fn cross_is_anticommutative() {
+        assert_eq!(
+            Vector3(1.0, 2.0, 3.0).cross(&Vector3(4.0, 5.0, 6.0)),
+            -Vector3(4.0, 5.0, 6.0).cross(&Vector3(1.0, 2.0, 3.0))
+        );
+    }
+
+    #[test]
+    fn len_sq() {
+        assert_eq!(Vector3(1.0, 2.0, 2.0).len_sq(), 9.0);
+    }
+
+    #[test]
+    fn len() {
+        assert_eq!(Vector3(1.0, 2.0, 2.0).len(), 3.0);
+    }
+
+    #[test]
+    fn normalize() {
+        assert_eq!(Vector3(2.0, 0.0, 0.0).normalize(), Vector3(1.0, 0.0, 0.0));
+    }
+
+    #[test]
+    fn normalize_preserves_direction() {
+        let v = Vector3(2.0, 4.0, 8.0);
+        let n = v.normalize();
+        assert!((n.len() - 1.0).abs() < 1.0e-6);
+        assert!((n.cross(&v).len()).abs() < 1.0e-6);
+    }
+
+    #[test]
+    fn eq_rounds_close_values() {
+        assert_eq!(Vector3(1.0, 0.0, 0.0), Vector3(1.000001, 0.0, 0.0));
+    }
+
+    #[test]
+    fn eq_distinguishes_distinct_values() {
+        assert!(Vector3(1.0, 0.0, 0.0) != Vector3(2.0, 0.0, 0.0));
+    }
+
+    #[test]
+    fn hash_consistent_with_eq() {
+        let a = Vector3(1.0, 2.0, 3.0);
+        let b = Vector3(1.000001, 2.0, 3.0);
+        assert_eq!(hash_of(&a), hash_of(&b));
+    }
+
+    #[test]
+    fn add() {
+        assert_eq!(
+            Vector3(1.0, 2.0, 3.0) + Vector3(4.0, 5.0, 6.0),
+            Vector3(5.0, 7.0, 9.0)
+        );
+    }
+
+    #[test]
+    fn add_ref() {
+        assert_eq!(
+            &Vector3(1.0, 2.0, 3.0) + &Vector3(4.0, 5.0, 6.0),
+            Vector3(5.0, 7.0, 9.0)
+        );
+    }
+
+    #[test]
+    fn sub() {
+        assert_eq!(
+            Vector3(1.0, 2.0, 3.0) - Vector3(4.0, 6.0, 8.0),
+            Vector3(-3.0, -4.0, -5.0)
+        );
+    }
+
+    #[test]
+    fn dot() {
+        assert_eq!(Vector3(1.0, 2.0, 3.0) * Vector3(4.0, 5.0, 6.0), 32.0);
+    }
+
+    #[test]
+    fn mul_scalar() {
+        assert_eq!(Vector3(1.0, 2.0, 3.0) * 2.0, Vector3(2.0, 4.0, 6.0));
+    }
+
+    #[test]
+    fn div_scalar() {
+        assert_eq!(Vector3(2.0, 4.0, 6.0) / 2.0, Vector3(1.0, 2.0, 3.0));
+    }
+
+    #[test]
+    fn neg() {
+        assert_eq!(-Vector3(1.0, -2.0, 3.0), Vector3(-1.0, 2.0, -3.0));
+    }
+
+    #[test]
+    fn neg_ref() {
+        assert_eq!(-&Vector3(1.0, -2.0, 3.0), Vector3(-1.0, 2.0, -3.0));
+    }
+}

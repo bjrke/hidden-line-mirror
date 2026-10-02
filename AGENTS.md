@@ -10,14 +10,15 @@ Hidden Line Elimination: an interactive web app that renders implicit surfaces `
 
 ## Commands (run from `hidden-line-wasm/`)
 
-Requires `rustup`, `wasm-pack`, and `npm` installed (README install steps; none are on PATH in this environment — `rustc`/`cargo`/`wasm-pack` are not installed here).
+Requires `rustup`, `wasm-pack`, and `npm` installed (README install steps; `cargo`/`rustc`/`wasm-pack` are on PATH only after `source ~/.cargo/env`).
 
 - `npm install` — install deps
 - `npm start` — dev server (`webpack-dev-server --open`), auto-reloads on change
 - `npm run build` — production build into `dist/` (removes `dist/` and `pkg/` first)
 - `npm test` — runs `cargo test && wasm-pack test --node`; append `-- --firefox` / `-- --chrome` / `-- --safari` to run the wasm tests in a browser instead
+- `cargo fmt --all` — format the workspace; run `cargo fmt --all -- --check` to verify (CI does the check)
 
-CI (GitLab, `.gitlab-ci.yml`) mirrors this: `cargo test --all`, then in `hidden-line-wasm/` `npm i --cache .npm --prefer-offline`, `npm run test`, `npm run build`. The `pages` job deploys `hidden-line-wasm/dist` to GitLab Pages on `main`. A manual job builds the CI Docker image from the repo `Dockerfile`.
+CI (GitLab, `.gitlab-ci.yml`) mirrors this: `cargo fmt --all -- --check`, `cargo test --all`, then in `hidden-line-wasm/` `npm i --cache .npm --prefer-offline`, `npm run test`, `npm run build`. The `pages` job deploys `hidden-line-wasm/dist` to GitLab Pages on `main`. A manual job builds the CI Docker image from the repo `Dockerfile`.
 
 ## Architecture
 
@@ -31,14 +32,15 @@ CI (GitLab, `.gitlab-ci.yml`) mirrors this: `cargo test --all`, then in `hidden-
 Committing is a required part of every task — never finish without it.
 
 1. Before making any changes: if not already on a branch, create one off `main` (e.g. `git checkout -b <short-description>`).
-2. Make and verify your changes.
-3. Before telling the user you are done, commit: `git add` the intended files (check `git status` and `git diff` first), then commit with a headline at most 50 chars and a body wrapped at 72 chars.
+2. Make your changes, then run `cargo fmt --all` so the tree stays format-clean.
+3. Verify with the test suite: `cargo test --all` from the repo root (and `wasm-pack test --node` in `hidden-line-wasm/` if you touched wasm-facing code).
+4. Before telling the user you are done, commit: `git add` the intended files (check `git status` and `git diff` first), then commit with a headline at most 50 chars and a body wrapped at 72 chars.
 
 Never leave the working tree dirty at the end of a task.
 
 ## Gotchas
 
-- `src/*.rs` is written in a **non-standard Rust dialect** (e.g. `impl Add for Vector2 { type Output = Vector2; ... Self::Output }`, `ref mut` pattern bindings, comma-separated tuple-structs `pub struct X(pub A, pub B);`). It does not compile with stock rustc. Do NOT "normalize" it to standard Rust — preserve the existing syntax and idioms.
+- `src/*.rs` uses an older Rust idiom set (e.g. `impl Add for Vector2 { type Output = Vector2; ... Self::Output }`, `ref mut` pattern bindings, comma-separated tuple-structs `pub struct X(pub A, pub B);`). It compiles and formats fine with the pinned `rust:1.85` toolchain. Do NOT "normalize" it into more modern Rust — preserve the existing syntax and idioms. (Historically this note claimed the code did not compile with stock rustc; that is no longer true.)
 - `pkg/` (wasm-bindgen output) and `dist/` (webpack output) are generated build artifacts, gitignored.
 - The root `Cargo.lock` is committed so CI builds are deterministic; do not delete it. `hidden-line-wasm/Cargo.toml` sets `rust-version = "1.85"` and `.cargo/config.toml` sets `resolver.incompatible-rust-version-fallback = false`, so a `cargo update` refuses to pick deps that need a newer rustc than the pinned `rust:1.85-slim` image (`rust_wasm_npm`). Bump both the `Dockerfile` and `rust-version` together.
 - `opencode.json` is gitignored (local-only config).

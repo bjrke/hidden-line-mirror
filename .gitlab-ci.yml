@@ -3,7 +3,7 @@ variables:
 
 cargo:
   stage: test
-  image: rust:slim
+  image: "registry.gitlab.com/bjrke/hidden-line/rust_wasm_npm:latest"
   variables:
     CARGO_HOME: $CI_PROJECT_DIR/.cargo
   cache:
@@ -12,6 +12,7 @@ cargo:
       - .cargo
       - target
   script:
+    - cargo fmt --all -- --check
     - cargo test --all
 
 npm:

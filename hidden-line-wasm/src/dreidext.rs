@@ -106,3 +106,90 @@ impl QuadStrip {
         self.scene_builder
     }
 }
+
+#[cfg(test)]
+mod tests {
+
+    use super::*;
+
+    #[test]
+    fn push_deduplicates_points() {
+        let mut builder = SceneBuilder::new();
+
+        let i1 = builder.push(Vector3(1.0, 2.0, 3.0));
+        let i2 = builder.push(Vector3(1.0, 2.0, 3.0));
+        let i3 = builder.push(Vector3(4.0, 5.0, 6.0));
+
+        assert_eq!(i1, i2);
+        assert_eq!(builder.scene3.points.len(), 2);
+        assert!(i3 != i1);
+    }
+
+    #[test]
+    fn triangle_appends_to_scene() {
+        let mut builder = SceneBuilder::new();
+        let a = builder.push(Vector3(0.0, 0.0, 0.0));
+        let b = builder.push(Vector3(1.0, 0.0, 0.0));
+        let c = builder.push(Vector3(0.0, 1.0, 0.0));
+
+        let t = builder.triangle(a, b, c, 7);
+
+        assert_eq!(t, 0);
+        assert_eq!(builder.scene3.triangles.len(), 1);
+        assert_eq!(builder.scene3.triangles[0].lset, 7);
+    }
+
+    #[test]
+    fn quad_splits_along_short_diagonal() {
+        let mut builder = SceneBuilder::new();
+        let p1 = builder.push(Vector3(0.0, 0.0, 0.0));
+        let p2 = builder.push(Vector3(2.0, 0.0, 0.0));
+        let p3 = builder.push(Vector3(2.0, 1.0, 0.0));
+        let p4 = builder.push(Vector3(0.0, 3.0, 0.0));
+
+        builder.quad(p1, p2, p3, p4);
+
+        let Scene3 { points, triangles } = &builder.scene3;
+        assert_eq!(points.len(), 4);
+        assert_eq!(triangles.len(), 2);
+        assert_eq!(triangles[0].p1, p1);
+        assert_eq!(triangles[0].p2, p2);
+        assert_eq!(triangles[0].p3, p3);
+        assert_eq!(triangles[1].p1, p3);
+        assert_eq!(triangles[1].p2, p4);
+        assert_eq!(triangles[1].p3, p1);
+    }
+
+    #[test]
+    fn quad_splits_along_other_diagonal() {
+        let mut builder = SceneBuilder::new();
+        let p1 = builder.push(Vector3(0.0, 0.0, 0.0));
+        let p2 = builder.push(Vector3(1.0, 0.0, 0.0));
+        let p3 = builder.push(Vector3(2.0, 1.0, 0.0));
+        let p4 = builder.push(Vector3(0.0, 1.0, 0.0));
+
+        builder.quad(p1, p2, p3, p4);
+
+        let Scene3 { triangles, .. } = &builder.scene3;
+        assert_eq!(triangles.len(), 2);
+        assert_eq!(triangles[0].p1, p4);
+        assert_eq!(triangles[0].p2, p1);
+        assert_eq!(triangles[0].p3, p2);
+        assert_eq!(triangles[1].p1, p2);
+        assert_eq!(triangles[1].p2, p3);
+        assert_eq!(triangles[1].p3, p4);
+    }
+
+    #[test]
+    fn quad_strip_builds_single_quad() {
+        let builder = SceneBuilder::new();
+        let mut strip = QuadStrip::new(builder, Vector3(0.0, 0.0, 0.0), Vector3(1.0, 0.0, 0.0));
+
+        strip.add(Vector3(0.0, 1.0, 0.0), Vector3(1.0, 1.0, 0.0));
+
+        let builder = strip.build();
+
+        assert_eq!(builder.scene3.points.len(), 4);
+        assert_eq!(builder.scene3.triangles.len(), 2);
+    }
+}

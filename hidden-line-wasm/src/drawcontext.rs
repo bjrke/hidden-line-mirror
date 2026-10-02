@@ -27,3 +27,39 @@ pub fn float_to_color(c: Float) -> Color {
         (c * 255.0).round() as u8
     }
 }
+
+#[cfg(test)]
+mod tests {
+
+    use super::*;
+
+    #[test]
+    fn one_maps_to_255() {
+        assert_eq!(float_to_color(1.0), 255);
+    }
+
+    #[test]
+    fn zero_maps_to_0() {
+        assert_eq!(float_to_color(0.0), 0);
+    }
+
+    #[test]
+    fn half_maps_to_128() {
+        assert_eq!(float_to_color(0.5), 128);
+    }
+
+    #[test]
+    fn above_one_clamps() {
+        assert_eq!(float_to_color(2.0), 255);
+    }
+
+    #[test]
+    fn below_zero_clamps() {
+        assert_eq!(float_to_color(-1.0), 0);
+    }
+
+    #[test]
+    fn rounds_intermediate() {
+        assert_eq!(float_to_color(0.4), 102);
+    }
+}

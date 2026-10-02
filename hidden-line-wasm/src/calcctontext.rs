@@ -301,3 +301,216 @@ fn intersect(
         range.remove(&FloatRange(l, r));
     }
 }
+
+#[cfg(test)]
+mod tests {
+
+    use super::*;
+    use crate::dreidext::SceneTriangle;
+    use std::collections::HashMap;
+
+    const EYE: Vector3 = Vector3(0.5, 0.5, 2.0);
+
+    fn test_triangle() -> TreeTriangle {
+        let scene3 = Scene3 {
+            points: vec![
+                Vector3(0.0, 0.0, 0.0),
+                Vector3(1.0, 0.0, 0.0),
+                Vector3(0.0, 1.0, 0.0),
+            ],
+            triangles: vec![],
+        };
+        let scene2 = Scene2 {
+            points: vec![Vector2(0.0, 0.0), Vector2(1.0, 0.0), Vector2(0.0, 1.0)],
+            triangles: vec![(0, 1, 2)],
+            lines: HashMap::new(),
+            eye: EYE,
+        };
+        TreeTriangle::new(&scene3, &scene2, 0, 1, 2)
+    }
+
+    fn full_range() -> RangeSet {
+        RangeSet(vec![FloatRange(0.0, 1.0)])
+    }
+
+    #[test]
+    fn clip_returns_full_range_when_ref_point_on_plane() {
+        let v1 = Vector3(1.0, 0.0, 0.0);
+        let v2 = Vector3(0.0, 1.0, 0.0);
+        let v3 = Vector3(1.0, 1.0, 0.0);
+        let p1 = Vector3(0.0, 0.0, 5.0);
+        let p2 = Vector3(0.0, 0.0, -1.0);
+
+        assert_eq!(
+            clip(p1, p2, v1, v2, v3, Vector3(0.0, 0.0, 0.0), true),
+            FloatRange(MIN, MAX)
+        );
+    }
+
+    #[test]
+    fn clip_returns_full_range_when_points_parallel() {
+        let v1 = Vector3(1.0, 0.0, 0.0);
+        let v2 = Vector3(0.0, 1.0, 0.0);
+        let v3 = Vector3(1.0, 1.0, 0.0);
+        let p1 = Vector3(0.0, 0.0, 1.0);
+        let p2 = Vector3(0.0, 0.0, 1.0);
+
+        assert_eq!(
+            clip(p1, p2, v1, v2, v3, Vector3(0.0, 0.0, 1.0), true),
+            FloatRange(MIN, MAX)
+        );
+    }
+
+    #[test]
+    fn clip_visible_ref_point() {
+        let v1 = Vector3(1.0, 0.0, 0.0);
+        let v2 = Vector3(0.0, 1.0, 0.0);
+        let v3 = Vector3(1.0, 1.0, 0.0);
+        let p1 = Vector3(0.0, 0.0, 5.0);
+        let p2 = Vector3(0.0, 0.0, -1.0);
+
+        assert_eq!(
+            clip(p1, p2, v1, v2, v3, Vector3(0.0, 0.0, 1.0), true),
+            FloatRange(0.16666667, MAX)
+        );
+    }
+
+    #[test]
+    fn clip_hidden_ref_point() {
+        let v1 = Vector3(1.0, 0.0, 0.0);
+        let v2 = Vector3(0.0, 1.0, 0.0);
+        let v3 = Vector3(1.0, 1.0, 0.0);
+        let p1 = Vector3(0.0, 0.0, 5.0);
+        let p2 = Vector3(0.0, 0.0, -1.0);
+
+        assert_eq!(
+            clip(p1, p2, v1, v2, v3, Vector3(0.0, 0.0, 1.0), false),
+            FloatRange(MIN, 0.16666667)
+        );
+    }
+
+    #[test]
+    fn intersect_keeps_range_when_line_is_on_eye_side() {
+        let triangle = test_triangle();
+        let line_shape = Line(Vector2(0.25, 0.5), Vector2(0.25, 1.0));
+
+        let mut range = full_range();
+        intersect(
+            &triangle,
+            &line_shape,
+            EYE,
+            Vector3(0.25, 0.25, 0.5),
+            Vector3(0.25, 0.25, 1.0),
+            &mut range,
+        );
+
+        assert_eq!(range.0, vec![FloatRange(0.0, 1.0)]);
+    }
+
+    #[test]
+    fn intersect_keeps_range_when_eye_is_on_plane() {
+        let triangle = test_triangle();
+        let line_shape = Line(Vector2(0.25, -1.0), Vector2(0.25, 1.0));
+
+        let mut range = full_range();
+        intersect(
+            &triangle,
+            &line_shape,
+            Vector3(0.5, 0.5, 0.0),
+            Vector3(0.25, 0.25, -1.0),
+            Vector3(0.25, 0.25, 1.0),
+            &mut range,
+        );
+
+        assert_eq!(range.0, vec![FloatRange(0.0, 1.0)]);
+    }
+
+    #[test]
+    fn intersect_keeps_range_when_line_lies_on_triangle() {
+        let triangle = test_triangle();
+        let line_shape = Line(Vector2(0.25, 0.25), Vector2(0.75, 0.25));
+
+        let mut range = full_range();
+        intersect(
+            &triangle,
+            &line_shape,
+            EYE,
+            Vector3(0.25, 0.25, 0.0),
+            Vector3(0.75, 0.25, 0.0),
+            &mut range,
+        );
+
+        assert_eq!(range.0, vec![FloatRange(0.0, 1.0)]);
+    }
+
+    #[test]
+    fn intersect_removes_occluded_middle() {
+        let triangle = test_triangle();
+        let line_shape = Line(Vector2(0.25, -1.0), Vector2(0.25, 1.0));
+
+        let mut range = full_range();
+        intersect(
+            &triangle,
+            &line_shape,
+            EYE,
+            Vector3(0.25, 0.25, -1.0),
+            Vector3(0.25, 0.25, 1.0),
+            &mut range,
+        );
+
+        assert_eq!(range.0, vec![FloatRange(0.0, 0.125), FloatRange(0.5, 1.0)]);
+    }
+
+    struct CollectContext {
+        lines: Vec<(Vector2, Vector2)>,
+    }
+
+    impl ColorContext for CollectContext {
+        fn line(&mut self, p1: Vector2, p2: Vector2) {
+            self.lines.push((p1, p2));
+        }
+    }
+
+    #[test]
+    fn hidden_line_occludes_middle_of_crossing_line() {
+        let scene3 = Scene3 {
+            points: vec![
+                Vector3(0.0, 0.0, 0.0),
+                Vector3(1.0, 0.0, 0.0),
+                Vector3(0.0, 1.0, 0.0),
+                Vector3(0.25, 0.25, -1.0),
+                Vector3(0.25, 0.25, 1.0),
+            ],
+            triangles: vec![SceneTriangle {
+                p1: 0,
+                p2: 1,
+                p3: 2,
+                lset: 0,
+            }],
+        };
+        let scene2 = Scene2 {
+            points: vec![
+                Vector2(0.0, 0.0),
+                Vector2(1.0, 0.0),
+                Vector2(0.0, 1.0),
+                Vector2(0.25, -1.0),
+                Vector2(0.25, 1.0),
+            ],
+            triangles: vec![(0, 1, 2)],
+            lines: HashMap::new(),
+            eye: EYE,
+        };
+
+        let tree = create_tree(&scene3, &scene2);
+        let mut ctx = CollectContext { lines: vec![] };
+        hidden_line(&tree, &scene3, &scene2, &vec![(3, 4)], &mut ctx);
+
+        assert_eq!(
+            ctx.lines,
+            vec![
+                (Vector2(0.25, 1.0), Vector2(0.25, 0.75)),
+                (Vector2(0.25, 0.0), Vector2(0.25, -1.0)),
+            ]
+        );
+    }
+}

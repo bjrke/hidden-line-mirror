@@ -99,7 +99,25 @@ mod tests {
         let mut dctx = TestDrawContext::new();
         actx.render(&mut dctx);
 
-        println!("{:?}", dctx.lines);
-        println!("{:?}", dctx.lines.len());
+        assert!(!dctx.lines.is_empty());
+        for &(a, e, _color) in dctx.lines.iter() {
+            assert!(a.0.is_finite() && a.1.is_finite());
+            assert!(e.0.is_finite() && e.1.is_finite());
+        }
+    }
+
+    #[test]
+    fn flat_plane_renders_lines() {
+        let mut actx = AppContext::new();
+        actx.scene3 = init_scene(|_x, _y| 0.0);
+
+        let mut dctx = TestDrawContext::new();
+        actx.render(&mut dctx);
+
+        assert!(!dctx.lines.is_empty());
+        for &(a, e, _color) in dctx.lines.iter() {
+            assert!(a.0.is_finite() && a.1.is_finite());
+            assert!(e.0.is_finite() && e.1.is_finite());
+        }
     }
 }

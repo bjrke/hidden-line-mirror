@@ -28,3 +28,44 @@ impl FloatExt for Float {
         self.is_sign_negative()
     }
 }
+
+#[cfg(test)]
+mod tests {
+
+    use super::*;
+
+    #[test]
+    fn round_for_eq_positive() {
+        assert_eq!(1.5.round_for_eq(), 98304);
+    }
+
+    #[test]
+    fn round_for_eq_negative() {
+        assert_eq!((-1.5).round_for_eq(), -98304);
+    }
+
+    #[test]
+    fn round_for_eq_zero() {
+        assert_eq!(0.0.round_for_eq(), 0);
+    }
+
+    #[test]
+    fn sign_positive() {
+        assert!(!(1.0).sign());
+    }
+
+    #[test]
+    fn sign_negative() {
+        assert!((-1.0).sign());
+    }
+
+    #[test]
+    fn sign_zero() {
+        assert!(!(0.0).sign());
+    }
+
+    #[test]
+    fn sign_negative_zero() {
+        assert!((-0.0).sign());
+    }
+}

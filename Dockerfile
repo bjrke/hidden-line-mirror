@@ -1,5 +1,6 @@
 FROM rust:1.85-slim
 MAINTAINER Jan Burkhardt <264754-bjrke@users.noreply.gitlab.com>
+RUN rustup component add rustfmt
 RUN apt update
 RUN apt install -y curl
 RUN curl -sSfL https://deb.nodesource.com/setup_22.x | bash -

@@ -185,3 +185,88 @@ impl Neg for &Vector2 {
         Vector2(-sx, -sy)
     }
 }
+
+#[cfg(test)]
+mod tests {
+
+    use super::*;
+
+    #[test]
+    fn len_sq() {
+        assert_eq!(Vector2(3.0, 4.0).len_sq(), 25.0);
+    }
+
+    #[test]
+    fn len() {
+        assert_eq!(Vector2(3.0, 4.0).len(), 5.0);
+    }
+
+    #[test]
+    fn mix_midpoint() {
+        assert_eq!(
+            Vector2(0.0, 0.0).mix(&Vector2(10.0, 20.0), 0.5),
+            Vector2(5.0, 10.0)
+        );
+    }
+
+    #[test]
+    fn mix_at_start() {
+        assert_eq!(
+            Vector2(0.0, 0.0).mix(&Vector2(10.0, 20.0), 0.0),
+            Vector2(10.0, 20.0)
+        );
+    }
+
+    #[test]
+    fn mix_at_end() {
+        assert_eq!(
+            Vector2(0.0, 0.0).mix(&Vector2(10.0, 20.0), 1.0),
+            Vector2(0.0, 0.0)
+        );
+    }
+
+    #[test]
+    fn add() {
+        assert_eq!(Vector2(1.0, 2.0) + Vector2(3.0, 4.0), Vector2(4.0, 6.0));
+    }
+
+    #[test]
+    fn add_ref() {
+        assert_eq!(&Vector2(1.0, 2.0) + &Vector2(3.0, 4.0), Vector2(4.0, 6.0));
+    }
+
+    #[test]
+    fn sub() {
+        assert_eq!(Vector2(1.0, 2.0) - Vector2(3.0, 5.0), Vector2(-2.0, -3.0));
+    }
+
+    #[test]
+    fn sub_ref() {
+        assert_eq!(&Vector2(1.0, 2.0) - &Vector2(3.0, 5.0), Vector2(-2.0, -3.0));
+    }
+
+    #[test]
+    fn dot() {
+        assert_eq!(Vector2(1.0, 2.0) * Vector2(3.0, 4.0), 11.0);
+    }
+
+    #[test]
+    fn mul_scalar() {
+        assert_eq!(Vector2(1.0, 2.0) * 2.0, Vector2(2.0, 4.0));
+    }
+
+    #[test]
+    fn div_scalar() {
+        assert_eq!(Vector2(2.0, 4.0) / 2.0, Vector2(1.0, 2.0));
+    }
+
+    #[test]
+    fn neg() {
+        assert_eq!(-Vector2(1.0, -2.0), Vector2(-1.0, 2.0));
+    }
+
+    #[test]
+    fn neg_ref() {
+        assert_eq!(-&Vector2(1.0, -2.0), Vector2(-1.0, 2.0));
+    }
+}
