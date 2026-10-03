@@ -8,7 +8,7 @@ authors = ["Jan Burkhardt <264754-bjrke@users.noreply.gitlab.com>"]
 categories = ["wasm"]
 readme = "README.md"
 edition = "2018"
-rust-version = "1.85"
+rust-version = "1.99"
 
 [lib]
 crate-type = ["cdylib"]
@@ -20,13 +20,12 @@ lto = true
 #default = ["wee_alloc"]
 
 [dependencies]
-wasm-bindgen = "0.2.60"
+wasm-bindgen = "0.2.129"
 #wee_alloc = { version = "0.4.5", optional = true }
-rand = { version="0.7.3", features = ['wasm-bindgen']}
-js-sys = "0.3.37"
+js-sys = "0.3.106"
 
 [dependencies.web-sys]
-version = "0.3.37"
+version = "0.3.106"
 features = [
   "Document",
   "Element",
@@ -35,10 +34,10 @@ features = [
   "console"
 ]
 [target."cfg(debug_assertions)".dependencies]
-console_error_panic_hook = "0.1.6"
+console_error_panic_hook = "0.1.7"
 
 [dev-dependencies]
-wasm-bindgen-test = "0.3.10"
+wasm-bindgen-test = "0.3.79"
 #futures = "0.3.1"
-js-sys = "0.3.37"
+js-sys = "0.3.106"
 #wasm-bindgen-futures = "0.4.8"
