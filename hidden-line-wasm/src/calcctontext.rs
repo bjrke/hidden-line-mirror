@@ -15,9 +15,6 @@ pub struct TreeTriangle {
     shape: Triangle,
     plane_norm: Vector3,
     plane_dist: Float,
-    o1: Vector3,
-    o2: Vector3,
-    o3: Vector3,
 }
 
 impl TreeTriangle {
@@ -38,9 +35,6 @@ impl TreeTriangle {
             ),
             plane_norm,
             plane_dist,
-            o1,
-            o2,
-            o3,
         }
     }
 }
@@ -107,6 +101,7 @@ pub fn hidden_line(
         ranges.reset();
 
         tree.elements_intersecting(&bounds, &mut |triangle| {
+            visited.set(visited.get() + 1);
             intersect(
                 &triangle,
                 &line_shape,
@@ -128,6 +123,7 @@ pub fn hidden_line(
     (visited.get(), emitted)
 }
 
+#[allow(dead_code)]
 fn clip(
     p1: Vector3,
     p2: Vector3,
@@ -175,37 +171,6 @@ fn clip(
         } else {
             FloatRange::new(l, MAX)
         }
-    }
-}
-
-#[allow(dead_code)]
-fn intersect2(
-    eye: Vector3,
-    triangle: &TreeTriangle,
-    p1: Vector3,
-    p2: Vector3,
-    range: &mut RangeSet,
-) {
-    let t1 = triangle.o1;
-    let t2 = triangle.o2;
-    let t3 = triangle.o3;
-
-    let reye = clip(p1, p2, t1, t2, t3, eye, true);
-    let rt1 = clip(p1, p2, eye, t2, t3, t1, false);
-
-    let mut remove = reye.intersect(&rt1);
-    if let Some(r) = remove {
-        let rt2 = clip(p1, p2, t1, eye, t3, t2, false);
-        remove = r.intersect(&rt2);
-    }
-
-    if let Some(r) = remove {
-        let rt3 = clip(p1, p2, t1, t2, eye, t3, false);
-        remove = r.intersect(&rt3);
-    }
-
-    if let Some(r) = remove {
-        range.remove(&r);
     }
 }
 
