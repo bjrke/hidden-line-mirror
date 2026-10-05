@@ -1,25 +1,19 @@
 #[cfg(target_arch = "wasm32")]
 #[macro_export]
-macro_rules! print {
-    ($($arg:tt)*) => (web_sys::console::log_1(&wasm_bindgen::JsValue::from_str(&format!($($arg)*))));
+macro_rules! console_log {
+    ($($arg:tt)*) => {{
+        #[cfg(debug_assertions)]
+        web_sys::console::log_1(&wasm_bindgen::JsValue::from_str(&format!($($arg)*)));
+    }};
 }
 
-#[cfg(target_arch = "wasm32")]
+#[cfg(not(target_arch = "wasm32"))]
 #[macro_export]
-macro_rules! println {
-    ($($arg:tt)*) => (web_sys::console::log_1(&wasm_bindgen::JsValue::from_str(&format!($($arg)*))));
-}
-
-#[cfg(target_arch = "wasm32")]
-#[macro_export]
-macro_rules! eprint {
-    ($($arg:tt)*) => (web_sys::console::warn_1(&wasm_bindgen::JsValue::from_str(&format!($($arg)*))));
-}
-
-#[cfg(target_arch = "wasm32")]
-#[macro_export]
-macro_rules! eprintln {
-    ($($arg:tt)*) => (web_sys::console::warn_1(&wasm_bindgen::JsValue::from_str(&format!($($arg)*))));
+macro_rules! console_log {
+    ($($arg:tt)*) => {{
+        #[cfg(debug_assertions)]
+        std::println!($($arg)*);
+    }};
 }
 
 mod appcontext;

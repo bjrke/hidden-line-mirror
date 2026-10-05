@@ -40,11 +40,11 @@ impl AppContext {
 
         let scene2 = Scene2::new(&self, &self.scene3);
 
-        println!("#triangle: {:?}", scene2.triangles.len());
-        println!("#lines: {:?}", scene2.lines.len());
-        println!("eye: {:?}", self.eye);
-        println!("view: {:?}", self.view);
-        println!("up {:?}", self.jv);
+        console_log!("#triangle: {:?}", scene2.triangles.len());
+        console_log!("#lines: {:?}", scene2.lines.len());
+        console_log!("eye: {:?}", self.eye);
+        console_log!("view: {:?}", self.view);
+        console_log!("up {:?}", self.jv);
 
         let tree = create_tree(&self.scene3, &scene2);
 
@@ -104,10 +104,10 @@ fn rot_vec(to_rot1: &mut Vector3, to_rot2: &mut Vector3, t: Float) {
     let len2 = to_rot2.len();
 
     if len1 == 0.0 {
-        println!("len1 = 0");
+        console_log!("len1 = 0");
     }
     if len2 == 0.0 {
-        println!("len2 = 0");
+        console_log!("len2 = 0");
     }
 
     let f1 = len1 / (len2 * rot_len);
