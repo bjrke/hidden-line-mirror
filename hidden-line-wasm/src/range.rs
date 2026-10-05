@@ -115,25 +115,6 @@ impl FloatRange {
         let (start, end) = (*self).into();
         start > end
     }
-
-    pub fn diff(&self, rhs: &Self) -> Vec<Self> {
-        let (ss, se) = (*self).into();
-        let (rs, re) = (*rhs).into();
-        if ss > se {
-            vec![]
-        } else if rs > re || re <= ss || se <= rs {
-            vec![FloatRange::new(ss, se)]
-        } else {
-            let mut result = vec![];
-            if rs > ss {
-                result.push(FloatRange::new(ss, rs))
-            }
-            if re < se {
-                result.push(FloatRange::new(re, se))
-            }
-            result
-        }
-    }
 }
 
 impl From<(Float, Float)> for FloatRange {
@@ -184,46 +165,6 @@ mod tests {
         assert_eq!(
             FloatRange::new(MIN, 2.0).intersect(&FloatRange::new(1.0, 3.0)),
             Some(FloatRange::new(1.0, 2.0))
-        );
-    }
-
-    #[test]
-    fn diff_left_only() {
-        assert_eq!(
-            FloatRange::new(1.0, 3.0).diff(&FloatRange::new(2.0, 4.0)),
-            vec![FloatRange::new(1.0, 2.0)]
-        );
-    }
-
-    #[test]
-    fn diff_left_only_included() {
-        assert_eq!(
-            FloatRange::new(1.0, 3.0).diff(&FloatRange::new(2.0, 1000.0)),
-            vec![FloatRange::new(1.0, 2.0)]
-        );
-    }
-
-    #[test]
-    fn diff_left_only_excluded() {
-        assert_eq!(
-            FloatRange::new(1.0, 3.0).diff(&FloatRange::new(2.0, MAX)),
-            vec![FloatRange::new(1.0, 2.0)]
-        );
-    }
-
-    #[test]
-    fn diff_right_only() {
-        assert_eq!(
-            FloatRange::new(2.0, 4.0).diff(&FloatRange::new(1.0, 3.0)),
-            vec![FloatRange::new(3.0, 4.0)]
-        );
-    }
-
-    #[test]
-    fn diff_left_and_right() {
-        assert_eq!(
-            FloatRange::new(1.0, 4.0).diff(&FloatRange::new(2.0, 3.0)),
-            vec![FloatRange::new(1.0, 2.0), FloatRange::new(3.0, 4.0)]
         );
     }
 

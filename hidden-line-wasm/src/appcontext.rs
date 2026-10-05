@@ -48,11 +48,16 @@ impl AppContext {
 
         let tree = create_tree(&self.scene3, &scene2);
 
+        let mut visited = 0usize;
+        let mut emitted = 0usize;
         for (&color, lines) in scene2.lines.iter() {
             let mut color_context = dctx.color_context(color);
-            hidden_line(&tree, &self.scene3, &scene2, lines, &mut color_context);
+            let (v, e) = hidden_line(&tree, &self.scene3, &scene2, lines, &mut color_context);
+            visited += v;
+            emitted += e;
             dctx.draw(self.frame, color_context);
         }
+        console_log!("lines {:?}/{:?}", emitted, visited);
 
         dctx.finish(self.frame);
     }

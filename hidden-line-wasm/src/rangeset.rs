@@ -2,12 +2,16 @@ use crate::range::*;
 
 pub struct RangeSet {
     pub ranges: Vec<FloatRange>,
+    scratch: Vec<FloatRange>,
 }
 
 impl RangeSet {
     #[inline]
     pub fn new(ranges: Vec<FloatRange>) -> RangeSet {
-        RangeSet { ranges }
+        RangeSet {
+            ranges,
+            scratch: Vec::new(),
+        }
     }
 
     #[inline]
@@ -16,14 +20,34 @@ impl RangeSet {
     }
 
     #[inline]
+    pub fn reset(&mut self) {
+        self.ranges.clear();
+        self.ranges.push(FloatRange::new(0.0, 1.0));
+    }
+
+    #[inline]
     pub fn remove(&mut self, r: &FloatRange) {
-        let mut n = vec![];
-        std::mem::swap(&mut n, &mut self.ranges);
-        for t in n {
-            for d in t.diff(r) {
-                self.ranges.push(d)
+        let RangeSet { ranges, scratch } = self;
+        scratch.clear();
+        for t in ranges.drain(..) {
+            let (ss, se) = t.into();
+            if ss > se {
+                // empty range, drop it
+                continue;
+            }
+            let (rs, re) = (*r).into();
+            if rs > re || re <= ss || se <= rs {
+                scratch.push(t);
+            } else {
+                if rs > ss {
+                    scratch.push(FloatRange::new(ss, rs));
+                }
+                if re < se {
+                    scratch.push(FloatRange::new(re, se));
+                }
             }
         }
+        std::mem::swap(ranges, scratch);
     }
 }
 
@@ -45,6 +69,7 @@ impl From<RangeSet> for Vec<FloatRange> {
 mod tests {
 
     use super::*;
+    use crate::float::*;
 
     fn set0() -> RangeSet {
         RangeSet::new(vec![])
@@ -87,7 +112,70 @@ mod tests {
             s.remove(&FloatRange::new(0.0, 0.5));
         }
 
-        let RangeSet { ranges } = s;
+        let RangeSet { ranges, .. } = s;
         assert_eq!(ranges, vec![FloatRange::new(0.5, 1.0)])
+    }
+
+    #[test]
+    fn remove_without_overlap_keeps_range() {
+        let mut s = set1(FloatRange::new(1.0, 2.0));
+        s.remove(&FloatRange::new(3.0, 4.0));
+
+        assert_eq!(s.ranges, vec![FloatRange::new(1.0, 2.0)]);
+    }
+
+    #[test]
+    fn remove_middle_splits_range() {
+        let mut s = set1(FloatRange::new(1.0, 4.0));
+        s.remove(&FloatRange::new(2.0, 3.0));
+
+        assert_eq!(
+            s.ranges,
+            vec![FloatRange::new(1.0, 2.0), FloatRange::new(3.0, 4.0)]
+        );
+    }
+
+    #[test]
+    fn remove_left_edge() {
+        let mut s = set1(FloatRange::new(1.0, 3.0));
+        s.remove(&FloatRange::new(2.0, 1000.0));
+
+        assert_eq!(s.ranges, vec![FloatRange::new(1.0, 2.0)]);
+    }
+
+    #[test]
+    fn remove_right_edge() {
+        let mut s = set1(FloatRange::new(2.0, 4.0));
+        s.remove(&FloatRange::new(1.0, 3.0));
+
+        assert_eq!(s.ranges, vec![FloatRange::new(3.0, 4.0)]);
+    }
+
+    #[test]
+    fn remove_spanning_gap_removes_multiple_ranges() {
+        let mut s = set2(FloatRange::new(1.0, 3.0), FloatRange::new(4.0, 8.0));
+        s.remove(&FloatRange::new(2.0, 6.0));
+
+        assert_eq!(
+            s.ranges,
+            vec![FloatRange::new(1.0, 2.0), FloatRange::new(6.0, 8.0)]
+        );
+    }
+
+    #[test]
+    fn remove_unbounded_removes_everything() {
+        let mut s = set1(FloatRange::new(1.0, 2.0));
+        s.remove(&FloatRange::new(MIN, MAX));
+
+        assert_eq!(s.ranges, vec![]);
+    }
+
+    #[test]
+    fn reset_restores_full_range() {
+        let mut s = set1(FloatRange::new(0.0, 1.0));
+        s.remove(&FloatRange::new(0.0, 0.5));
+        s.reset();
+
+        assert_eq!(s.ranges, vec![FloatRange::new(0.0, 1.0)]);
     }
 }

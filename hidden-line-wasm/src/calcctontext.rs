@@ -43,12 +43,6 @@ impl TreeTriangle {
             o3,
         }
     }
-
-    #[inline]
-    fn lines(&self) -> Vec<Line> {
-        let (p1, p2, p3) = self.shape.into();
-        vec![Line::new(p1, p2), Line::new(p2, p3), Line::new(p3, p1)]
-    }
 }
 
 impl Shape for TreeTriangle {
@@ -100,14 +94,17 @@ pub fn hidden_line(
     scene2: &Scene2,
     lines: &Vec<(usize, usize)>,
     color_context: &mut dyn ColorContext,
-) {
+) -> (usize, usize) {
+    let visited = std::cell::Cell::new(0usize);
+    let mut emitted = 0usize;
+    let mut ranges: RangeSet = RangeSet::new(vec![FloatRange::new(0.0, 1.0)]);
     for &(a, e) in lines.iter() {
         let pa = scene2.points[a];
         let pe = scene2.points[e];
         let line_shape = Line::new(pa, pe);
 
         let bounds = line_shape.bounds();
-        let mut ranges: RangeSet = RangeSet::new(vec![FloatRange::new(0.0, 1.0)]);
+        ranges.reset();
 
         tree.elements_intersecting(&bounds, &mut |triangle| {
             intersect(
@@ -121,13 +118,14 @@ pub fn hidden_line(
             ranges.is_empty()
         });
 
-        let RangeSet { ranges } = ranges;
-        for FloatRange { start: l1, end: l2 } in ranges {
+        emitted += ranges.ranges.len();
+        for &FloatRange { start: l1, end: l2 } in ranges.ranges.iter() {
             let start = pa.mix(&pe, l1);
             let end = pa.mix(&pe, l2);
             color_context.line(start, end);
         }
     }
+    (visited.get(), emitted)
 }
 
 fn clip(
@@ -257,7 +255,12 @@ fn intersect(
     let d21 = b2 - b1;
     let mut min = None;
     let mut max = None;
-    for Line { a: p3, e: p4 } in triangle.lines() {
+    let shape = triangle.shape;
+    for (p3, p4) in [
+        (shape.p1, shape.p2),
+        (shape.p2, shape.p3),
+        (shape.p3, shape.p1),
+    ] {
         //https://quickmath.com/webMathematica3/quickmath/equations/solve/advanced.jsp#c=solve_advancedsolveequations&v1=lx_1%2Bmx_2%253Dp%250Aly_1%2Bmy_2%253Dq%250Al%2Bm%253D1%250Anx_3%2Box_4%253Dp%250Any_3%2Boy_4%253Dq%250An%2Bo%253D1%250A&v2=l%250Am%250An%250Ao%250Ap%250Aq%250A&v5=1
 
         let d43 = p4 - p3;
