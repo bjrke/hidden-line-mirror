@@ -3,8 +3,8 @@ pub type Float = f32;
 type IntPrecision = i64;
 
 pub const PI: Float = std::f32::consts::PI;
-pub const MAX: Float = std::f32::MAX;
-pub const MIN: Float = std::f32::MIN;
+pub const MAX: Float = f32::MAX;
+pub const MIN: Float = f32::MIN;
 
 pub const PRECISION: Float = 65536.0;
 pub const EPSILON0: Float = 1.0 / PRECISION;
