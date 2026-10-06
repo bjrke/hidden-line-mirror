@@ -10,6 +10,7 @@
   "scripts": {
     "build": "webpack",
     "start": "webpack serve --mode development --open",
+    "debug": "CARGO_PROFILE_DEV_OPT_LEVEL=0 CARGO_PROFILE_DEV_DEBUG=true npm start",
     "test": "cargo test && wasm-pack test --node"
   },
   "devDependencies": {

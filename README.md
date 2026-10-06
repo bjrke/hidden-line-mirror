@@ -19,11 +19,15 @@ https://www.npmjs.com/get-npm
 npm install
 ```
 
-## How to run in debug mode
+## How to run in development mode
 
 ```sh
 # Builds the project and opens it in a new browser tab. Auto-reloads when the project changes.
+# Uses an optimized build (no debug symbols) for smooth rendering of CPU intensive formulas.
 npm start
+
+# Same, but unoptimized and with debug symbols, for debugging.
+npm run debug
 ```
 
 ## How to build in release mode
