@@ -95,3 +95,34 @@ async function rebuild() {
 const svg = document.getElementsByTagName("svg").item(0);
 const hiddenLine = wasm.lets_go(svg, scheduleDraw, rebuild);
 rebuild();
+
+const buildInfo = document.getElementById("buildInfo");
+if (buildInfo) {
+    buildInfo.textContent = __BUILD_INFO__;
+}
+
+const licenseLink = document.getElementById("licenseLink");
+const licenseDialog = document.getElementById("licenseDialog");
+if (licenseLink && licenseDialog) {
+    const licenseText = document.getElementById("licenseText");
+    licenseLink.addEventListener("click", async event => {
+        event.preventDefault();
+        if (!licenseText.textContent) {
+            try {
+                const response = await fetch(licenseLink.href);
+                licenseText.textContent = await response.text();
+            } catch (e) {
+                console.error(e);
+            }
+        }
+        licenseDialog.showModal();
+    });
+    document.getElementById("licenseClose").addEventListener("click", () => {
+        licenseDialog.close();
+    });
+    licenseDialog.addEventListener("click", event => {
+        if (event.target === licenseDialog) {
+            licenseDialog.close();
+        }
+    });
+}

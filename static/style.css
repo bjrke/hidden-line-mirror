@@ -33,3 +33,59 @@ svg {
   height: 0;
   overflow: hidden;
 }
+
+#pageFooter {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 5px;
+  font-size: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+#pageFooter a {
+  color: inherit;
+  text-decoration: none;
+  text-decoration-color: currentColor;
+}
+
+#pageFooter a:hover {
+  color: white;
+  text-decoration: underline;
+}
+
+#pipelineBadge {
+  display: block;
+  height: 1.1em;
+}
+
+#licenseDialog {
+  margin: auto;
+  padding: 16px;
+  max-width: min(640px, 90vw);
+  color: white;
+  background: #111;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+#licenseDialog::backdrop {
+  background: rgba(0, 0, 0, 0.6);
+}
+
+#licenseText {
+  white-space: pre-wrap;
+  font-size: 0.85rem;
+  margin-bottom: 12px;
+}
+
+#licenseClose {
+  padding: 4px 12px;
+  color: white;
+  background: #333;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  cursor: pointer;
+}

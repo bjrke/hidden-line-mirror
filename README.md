@@ -1,10 +1,11 @@
 ## Hidden Line Elemination
 
-https://bjrke.gitlab.io/hidden-line
+[gitlab.com/bjrke/hidden-line](https://gitlab.com/bjrke/hidden-line) · [License](LICENSE)
+[![pipeline status](https://gitlab.com/bjrke/hidden-line/badges/main/pipeline.svg)](https://gitlab.com/bjrke/hidden-line/-/pipelines)
 
 ## How to install
 
-install rustup, you probably have to relogin
+install rust via rustup, you probably have to relogin
 https://rustup.rs/
 
 install wasm-pack
@@ -25,7 +26,9 @@ npm install
 # Builds the project and opens it in a new browser tab. Auto-reloads when the project changes.
 # Uses an optimized build (no debug symbols) for smooth rendering of CPU intensive formulas.
 npm start
+```
 
+```sh
 # Same, but unoptimized and with debug symbols, for debugging.
 npm run debug
 ```
@@ -42,10 +45,14 @@ npm run build
 ```sh
 # Runs tests in Firefox
 npm test -- --firefox
+```
 
+```sh
 # Runs tests in Chrome
 npm test -- --chrome
+```
 
+```sh
 # Runs tests in Safari
 npm test -- --safari
 ```
