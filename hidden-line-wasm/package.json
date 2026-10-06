@@ -8,8 +8,8 @@
     "node": ">=22.15.0"
   },
   "scripts": {
-    "build": "rimraf dist pkg && webpack",
-    "start": "rimraf dist pkg && webpack serve --mode development --open",
+    "build": "webpack",
+    "start": "webpack serve --mode development --open",
     "test": "cargo test && wasm-pack test --node"
   },
   "devDependencies": {
@@ -17,7 +17,6 @@
     "copy-webpack-plugin": "14.0.0",
     "webpack": "5.111.1",
     "webpack-cli": "7.2.3",
-    "webpack-dev-server": "6.0.0",
-    "rimraf": "6.1.3"
+    "webpack-dev-server": "6.0.0"
   }
 }

@@ -14,7 +14,7 @@ Requires `rustup`, `wasm-pack`, and `npm` installed (README install steps; `carg
 
 - `npm install` — install deps
 - `npm start` — dev server (`webpack-dev-server --open`), auto-reloads on change
-- `npm run build` — production build into `dist/` (removes `dist/` and `pkg/` first)
+- `npm run build` — production build into `dist/` (webpack cleans `dist/` via `output.clean`)
 - `npm test` — runs `cargo test && wasm-pack test --node`; append `-- --firefox` / `-- --chrome` / `-- --safari` to run the wasm tests in a browser instead
 - `cargo fmt --all` — format the workspace; run `cargo fmt --all -- --check` to verify (CI does the check)
 
@@ -22,8 +22,9 @@ CI (GitLab, `.gitlab-ci.yml`) mirrors this: `cargo fmt --all -- --check`, `cargo
 
 ## Architecture
 
-- JS entry is `hidden-line-wasm/js/index.js` (webpack entry). It `eval`s the formula into an `(x, y) => z` function, calls `wasm.lets_go(svg)`, then `hiddenLine.set_function(f)`.
-- Rust entry is `hidden-line-wasm/src/lib.rs`, using the modern `wasm-bindgen` 0.2.129 API: `lets_go(svg) -> HiddenLine`, with `on_key` / `set_function` methods. It defines its own `console_log!` macro (routing to the JS console via `web_sys`), which compiles to a no-op unless `debug_assertions` is set.
+- JS entry is `hidden-line-wasm/js/index.js` (webpack entry). It owns only the Web Worker pool and rendering loop: it builds the workers, calls `wasm.lets_go(svg, scheduleDraw, rebuild)`, then `rebuild()`. The worker bootstrap is `js/worker.js`.
+- Rust entry is `hidden-line-wasm/src/lib.rs`, using the modern `wasm-bindgen` 0.2.129 API: `lets_go(svg, redraw, rebuild) -> HiddenLine`, exposing only `mesh_points` / `mesh_triangles` / `camera` / `draw_records` to JS. It defines its own `console_log!` macro (routing to the JS console via `web_sys`), which compiles to a no-op unless `debug_assertions` is set.
+- `webapp.rs` owns the DOM/input side in Rust: formula textarea (autosize, hash, submit), `js_sys::eval` of the formula into an `(x, y) => z` function, keyboard camera control, and pointer/wheel pan+zoom (viewBox math). Event closures are registered with `Closure::forget()`; `redraw` (camera changed) and `rebuild` (formula changed) call back into JS.
 - Pipeline: `plot::init_scene` samples the surface into a triangle mesh (`Scene3` in `dreidext.rs`) → `AppContext` (keyboard state) → `CalcContext` (`calcctontext.rs`, the hidden-line elimination core using `QuadTree` + `RangeSet`) → `DrawContext` trait (`drawcontext.rs`) → `SvgContext` (`svgcontext.rs`) writes SVG paths.
 - `float.rs` sets `pub type Float = f32`; all geometry math is single-precision.
 

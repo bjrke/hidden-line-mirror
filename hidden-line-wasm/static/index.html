@@ -17,6 +17,7 @@
     height: 100%;
     background: #000;
     z-index: -1;
+    touch-action: none;
   }
 
   #formulaForm {
@@ -50,7 +51,16 @@
 
   <form id="formulaForm">
     <pre>(x,y) => {</pre>
-    <textarea id="formula"></textarea>
+    <textarea id="formula">let h=0;
+const step=Math.PI/36;
+for (let a=0; a<Math.PI; a+=step) {
+  const c=Math.cos(a);
+  const s=Math.sin(a);
+  const xd=x*c-y*s;
+  const yd=x*s+y*c;
+  h += Math.cos(a*Math.sqrt(xd*xd*25+yd*yd*100))/(Math.PI+a);
+}
+return h/10;</textarea>
     <pre>}</pre>
     <input id="submitFormula" type="submit" value="update formula">
   </form>

@@ -27,10 +27,25 @@ js-sys = "0.3.106"
 [dependencies.web-sys]
 version = "0.3.106"
 features = [
+  "AddEventListenerOptions",
+  "CssStyleDeclaration",
   "Document",
+  "DomRect",
   "Element",
-  "SvgElement",
+  "Event",
+  "EventTarget",
+  "HtmlElement",
+  "HtmlFormElement",
+  "HtmlInputElement",
+  "HtmlTextAreaElement",
+  "KeyboardEvent",
+  "Location",
+  "MouseEvent",
   "Node",
+  "PointerEvent",
+  "SvgElement",
+  "WheelEvent",
+  "Window",
   "console"
 ]
 [target."cfg(debug_assertions)".dependencies]
