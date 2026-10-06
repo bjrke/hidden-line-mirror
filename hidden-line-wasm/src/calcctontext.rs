@@ -82,45 +82,98 @@ pub fn create_tree(scene3: &Scene3, scene2: &Scene2) -> QuadTree<TreeTriangle> {
     tree
 }
 
+#[inline]
+fn line_ranges(
+    tree: &QuadTree<TreeTriangle>,
+    scene3: &Scene3,
+    scene2: &Scene2,
+    a: usize,
+    e: usize,
+    ranges: &mut RangeSet,
+) {
+    let pa = scene2.points[a];
+    let pe = scene2.points[e];
+    let line_shape = Line::new(pa, pe);
+    let bounds = line_shape.bounds();
+
+    ranges.reset();
+
+    tree.elements_intersecting(&bounds, &mut |triangle| {
+        intersect(
+            &triangle,
+            &line_shape,
+            scene2.eye,
+            scene3.points[a],
+            scene3.points[e],
+            ranges,
+        );
+        ranges.is_empty()
+    });
+}
+
+#[allow(dead_code)]
 pub fn hidden_line(
     tree: &QuadTree<TreeTriangle>,
     scene3: &Scene3,
     scene2: &Scene2,
     lines: &Vec<(usize, usize)>,
     color_context: &mut dyn ColorContext,
-) -> (usize, usize) {
-    let visited = std::cell::Cell::new(0usize);
+) -> usize {
     let mut emitted = 0usize;
     let mut ranges: RangeSet = RangeSet::new(vec![FloatRange::new(0.0, 1.0)]);
     for &(a, e) in lines.iter() {
-        let pa = scene2.points[a];
-        let pe = scene2.points[e];
-        let line_shape = Line::new(pa, pe);
-
-        let bounds = line_shape.bounds();
-        ranges.reset();
-
-        tree.elements_intersecting(&bounds, &mut |triangle| {
-            visited.set(visited.get() + 1);
-            intersect(
-                &triangle,
-                &line_shape,
-                scene2.eye,
-                scene3.points[a],
-                scene3.points[e],
-                &mut ranges,
-            );
-            ranges.is_empty()
-        });
+        line_ranges(tree, scene3, scene2, a, e, &mut ranges);
 
         emitted += ranges.ranges.len();
+        let pa = scene2.points[a];
+        let pe = scene2.points[e];
         for &FloatRange { start: l1, end: l2 } in ranges.ranges.iter() {
             let start = pa.mix(&pe, l1);
             let end = pa.mix(&pe, l2);
             color_context.line(start, end);
         }
     }
-    (visited.get(), emitted)
+    emitted
+}
+
+pub fn scene_lines(scene2: &Scene2) -> Vec<(Color, (usize, usize))> {
+    scene2
+        .lines
+        .iter()
+        .flat_map(|(&color, v)| v.iter().map(move |&ae| (color, ae)))
+        .collect()
+}
+
+pub fn hidden_line_records(
+    tree: &QuadTree<TreeTriangle>,
+    scene3: &Scene3,
+    scene2: &Scene2,
+    lines: &[(Color, (usize, usize))],
+    rank: usize,
+    count: usize,
+) -> Vec<f32> {
+    let mut out = Vec::new();
+    let mut ranges: RangeSet = RangeSet::new(vec![FloatRange::new(0.0, 1.0)]);
+    for (i, &(color, (a, e))) in lines.iter().enumerate() {
+        if count > 1 && i % count != rank {
+            continue;
+        }
+
+        line_ranges(tree, scene3, scene2, a, e, &mut ranges);
+
+        let pa = scene2.points[a];
+        let pe = scene2.points[e];
+        for &FloatRange { start: l1, end: l2 } in ranges.ranges.iter() {
+            let start = pa.mix(&pe, l1);
+            let end = pa.mix(&pe, l2);
+            out.push(color as f32);
+            out.push(start.x);
+            out.push(start.y);
+            out.push(end.x);
+            out.push(end.y);
+        }
+    }
+    out
 }
 
 #[allow(dead_code)]
@@ -275,7 +328,7 @@ mod tests {
 
     use super::*;
     use crate::dreidext::SceneTriangle;
-    use std::collections::HashMap;
+    use std::collections::BTreeMap;
 
     const EYE: Vector3 = Vector3::new(0.5, 0.5, 2.0);
 
@@ -295,7 +348,7 @@ mod tests {
                 Vector2::new(0.0, 1.0),
             ],
             triangles: vec![(0, 1, 2)],
-            lines: HashMap::new(),
+            lines: BTreeMap::new(),
             eye: EYE,
         };
         TreeTriangle::new(&scene3, &scene2, 0, 1, 2)
@@ -472,7 +525,7 @@ mod tests {
                 Vector2::new(0.25, 1.0),
             ],
             triangles: vec![(0, 1, 2)],
-            lines: HashMap::new(),
+            lines: BTreeMap::new(),
             eye: EYE,
         };
 
@@ -487,5 +540,74 @@ mod tests {
                 (Vector2::new(0.25, 0.0), Vector2::new(0.25, -1.0)),
             ]
         );
+    }
+
+    fn sorted_records(flat: &[f32]) -> Vec<[u32; 5]> {
+        let mut records: Vec<[u32; 5]> = flat
+            .chunks_exact(5)
+            .map(|c| {
+                [
+                    c[0].to_bits(),
+                    c[1].to_bits(),
+                    c[2].to_bits(),
+                    c[3].to_bits(),
+                    c[4].to_bits(),
+                ]
+            })
+            .collect();
+        records.sort_unstable();
+        records
+    }
+
+    #[test]
+    fn scene_lines_are_deterministic_and_sorted() {
+        use crate::plot::init_scene;
+
+        let mut actx = AppContext::new();
+        actx.scene3 = init_scene(|x, y| x * x - y * y);
+        let camera = actx.camera();
+        let scene2 = Scene2::new(&camera, &actx.scene3);
+
+        for v in scene2.lines.values() {
+            assert!(v.windows(2).all(|w| w[0] <= w[1]));
+        }
+        assert_eq!(scene_lines(&scene2), scene_lines(&scene2));
+    }
+
+    #[test]
+    fn records_shards_cover_single_result() {
+        use crate::plot::init_scene;
+
+        let mut actx = AppContext::new();
+        actx.scene3 = init_scene(|x, y| x * x - y * y);
+        let camera = actx.camera();
+        let scene2 = Scene2::new(&camera, &actx.scene3);
+        let tree = create_tree(&actx.scene3, &scene2);
+        let lines = scene_lines(&scene2);
+
+        let single = sorted_records(&hidden_line_records(
+            &tree,
+            &actx.scene3,
+            &scene2,
+            &lines,
+            0,
+            1,
+        ));
+        assert!(!single.is_empty());
+
+        for n in [2usize, 3, 4, 7] {
+            let mut sharded = Vec::new();
+            for rank in 0..n {
+                sharded.extend(hidden_line_records(
+                    &tree,
+                    &actx.scene3,
+                    &scene2,
+                    &lines,
+                    rank,
+                    n,
+                ));
+            }
+            assert_eq!(single, sorted_records(&sharded), "shard count {}", n);
+        }
     }
 }

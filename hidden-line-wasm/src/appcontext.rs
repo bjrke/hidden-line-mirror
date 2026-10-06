@@ -5,7 +5,16 @@ use crate::float::*;
 use crate::matrix::*;
 use crate::vec2::*;
 use crate::vec3::*;
-use std::collections::HashMap;
+use std::collections::{BTreeMap, HashMap};
+
+#[derive(Clone, Copy)]
+pub struct Camera {
+    pub eye: Vector3,
+    pub view: Vector3,
+    pub iv: Vector3,
+    pub jv: Vector3,
+    pub back_face: bool,
+}
 
 pub struct AppContext {
     eye: Vector3,
@@ -14,7 +23,6 @@ pub struct AppContext {
     jv: Vector3,
     pub scene3: Scene3,
     back_face: bool,
-    frame: Frame,
 }
 
 impl AppContext {
@@ -29,16 +37,12 @@ impl AppContext {
             iv: Vector3::new(1.0, 0.0, 0.0),
             jv: Vector3::new(0.0, 0.0, 1.0),
             back_face: false,
-            frame: 0,
         }
     }
 
+    #[allow(dead_code)]
     pub fn render<C: ColorContext, D: DrawContext<C>>(&mut self, dctx: &mut D) {
-        let unit_vec_len = 0.4 * self.view.len();
-        self.iv = self.view.cross(&self.jv).normalize() * unit_vec_len;
-        self.jv = self.iv.cross(&self.view).normalize() * unit_vec_len;
-
-        let scene2 = Scene2::new(&self, &self.scene3);
+        let scene2 = self.scene2();
 
         console_log!("#triangle: {:?}", scene2.triangles.len());
         console_log!("#lines: {:?}", scene2.lines.len());
@@ -48,18 +52,33 @@ impl AppContext {
 
         let tree = create_tree(&self.scene3, &scene2);
 
-        let mut visited = 0usize;
-        let mut emitted = 0usize;
         for (&color, lines) in scene2.lines.iter() {
             let mut color_context = dctx.color_context(color);
-            let (v, e) = hidden_line(&tree, &self.scene3, &scene2, lines, &mut color_context);
-            visited += v;
-            emitted += e;
-            dctx.draw(self.frame, color_context);
+            hidden_line(&tree, &self.scene3, &scene2, lines, &mut color_context);
+            dctx.draw(0, color_context);
         }
-        console_log!("lines {:?}/{:?}", emitted, visited);
 
-        dctx.finish(self.frame);
+        dctx.finish(0);
+    }
+
+    pub fn camera(&mut self) -> Camera {
+        let unit_vec_len = 0.4 * self.view.len();
+        self.iv = self.view.cross(&self.jv).normalize() * unit_vec_len;
+        self.jv = self.iv.cross(&self.view).normalize() * unit_vec_len;
+
+        Camera {
+            eye: self.eye,
+            view: self.view,
+            iv: self.iv,
+            jv: self.jv,
+            back_face: self.back_face,
+        }
+    }
+
+    #[allow(dead_code)]
+    pub(crate) fn scene2(&mut self) -> Scene2 {
+        let camera = self.camera();
+        Scene2::new(&camera, &self.scene3)
     }
 
     pub fn on_key(&mut self, ch: char) -> bool {
@@ -125,19 +144,19 @@ fn rot_vec(to_rot1: &mut Vector3, to_rot2: &mut Vector3, t: Float) {
 pub struct Scene2 {
     pub points: Vec<Vector2>,
     pub triangles: Vec<(usize, usize, usize)>,
-    pub lines: HashMap<Color, Vec<(usize, usize)>>,
+    pub lines: BTreeMap<Color, Vec<(usize, usize)>>,
     pub eye: Vector3,
 }
 
-fn perspektive(actx: &AppContext, o: &Vector3) -> Vector2 {
-    let mut k = Matrix3::new(actx.iv, actx.jv, actx.eye - *o);
+fn perspektive(camera: &Camera, o: &Vector3) -> Vector2 {
+    let mut k = Matrix3::new(camera.iv, camera.jv, camera.eye - *o);
 
     let kd = k.determinant();
     if kd.abs() > EPSILON2 {
-        k.a = -actx.view;
+        k.a = -camera.view;
         let x = k.determinant() / kd;
         k.b = k.a;
-        k.a = actx.iv;
+        k.a = camera.iv;
         let y = k.determinant() / kd;
         Vector2::new(x, y)
     } else {
@@ -146,17 +165,17 @@ fn perspektive(actx: &AppContext, o: &Vector3) -> Vector2 {
 }
 
 impl Scene2 {
-    pub fn new(actx: &AppContext, scene3: &Scene3) -> Scene2 {
+    pub fn new(camera: &Camera, scene3: &Scene3) -> Scene2 {
         let mut points = Vec::new();
         let mut triangles = Vec::new();
 
         for p in scene3.points.iter() {
-            points.push(perspektive(&actx, &p));
+            points.push(perspektive(camera, p));
         }
 
         let mut lines_by_index = HashMap::new();
 
-        let eye = actx.eye;
+        let eye = camera.eye;
         for t in scene3.triangles.iter() {
             let o1 = scene3.points[t.p1];
             let o2 = scene3.points[t.p2];
@@ -167,15 +186,15 @@ impl Scene2 {
             let p3 = points[t.p3];
 
             let c = (o1 - o2).cross(&(o3 - o2));
-            let cols = float_to_color((actx.view.normalize() * c.normalize()).abs());
+            let cols = float_to_color((camera.view.normalize() * c.normalize()).abs());
 
-            let eye_view_plane_dist = actx.view * eye + EPSILON1;
+            let eye_view_plane_dist = camera.view * eye + EPSILON1;
 
             // test if not behind view plane
-            if actx.view * o1 > eye_view_plane_dist
-                && actx.view * o2 > eye_view_plane_dist
-                && actx.view * o3 > eye_view_plane_dist
-                && (!actx.back_face
+            if camera.view * o1 > eye_view_plane_dist
+                && camera.view * o2 > eye_view_plane_dist
+                && camera.view * o3 > eye_view_plane_dist
+                && (!camera.back_face
                     || ((p3.x - p1.x) * (p2.y - p1.y) + EPSILON1 < (p3.y - p1.y) * (p2.x - p1.x)))
             // && !colinear(&p1, &p2, &p3)
             {
@@ -193,13 +212,17 @@ impl Scene2 {
             }
         }
 
-        let mut lines: HashMap<Color, Vec<(usize, usize)>> = HashMap::new();
+        let mut lines: BTreeMap<Color, Vec<(usize, usize)>> = BTreeMap::new();
 
         for (&(a, e), &color) in lines_by_index.iter() {
             lines
                 .entry(color)
                 .and_modify(|v| v.push((a, e)))
                 .or_insert(vec![(a, e)]);
+        }
+
+        for v in lines.values_mut() {
+            v.sort_unstable();
         }
 
         Scene2 {
@@ -289,7 +312,14 @@ mod tests {
             triangles: vec![],
         };
 
-        let scene2 = Scene2::new(&actx, &actx.scene3);
+        let camera = Camera {
+            eye: actx.eye,
+            view: actx.view,
+            iv: actx.iv,
+            jv: actx.jv,
+            back_face: false,
+        };
+        let scene2 = Scene2::new(&camera, &actx.scene3);
 
         assert_eq!(scene2.points, vec![Vector2::new(0.0, 0.0)]);
     }
@@ -302,7 +332,14 @@ mod tests {
             triangles: vec![],
         };
 
-        let scene2 = Scene2::new(&actx, &actx.scene3);
+        let camera = Camera {
+            eye: actx.eye,
+            view: actx.view,
+            iv: actx.iv,
+            jv: actx.jv,
+            back_face: false,
+        };
+        let scene2 = Scene2::new(&camera, &actx.scene3);
 
         assert_eq!(scene2.points, vec![Vector2::new(0.5, 0.0)]);
     }
