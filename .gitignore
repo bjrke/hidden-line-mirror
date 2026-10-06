@@ -3,3 +3,8 @@
 *.iml
 target
 opencode.json
+node_modules
+/dist
+/pkg
+/wasm-pack.log
+**/*.rs.bk

@@ -1,6 +1,6 @@
 {
   "author": "Jan Burkhardt <264754-bjrke@users.noreply.gitlab.com>",
-  "name": "hidden-line-wasm",
+  "name": "hidden-line",
   "version": "0.1.0",
   "repository": "gitlab:bjrke/hidden-line",
   "license": "Beerware",

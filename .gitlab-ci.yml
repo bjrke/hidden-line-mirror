@@ -23,25 +23,24 @@ npm:
   cache:
     key: npm
     paths:
-      - hidden-line-wasm/node_modules
+      - node_modules
       - .cargo
       - target
-      - hidden-line-wasm/.npm
+      - .npm
   script:
-    - cd hidden-line-wasm
     - npm i --cache .npm --prefer-offline
     - npm run test
     - npm run build
   artifacts:
     expire_in: 1 week
     paths:
-      - hidden-line-wasm/dist
+      - dist
 
 pages:
   stage: deploy
   image: alpine:latest
   script:
-    - mv hidden-line-wasm/dist public
+    - mv dist public
   artifacts:
     expire_in: 1 week
     paths:
