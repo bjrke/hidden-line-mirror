@@ -101,28 +101,62 @@ if (buildInfo) {
     buildInfo.textContent = __BUILD_INFO__;
 }
 
-const licenseLink = document.getElementById("licenseLink");
-const licenseDialog = document.getElementById("licenseDialog");
-if (licenseLink && licenseDialog) {
-    const licenseText = document.getElementById("licenseText");
-    licenseLink.addEventListener("click", async event => {
+function openDialog(dialog) {
+    if (dialog.open) {
+        return;
+    }
+    dialog.showModal();
+    dialog.focus();
+    dialog.scrollTop = 0;
+}
+
+function setupDialog(link, dialog, closeId, onOpen) {
+    link.addEventListener("click", async event => {
         event.preventDefault();
-        if (!licenseText.textContent) {
+        if (onOpen) {
             try {
-                const response = await fetch(licenseLink.href);
-                licenseText.textContent = await response.text();
+                await onOpen();
             } catch (e) {
                 console.error(e);
             }
         }
-        licenseDialog.showModal();
+        openDialog(dialog);
     });
-    document.getElementById("licenseClose").addEventListener("click", () => {
-        licenseDialog.close();
+    document.getElementById(closeId).addEventListener("click", () => {
+        dialog.close();
     });
-    licenseDialog.addEventListener("click", event => {
-        if (event.target === licenseDialog) {
-            licenseDialog.close();
+    dialog.addEventListener("click", event => {
+        if (event.target === dialog) {
+            dialog.close();
+        }
+    });
+    dialog.addEventListener("wheel", event => event.stopPropagation());
+}
+
+const licenseLink = document.getElementById("licenseLink");
+const licenseDialog = document.getElementById("licenseDialog");
+if (licenseLink && licenseDialog) {
+    const licenseText = document.getElementById("licenseText");
+    setupDialog(licenseLink, licenseDialog, "licenseClose", async () => {
+        if (!licenseText.textContent) {
+            const response = await fetch(licenseLink.href);
+            licenseText.textContent = await response.text();
+        }
+    });
+}
+
+const helpDialog = document.getElementById("helpDialog");
+if (helpDialog) {
+    setupDialog(document.getElementById("helpLink"), helpDialog, "helpClose");
+    document.addEventListener("keydown", event => {
+        if (!["?", "h", "H"].includes(event.key) || event.target === document.getElementById("formula")) {
+            return;
+        }
+        event.preventDefault();
+        if (helpDialog.open) {
+            helpDialog.close();
+        } else {
+            openDialog(helpDialog);
         }
     });
 }

@@ -31,6 +31,7 @@ return h/10;</textarea>
   <footer id="pageFooter">
     <a href="https://gitlab.com/bjrke/hidden-line" target="_blank" rel="noopener">gitlab.com/bjrke/hidden-line</a>
     <a id="licenseLink" href="LICENSE.txt">license</a>
+    <a id="helpLink" href="#">help</a>
     <a href="https://gitlab.com/bjrke/hidden-line/-/pipelines" target="_blank" rel="noopener">
       <img id="pipelineBadge"
         src="https://gitlab.com/bjrke/hidden-line/badges/main/pipeline.svg"
@@ -39,9 +40,107 @@ return h/10;</textarea>
     <span id="buildInfo"></span>
   </footer>
 
-  <dialog id="licenseDialog">
+  <dialog id="licenseDialog" class="infoDialog" tabindex="-1">
     <pre id="licenseText"></pre>
     <button id="licenseClose" type="button">close</button>
+  </dialog>
+
+  <dialog id="helpDialog" class="infoDialog" tabindex="-1">
+    <h2>help</h2>
+
+    <p>
+      Type a formula <code>(x, y) =&gt; z</code> in the box at the top and press
+      <em>update formula</em> (<kbd>Enter</kbd>). The surface is triangulated and
+      rendered as hidden-line-eliminated SVG. The current formula is stored in
+      the URL hash, so the address bar is a shareable link.
+    </p>
+
+    <h3>keyboard</h3>
+    <p>
+      Click the canvas once so it has focus. Keys are captured there until you
+      focus the formula box again. An uppercase letter (or the shifted symbol)
+      repeats the action ten times.
+    </p>
+    <table>
+      <thead>
+        <tr>
+          <th>keys</th>
+          <th>action</th>
+          <th>keys</th>
+          <th>action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><kbd>a</kbd>/<kbd>A</kbd></td>
+          <td>eye forward</td>
+          <td><kbd>y</kbd> <kbd>z</kbd>/<kbd>Y</kbd> <kbd>Z</kbd></td>
+          <td>eye backward</td>
+        </tr>
+        <tr>
+          <td><kbd>k</kbd>/<kbd>K</kbd></td>
+          <td>strafe left</td>
+          <td><kbd>l</kbd>/<kbd>L</kbd></td>
+          <td>strafe right</td>
+        </tr>
+        <tr>
+          <td><kbd>s</kbd>/<kbd>S</kbd></td>
+          <td>eye down</td>
+          <td><kbd>x</kbd>/<kbd>X</kbd></td>
+          <td>eye up</td>
+        </tr>
+        <tr>
+          <td><kbd>d</kbd>/<kbd>D</kbd></td>
+          <td>rotate view &amp; up</td>
+          <td><kbd>c</kbd>/<kbd>C</kbd></td>
+          <td>rotate up &amp; view</td>
+        </tr>
+        <tr>
+          <td><kbd>,</kbd> <kbd>;</kbd>/<kbd>&lt;</kbd></td>
+          <td>rotate right &amp; view</td>
+          <td><kbd>.</kbd> <kbd>:</kbd>/<kbd>&gt;</kbd></td>
+          <td>rotate view &amp; right</td>
+        </tr>
+        <tr>
+          <td><kbd>o</kbd>/<kbd>O</kbd></td>
+          <td>rotate up &amp; right</td>
+          <td><kbd>i</kbd>/<kbd>I</kbd></td>
+          <td>rotate right &amp; up</td>
+        </tr>
+        <tr>
+          <td><kbd>b</kbd>/<kbd>B</kbd></td>
+          <td>toggle back faces</td>
+          <td><kbd>?</kbd> <kbd>h</kbd></td>
+          <td>open this help</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>mouse &amp; touch</h3>
+    <ul>
+      <li>drag with the pointer (mouse or one finger) to pan the view.</li>
+      <li>scroll the wheel to zoom in and out, centred on the cursor.</li>
+    </ul>
+
+    <h3>inspect with devtools (F12)</h3>
+    <ul>
+      <li>
+        The drawing is a real SVG element in the DOM. Its <code>&lt;g fill="none"&gt;</code>
+        group contains one <code>&lt;path&gt;</code> per grayscale shade; each path's
+        <code>d</code> attribute holds the <code>M</code>/<code>L</code> commands in
+        scaled integer coordinates.
+      </li>
+      <li>
+        The <code>viewBox</code> attribute on the <code>&lt;svg&gt;</code> is the
+        camera framing. Edit it live in the inspector to pan and zoom by hand.
+      </li>
+      <li>
+        The formula in the URL hash can be edited or shared; reloading the page
+        re-evaluates it.
+      </li>
+    </ul>
+
+    <button id="helpClose" type="button">close</button>
   </dialog>
 
   <script src="index.js"></script>

@@ -63,16 +63,19 @@ svg {
   height: 1.1em;
 }
 
-#licenseDialog {
+.infoDialog {
   margin: auto;
   padding: 16px;
   max-width: min(640px, 90vw);
+  max-height: 80vh;
+  overflow: auto;
+  overscroll-behavior: contain;
   color: white;
   background: #111;
   border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
-#licenseDialog::backdrop {
+.infoDialog::backdrop {
   background: rgba(0, 0, 0, 0.6);
 }
 
@@ -82,10 +85,68 @@ svg {
   margin-bottom: 12px;
 }
 
-#licenseClose {
+#licenseClose,
+#helpClose {
   padding: 4px 12px;
   color: white;
   background: #333;
   border: 1px solid rgba(255, 255, 255, 0.3);
   cursor: pointer;
+}
+
+#helpDialog h2 {
+  font-size: 1rem;
+  margin-bottom: 12px;
+}
+
+#helpDialog h3 {
+  font-size: 0.9rem;
+  margin: 16px 0 6px;
+}
+
+#helpDialog p,
+#helpDialog ul {
+  font-size: 0.85rem;
+  margin-bottom: 8px;
+}
+
+#helpDialog ul {
+  padding-left: 1.2em;
+}
+
+#helpDialog code,
+#helpDialog kbd {
+  font-family: monospace;
+  font-size: 0.8rem;
+  background: #333;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+  padding: 0 4px;
+}
+
+#helpDialog table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 0.85rem;
+}
+
+#helpDialog th,
+#helpDialog td {
+  text-align: left;
+  vertical-align: top;
+  padding: 3px 12px 3px 0;
+}
+
+#helpDialog th:nth-child(3),
+#helpDialog td:nth-child(3) {
+  padding-left: 24px;
+}
+
+#helpDialog td:nth-child(odd) {
+  white-space: nowrap;
+}
+
+#helpDialog th {
+  font-weight: normal;
+  color: rgba(255, 255, 255, 0.6);
 }
