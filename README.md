@@ -43,6 +43,11 @@ npm run build
 ## How to run unit tests
 
 ```sh
+# Runs the Rust tests and the node wasm tests.
+npm test
+```
+
+```sh
 # Runs tests in Firefox
 npm test -- --firefox
 ```
@@ -55,4 +60,10 @@ npm test -- --chrome
 ```sh
 # Runs tests in Safari
 npm test -- --safari
+```
+
+## How to lint
+
+```sh
+cargo clippy --all-targets --all-features -- -D warnings
 ```

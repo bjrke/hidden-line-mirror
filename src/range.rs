@@ -133,10 +133,11 @@ impl From<FloatRange> for (Float, Float) {
 
 #[cfg(test)]
 mod tests {
+    use wasm_bindgen_test::wasm_bindgen_test;
 
     use super::*;
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn intersect_with_result() {
         assert_eq!(
             FloatRange::new(1.0, 3.0).intersect(&FloatRange::new(2.0, 4.0)),
@@ -144,7 +145,7 @@ mod tests {
         );
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn intersect_without_result() {
         assert_eq!(
             FloatRange::new(1.0, 2.0).intersect(&FloatRange::new(3.0, 4.0)),
@@ -152,7 +153,7 @@ mod tests {
         );
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn intersect_with_point_result() {
         assert_eq!(
             FloatRange::new(1.0, 2.0).intersect(&FloatRange::new(2.0, 3.0)),
@@ -160,7 +161,7 @@ mod tests {
         );
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn intersect_unbound_left() {
         assert_eq!(
             FloatRange::new(MIN, 2.0).intersect(&FloatRange::new(1.0, 3.0)),
@@ -168,7 +169,7 @@ mod tests {
         );
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn range_should_not_overlap() {
         assert!(!FloatRange::new(2.0, 3.0).range_overlap(&FloatRange::new(1.0, 1.5)));
     }

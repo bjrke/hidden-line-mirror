@@ -113,10 +113,11 @@ impl QuadStrip {
 
 #[cfg(test)]
 mod tests {
+    use wasm_bindgen_test::wasm_bindgen_test;
 
     use super::*;
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn push_deduplicates_points() {
         let mut builder = SceneBuilder::new();
 
@@ -129,7 +130,7 @@ mod tests {
         assert!(i3 != i1);
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn triangle_appends_to_scene() {
         let mut builder = SceneBuilder::new();
         let a = builder.push(Vector3::new(0.0, 0.0, 0.0));
@@ -143,7 +144,7 @@ mod tests {
         assert_eq!(builder.scene3.triangles[0].lset, 7);
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn quad_splits_along_short_diagonal() {
         let mut builder = SceneBuilder::new();
         let p1 = builder.push(Vector3::new(0.0, 0.0, 0.0));
@@ -164,7 +165,7 @@ mod tests {
         assert_eq!(triangles[1].p3, p1);
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn quad_splits_along_other_diagonal() {
         let mut builder = SceneBuilder::new();
         let p1 = builder.push(Vector3::new(0.0, 0.0, 0.0));
@@ -184,7 +185,7 @@ mod tests {
         assert_eq!(triangles[1].p3, p4);
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn quad_strip_builds_single_quad() {
         let builder = SceneBuilder::new();
         let mut strip = QuadStrip::new(

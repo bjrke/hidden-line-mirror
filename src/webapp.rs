@@ -354,8 +354,9 @@ fn alert_error(error: &JsValue) {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use wasm_bindgen_test::wasm_bindgen_test;
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn pan_moves_in_opposite_direction() {
         let mut vb = ViewBox::new();
         vb.pan(100.0, 50.0, 2000.0);
@@ -364,7 +365,7 @@ mod tests {
         assert_eq!(vb.size, 2000.0);
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn pan_scales_with_zoom() {
         let mut vb = ViewBox::new();
         vb.size = 4000.0;
@@ -372,14 +373,14 @@ mod tests {
         assert_eq!(vb.x, -1200.0);
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn zoom_out_increases_size() {
         let mut vb = ViewBox::new();
         vb.zoom(100.0, 1000.0, 1000.0, 2000.0, 2000.0);
         assert_eq!(vb.size, 4000.0);
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn zoom_shifts_origin_towards_cursor() {
         let mut vb = ViewBox::new();
         vb.zoom(50.0, 1000.0, 1000.0, 2000.0, 2000.0);

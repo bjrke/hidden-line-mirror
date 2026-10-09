@@ -185,20 +185,21 @@ impl Neg for &Vector2 {
 
 #[cfg(test)]
 mod tests {
+    use wasm_bindgen_test::wasm_bindgen_test;
 
     use super::*;
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn len_sq() {
         assert_eq!(Vector2::new(3.0, 4.0).len_sq(), 25.0);
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn len() {
         assert_eq!(Vector2::new(3.0, 4.0).len(), 5.0);
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn mix_midpoint() {
         assert_eq!(
             Vector2::new(0.0, 0.0).mix(&Vector2::new(10.0, 20.0), 0.5),
@@ -206,7 +207,7 @@ mod tests {
         );
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn mix_at_start() {
         assert_eq!(
             Vector2::new(0.0, 0.0).mix(&Vector2::new(10.0, 20.0), 0.0),
@@ -214,7 +215,7 @@ mod tests {
         );
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn mix_at_end() {
         assert_eq!(
             Vector2::new(0.0, 0.0).mix(&Vector2::new(10.0, 20.0), 1.0),
@@ -222,7 +223,7 @@ mod tests {
         );
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn add() {
         assert_eq!(
             Vector2::new(1.0, 2.0) + Vector2::new(3.0, 4.0),
@@ -230,7 +231,8 @@ mod tests {
         );
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
+    #[allow(clippy::op_ref)]
     fn add_ref() {
         assert_eq!(
             &Vector2::new(1.0, 2.0) + &Vector2::new(3.0, 4.0),
@@ -238,7 +240,7 @@ mod tests {
         );
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn sub() {
         assert_eq!(
             Vector2::new(1.0, 2.0) - Vector2::new(3.0, 5.0),
@@ -246,7 +248,8 @@ mod tests {
         );
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
+    #[allow(clippy::op_ref)]
     fn sub_ref() {
         assert_eq!(
             &Vector2::new(1.0, 2.0) - &Vector2::new(3.0, 5.0),
@@ -254,27 +257,27 @@ mod tests {
         );
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn dot() {
         assert_eq!(Vector2::new(1.0, 2.0) * Vector2::new(3.0, 4.0), 11.0);
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn mul_scalar() {
         assert_eq!(Vector2::new(1.0, 2.0) * 2.0, Vector2::new(2.0, 4.0));
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn div_scalar() {
         assert_eq!(Vector2::new(2.0, 4.0) / 2.0, Vector2::new(1.0, 2.0));
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn neg() {
         assert_eq!(-Vector2::new(1.0, -2.0), Vector2::new(-1.0, 2.0));
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn neg_ref() {
         assert_eq!(-&Vector2::new(1.0, -2.0), Vector2::new(-1.0, 2.0));
     }

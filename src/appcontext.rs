@@ -1,3 +1,4 @@
+#[cfg(test)]
 use crate::calcctontext::*;
 use crate::drawcontext::*;
 use crate::dreidext::*;
@@ -40,7 +41,7 @@ impl AppContext {
         }
     }
 
-    #[allow(dead_code)]
+    #[cfg(test)]
     pub fn render<C: ColorContext, D: DrawContext<C>>(&mut self, dctx: &mut D) {
         let scene2 = self.scene2();
 
@@ -75,7 +76,7 @@ impl AppContext {
         }
     }
 
-    #[allow(dead_code)]
+    #[cfg(test)]
     pub(crate) fn scene2(&mut self) -> Scene2 {
         let camera = self.camera();
         Scene2::new(&camera, &self.scene3)
@@ -247,10 +248,11 @@ fn push_line(lines: &mut HashMap<(usize, usize), Color>, p1: usize, p2: usize, c
 
 #[cfg(test)]
 mod tests {
+    use wasm_bindgen_test::wasm_bindgen_test;
 
     use super::*;
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn on_key_known_keys_return_true() {
         let mut actx = AppContext::new();
         let keys = [
@@ -262,7 +264,7 @@ mod tests {
         }
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn on_key_unknown_keys_return_false() {
         let mut actx = AppContext::new();
         assert!(!actx.on_key('1'));
@@ -270,7 +272,7 @@ mod tests {
         assert!(!actx.on_key('\n'));
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn on_key_a_moves_eye() {
         let mut actx = AppContext::new();
         let before = actx.eye;
@@ -278,7 +280,7 @@ mod tests {
         assert!(actx.eye != before);
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn rot_vec_preserves_lengths_and_orthogonality() {
         let mut u = Vector3::new(1.0, 0.0, 0.0);
         let mut v = Vector3::new(0.0, 1.0, 0.0);
@@ -290,7 +292,7 @@ mod tests {
         assert!(u * v < 1.0e-5);
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn rot_vec_small_angle_keeps_vectors_close() {
         let mut u = Vector3::new(1.0, 0.0, 0.0);
         let mut v = Vector3::new(0.0, 1.0, 0.0);
@@ -303,7 +305,7 @@ mod tests {
         assert!(v.cross(&v0).len() < 0.1);
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn scene2_projects_axis_point_to_origin() {
         let mut actx = AppContext::new();
         let on_axis = actx.eye - actx.view;
@@ -324,7 +326,7 @@ mod tests {
         assert_eq!(scene2.points, vec![Vector2::new(0.0, 0.0)]);
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn scene2_projects_off_axis_point() {
         let mut actx = AppContext::new();
         actx.scene3 = Scene3 {

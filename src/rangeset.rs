@@ -67,6 +67,7 @@ impl From<RangeSet> for Vec<FloatRange> {
 
 #[cfg(test)]
 mod tests {
+    use wasm_bindgen_test::wasm_bindgen_test;
 
     use super::*;
     use crate::float::*;
@@ -83,17 +84,17 @@ mod tests {
         RangeSet::new(vec![r1, r2])
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn is_empty_should_return_true() {
         assert!(set0().is_empty());
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn is_empty_should_return_false() {
         assert!(!set1(FloatRange::new(1.0, 2.0)).is_empty());
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn remove_should_work() {
         let mut set = set2(FloatRange::new(1.0, 3.0), FloatRange::new(4.0, 8.0));
         set.remove(&FloatRange::new(2.0, 6.0));
@@ -104,7 +105,7 @@ mod tests {
         );
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn remove_twice() {
         let mut s = set1(FloatRange::new(0.0, 1.0));
 
@@ -116,7 +117,7 @@ mod tests {
         assert_eq!(ranges, vec![FloatRange::new(0.5, 1.0)])
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn remove_without_overlap_keeps_range() {
         let mut s = set1(FloatRange::new(1.0, 2.0));
         s.remove(&FloatRange::new(3.0, 4.0));
@@ -124,7 +125,7 @@ mod tests {
         assert_eq!(s.ranges, vec![FloatRange::new(1.0, 2.0)]);
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn remove_middle_splits_range() {
         let mut s = set1(FloatRange::new(1.0, 4.0));
         s.remove(&FloatRange::new(2.0, 3.0));
@@ -135,7 +136,7 @@ mod tests {
         );
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn remove_left_edge() {
         let mut s = set1(FloatRange::new(1.0, 3.0));
         s.remove(&FloatRange::new(2.0, 1000.0));
@@ -143,7 +144,7 @@ mod tests {
         assert_eq!(s.ranges, vec![FloatRange::new(1.0, 2.0)]);
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn remove_right_edge() {
         let mut s = set1(FloatRange::new(2.0, 4.0));
         s.remove(&FloatRange::new(1.0, 3.0));
@@ -151,7 +152,7 @@ mod tests {
         assert_eq!(s.ranges, vec![FloatRange::new(3.0, 4.0)]);
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn remove_spanning_gap_removes_multiple_ranges() {
         let mut s = set2(FloatRange::new(1.0, 3.0), FloatRange::new(4.0, 8.0));
         s.remove(&FloatRange::new(2.0, 6.0));
@@ -162,7 +163,7 @@ mod tests {
         );
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn remove_unbounded_removes_everything() {
         let mut s = set1(FloatRange::new(1.0, 2.0));
         s.remove(&FloatRange::new(MIN, MAX));
@@ -170,7 +171,7 @@ mod tests {
         assert_eq!(s.ranges, vec![]);
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn reset_restores_full_range() {
         let mut s = set1(FloatRange::new(0.0, 1.0));
         s.remove(&FloatRange::new(0.0, 0.5));

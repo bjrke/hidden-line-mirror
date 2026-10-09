@@ -113,7 +113,7 @@ impl HiddenLine {
 
         let mut groups: BTreeMap<Color, Vec<(Vector2, Vector2)>> = BTreeMap::new();
 
-        for r in records.chunks_exact(5) {
+        for r in records.as_chunks::<5>().0 {
             groups
                 .entry(r[0] as u8)
                 .or_default()

@@ -73,7 +73,7 @@ impl<S> QuadTree<S> {
 
     pub fn elements_intersecting<F: FnMut(&S) -> bool>(&self, rect: &Rect, f: &mut F) -> bool {
         for QuadTreeLeave { bounds, value } in self.content.iter() {
-            if bounds.intersects(rect) && f(&value) {
+            if bounds.intersects(rect) && f(value) {
                 return true;
             }
         }
@@ -89,6 +89,7 @@ impl<S> QuadTree<S> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use wasm_bindgen_test::wasm_bindgen_test;
 
     impl<S: Shape> QuadTree<S> {
         #[inline]
@@ -97,7 +98,7 @@ mod tests {
         }
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn tree() {
         let mut tree = QuadTree::new(Rect::new(-1000.0, -1000.0).extend(1000.0, 1000.0));
 

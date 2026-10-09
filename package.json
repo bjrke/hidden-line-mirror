@@ -11,7 +11,9 @@
     "build": "webpack",
     "start": "webpack serve --mode development --open",
     "debug": "CARGO_PROFILE_DEV_OPT_LEVEL=0 CARGO_PROFILE_DEV_DEBUG=true npm start",
-    "test": "cargo test && wasm-pack test --node"
+    "test": "cargo test && wasm-pack test --node",
+    "test:rust": "cargo test",
+    "test:wasm": "wasm-pack test --node"
   },
   "devDependencies": {
     "@wasm-tool/wasm-pack-plugin": "1.7.0",

@@ -5,7 +5,7 @@ Hidden Line Elimination: an interactive web app that renders implicit surfaces `
 ## Layout
 
 - Single crate at the repo root: the Rust core (`src/`, `Cargo.toml`) plus a webpack project (`js/`, `static/`, `webpack.config.js`, `package.json`). There is no Cargo workspace and no target other than wasm.
-- `Cargo.toml` is a plain `cdylib` crate named `hidden-line`; `cargo test --all` from the root runs its tests.
+- `Cargo.toml` is a `cdylib`/`rlib` crate named `hidden-line` (the `rlib` lets the wasm integration test in `tests/` link the crate); `cargo test --all` from the root runs its tests.
 
 ## Commands (run from the repo root)
 
@@ -14,10 +14,11 @@ Requires `rustup`, `wasm-pack`, and `npm` installed (README install steps; `carg
 - `npm install` — install deps
 - `npm start` — dev server (`webpack-dev-server --open`), auto-reloads on change
 - `npm run build` — production build into `dist/` (webpack cleans `dist/` via `output.clean`)
-- `npm test` — runs `cargo test && wasm-pack test --node`; append `-- --firefox` / `-- --chrome` / `-- --safari` to run the wasm tests in a browser instead
+- `npm test` — runs `cargo test && wasm-pack test --node`; append `-- --firefox` / `-- --chrome` / `-- --safari` to run the wasm tests in a browser instead. `npm run test:rust` runs only `cargo test`, `npm run test:wasm` only `wasm-pack test --node`.
 - `cargo fmt --all` — format the crate; run `cargo fmt --all -- --check` to verify (CI does the check)
+- `cargo clippy --all-targets --all-features -- -D warnings` — lint the crate (CI runs this)
 
-CI (GitLab, `.gitlab-ci.yml`) mirrors this: `cargo fmt --all -- --check`, `cargo test --all`, then `npm i --cache .npm --prefer-offline`, `npm run test`, `npm run build`. The `pages` job deploys `dist` to GitLab Pages on `main`. A manual job builds the CI Docker image from the repo `Dockerfile`.
+CI (GitLab, `.gitlab-ci.yml`) mirrors this: `cargo fmt --all -- --check`, `cargo clippy --all-targets --all-features -- -D warnings`, `cargo test --all`, then `npm i --cache .npm --prefer-offline`, `npm run test:wasm`, `npm run build`. The `pages` job deploys `dist` to GitLab Pages on `main`. A manual job builds the CI Docker image from the repo `Dockerfile`.
 
 ## Architecture
 
@@ -45,3 +46,4 @@ Never leave the working tree dirty at the end of a task.
 - The root `Cargo.lock` is committed so CI builds are deterministic; do not delete it. `Cargo.toml` sets `rust-version = "1.99"` and `.cargo/config.toml` sets `[resolver] incompatible-rust-versions = "fallback"`, so a `cargo update` prefers deps that need a rustc no newer than the pinned `rust:1.99-slim` image (`rust_wasm_npm`). Bump both the `Dockerfile` and `rust-version` together.
 - `opencode.json` is gitignored (local-only config).
 - Every text file must end with a single trailing newline — a missing final newline is an antipattern to avoid.
+- Unit tests are annotated `#[wasm_bindgen_test(unsupported = test)]` with `use wasm_bindgen_test::wasm_bindgen_test;` in each test module, so the same tests run under both `cargo test` (native) and `wasm-pack test --node` (wasm-compiled). Plain `#[test]` is invisible to the wasm test runner.

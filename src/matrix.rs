@@ -70,10 +70,11 @@ impl From<Matrix3> for (Vector3, Vector3, Vector3) {
 
 #[cfg(test)]
 mod tests {
+    use wasm_bindgen_test::wasm_bindgen_test;
 
     use super::*;
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn matrix2_determinant() {
         assert_eq!(
             Matrix2::new(Vector2::new(1.0, 2.0), Vector2::new(3.0, 4.0)).determinant(),
@@ -81,7 +82,7 @@ mod tests {
         );
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn matrix2_determinant_zero() {
         assert_eq!(
             Matrix2::new(Vector2::new(1.0, 2.0), Vector2::new(2.0, 4.0)).determinant(),
@@ -89,7 +90,7 @@ mod tests {
         );
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn matrix3_identity_determinant() {
         assert_eq!(
             Matrix3::new(
@@ -102,7 +103,7 @@ mod tests {
         );
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn matrix3_diagonal_determinant() {
         assert_eq!(
             Matrix3::new(
@@ -115,7 +116,7 @@ mod tests {
         );
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn matrix3_singular_determinant() {
         assert_eq!(
             Matrix3::new(

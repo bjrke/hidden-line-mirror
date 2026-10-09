@@ -1,6 +1,6 @@
 FROM rust:1.99-slim
 MAINTAINER Jan Burkhardt <264754-bjrke@users.noreply.gitlab.com>
-RUN rustup component add rustfmt
+RUN rustup component add rustfmt clippy
 RUN apt update
 RUN apt install -y curl
 RUN curl -sSfL https://deb.nodesource.com/setup_24.x | bash -

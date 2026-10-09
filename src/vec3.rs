@@ -219,6 +219,7 @@ impl Neg for &Vector3 {
 
 #[cfg(test)]
 mod tests {
+    use wasm_bindgen_test::wasm_bindgen_test;
 
     use super::*;
     use std::collections::hash_map::DefaultHasher;
@@ -229,7 +230,7 @@ mod tests {
         hasher.finish()
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn cross_of_basis_vectors() {
         assert_eq!(
             Vector3::new(1.0, 0.0, 0.0).cross(&Vector3::new(0.0, 1.0, 0.0)),
@@ -237,7 +238,7 @@ mod tests {
         );
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn cross_is_anticommutative() {
         assert_eq!(
             Vector3::new(1.0, 2.0, 3.0).cross(&Vector3::new(4.0, 5.0, 6.0)),
@@ -245,17 +246,17 @@ mod tests {
         );
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn len_sq() {
         assert_eq!(Vector3::new(1.0, 2.0, 2.0).len_sq(), 9.0);
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn len() {
         assert_eq!(Vector3::new(1.0, 2.0, 2.0).len(), 3.0);
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn normalize() {
         assert_eq!(
             Vector3::new(2.0, 0.0, 0.0).normalize(),
@@ -263,7 +264,7 @@ mod tests {
         );
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn normalize_preserves_direction() {
         let v = Vector3::new(2.0, 4.0, 8.0);
         let n = v.normalize();
@@ -271,7 +272,7 @@ mod tests {
         assert!((n.cross(&v).len()).abs() < 1.0e-6);
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn eq_rounds_close_values() {
         assert_eq!(
             Vector3::new(1.0, 0.0, 0.0),
@@ -279,19 +280,19 @@ mod tests {
         );
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn eq_distinguishes_distinct_values() {
         assert!(Vector3::new(1.0, 0.0, 0.0) != Vector3::new(2.0, 0.0, 0.0));
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn hash_consistent_with_eq() {
         let a = Vector3::new(1.0, 2.0, 3.0);
         let b = Vector3::new(1.000001, 2.0, 3.0);
         assert_eq!(hash_of(&a), hash_of(&b));
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn add() {
         assert_eq!(
             Vector3::new(1.0, 2.0, 3.0) + Vector3::new(4.0, 5.0, 6.0),
@@ -299,7 +300,8 @@ mod tests {
         );
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
+    #[allow(clippy::op_ref)]
     fn add_ref() {
         assert_eq!(
             &Vector3::new(1.0, 2.0, 3.0) + &Vector3::new(4.0, 5.0, 6.0),
@@ -307,7 +309,7 @@ mod tests {
         );
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn sub() {
         assert_eq!(
             Vector3::new(1.0, 2.0, 3.0) - Vector3::new(4.0, 6.0, 8.0),
@@ -315,7 +317,7 @@ mod tests {
         );
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn dot() {
         assert_eq!(
             Vector3::new(1.0, 2.0, 3.0) * Vector3::new(4.0, 5.0, 6.0),
@@ -323,7 +325,7 @@ mod tests {
         );
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn mul_scalar() {
         assert_eq!(
             Vector3::new(1.0, 2.0, 3.0) * 2.0,
@@ -331,7 +333,7 @@ mod tests {
         );
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn div_scalar() {
         assert_eq!(
             Vector3::new(2.0, 4.0, 6.0) / 2.0,
@@ -339,12 +341,12 @@ mod tests {
         );
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn neg() {
         assert_eq!(-Vector3::new(1.0, -2.0, 3.0), Vector3::new(-1.0, 2.0, -3.0));
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn neg_ref() {
         assert_eq!(
             -&Vector3::new(1.0, -2.0, 3.0),

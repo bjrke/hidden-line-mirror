@@ -262,31 +262,32 @@ impl Shape for Triangle {
 
 #[cfg(test)]
 mod tests {
+    use wasm_bindgen_test::wasm_bindgen_test;
 
     use super::*;
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn rect_should_contain_vector() {
         assert!(Rect::new(2.0, 3.0)
             .extend(4.0, 6.0)
             .contains(&Vector2::new(2.5, 5.0)));
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn rect_should_contain_top_left() {
         assert!(Rect::new(2.0, 3.0)
             .extend(4.0, 6.0)
             .contains(&Vector2::new(2.0, 3.0)));
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn rect_should_contain_bottom_right() {
         assert!(Rect::new(2.0, 3.0)
             .extend(4.0, 6.0)
             .contains(&Vector2::new(4.0, 6.0)));
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn rect_top_left() {
         assert_eq!(
             Rect::new(2.0, 3.0).extend(4.0, 6.0).top_left(),
@@ -294,7 +295,7 @@ mod tests {
         );
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn rect_top_right() {
         assert_eq!(
             Rect::new(2.0, 3.0).extend(4.0, 6.0).top_right(),
@@ -302,7 +303,7 @@ mod tests {
         );
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn rect_bottom_left() {
         assert_eq!(
             Rect::new(2.0, 3.0).extend(4.0, 6.0).bottom_left(),
@@ -310,7 +311,7 @@ mod tests {
         );
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn rect_bottom_right() {
         assert_eq!(
             Rect::new(2.0, 3.0).extend(4.0, 6.0).bottom_right(),
@@ -318,28 +319,28 @@ mod tests {
         );
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn rect_should_intersect() {
         assert!(Rect::new(2.0, 3.5)
             .extend(4.0, 6.0)
             .intersects(&Rect::new(1.0, 2.5).extend(3.0, 4.0)));
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn rect_should_not_intersect_y() {
         assert!(!Rect::new(2.0, 3.5)
             .extend(4.0, 6.0)
             .intersects(&Rect::new(1.0, 2.5).extend(1.5, 4.0)));
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn rect_should_not_intersect_x() {
         assert!(!Rect::new(2.0, 3.5)
             .extend(4.0, 6.0)
             .intersects(&Rect::new(1.0, 2.5).extend(3.0, 3.0)));
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn triangle_should_contain_point_on_line() {
         let triangle = Triangle::new(
             Vector2::new(1.0, 1.0),
@@ -350,7 +351,7 @@ mod tests {
         assert!(triangle.contains(&Vector2::new(3.0, 3.0)))
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn triangle_should_contain_point_in_rect() {
         let triangle = Triangle::new(
             Vector2::new(1.0, 1.0),
@@ -363,7 +364,7 @@ mod tests {
         assert!(!triangle.contains(&v))
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn triangle_should_contain_out_of_rect() {
         let triangle = Triangle::new(
             Vector2::new(1.0, 1.0),
@@ -376,7 +377,7 @@ mod tests {
         assert!(!triangle.contains(&v))
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn triangle_should_have_correct_bound() {
         let triangle = Triangle::new(
             Vector2::new(1.0, 1.0),
@@ -393,7 +394,7 @@ mod tests {
         )
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn line_should_have_correct_bounds() {
         let line = Line::new(Vector2::new(1.0, 1.0), Vector2::new(6.0, 2.0));
         assert_eq!(
@@ -405,12 +406,12 @@ mod tests {
         )
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn range_should_contain_range() {
         assert!(FloatRange::new(-9.0, 3.0).contains_range(&FloatRange::new(-9.0, -3.0)));
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn range_should_not_contain_range() {
         assert!(!FloatRange::new(-10.0, 1.0).contains_range(&FloatRange::new(-2.0, 5.0)));
     }

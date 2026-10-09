@@ -30,35 +30,36 @@ pub fn float_to_color(c: Float) -> Color {
 
 #[cfg(test)]
 mod tests {
+    use wasm_bindgen_test::wasm_bindgen_test;
 
     use super::*;
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn one_maps_to_255() {
         assert_eq!(float_to_color(1.0), 255);
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn zero_maps_to_0() {
         assert_eq!(float_to_color(0.0), 0);
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn half_maps_to_128() {
         assert_eq!(float_to_color(0.5), 128);
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn above_one_clamps() {
         assert_eq!(float_to_color(2.0), 255);
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn below_zero_clamps() {
         assert_eq!(float_to_color(-1.0), 0);
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn rounds_intermediate() {
         assert_eq!(float_to_color(0.4), 102);
     }

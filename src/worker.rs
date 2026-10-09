@@ -23,11 +23,15 @@ impl Worker {
 
     pub fn set_scene(&mut self, points: &[f32], triangles: &[u32]) {
         let pts: Vec<Vector3> = points
-            .chunks_exact(3)
+            .as_chunks::<3>()
+            .0
+            .iter()
             .map(|c| Vector3::new(c[0], c[1], c[2]))
             .collect();
         let tris: Vec<SceneTriangle> = triangles
-            .chunks_exact(4)
+            .as_chunks::<4>()
+            .0
+            .iter()
             .map(|c| SceneTriangle {
                 p1: c[0] as usize,
                 p2: c[1] as usize,
@@ -61,8 +65,9 @@ impl Worker {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use wasm_bindgen_test::wasm_bindgen_test;
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn compute_returns_visible_segments() {
         let mut worker = Worker::new();
         let points = [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0];

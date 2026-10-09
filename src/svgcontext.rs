@@ -160,7 +160,7 @@ impl DrawContext<ColorGroup> for SvgContext {
 
     #[inline]
     fn finish(&mut self, frame: Frame) {
-        for (_, pf) in self.paths.iter_mut() {
+        for pf in self.paths.values_mut() {
             if pf.frame < frame {
                 pf.path.set_attribute("d", "").unwrap();
             }

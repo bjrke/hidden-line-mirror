@@ -100,7 +100,7 @@ fn line_ranges(
 
     tree.elements_intersecting(&bounds, &mut |triangle| {
         intersect(
-            &triangle,
+            triangle,
             &line_shape,
             scene2.eye,
             scene3.points[a],
@@ -111,12 +111,12 @@ fn line_ranges(
     });
 }
 
-#[allow(dead_code)]
+#[cfg(test)]
 pub fn hidden_line(
     tree: &QuadTree<TreeTriangle>,
     scene3: &Scene3,
     scene2: &Scene2,
-    lines: &Vec<(usize, usize)>,
+    lines: &[(usize, usize)],
     color_context: &mut dyn ColorContext,
 ) -> usize {
     let mut emitted = 0usize;
@@ -176,7 +176,8 @@ pub fn hidden_line_records(
     out
 }
 
-#[allow(dead_code)]
+#[cfg(test)]
+#[allow(clippy::too_many_arguments)]
 fn clip(
     p1: Vector3,
     p2: Vector3,
@@ -264,10 +265,6 @@ fn intersect(
         return;
     }
 
-    if p1_visible != p2_visible {
-        // range.remove(&(..));
-    }
-
     let (b1, b2) = (*line_shape).into();
 
     let d21 = b2 - b1;
@@ -325,6 +322,7 @@ fn intersect(
 
 #[cfg(test)]
 mod tests {
+    use wasm_bindgen_test::wasm_bindgen_test;
 
     use super::*;
     use crate::dreidext::SceneTriangle;
@@ -358,7 +356,7 @@ mod tests {
         RangeSet::new(vec![FloatRange::new(0.0, 1.0)])
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn clip_returns_full_range_when_ref_point_on_plane() {
         let v1 = Vector3::new(1.0, 0.0, 0.0);
         let v2 = Vector3::new(0.0, 1.0, 0.0);
@@ -372,7 +370,7 @@ mod tests {
         );
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn clip_returns_full_range_when_points_parallel() {
         let v1 = Vector3::new(1.0, 0.0, 0.0);
         let v2 = Vector3::new(0.0, 1.0, 0.0);
@@ -386,7 +384,7 @@ mod tests {
         );
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn clip_visible_ref_point() {
         let v1 = Vector3::new(1.0, 0.0, 0.0);
         let v2 = Vector3::new(0.0, 1.0, 0.0);
@@ -400,7 +398,7 @@ mod tests {
         );
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn clip_hidden_ref_point() {
         let v1 = Vector3::new(1.0, 0.0, 0.0);
         let v2 = Vector3::new(0.0, 1.0, 0.0);
@@ -414,7 +412,7 @@ mod tests {
         );
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn intersect_keeps_range_when_line_is_on_eye_side() {
         let triangle = test_triangle();
         let line_shape = Line::new(Vector2::new(0.25, 0.5), Vector2::new(0.25, 1.0));
@@ -432,7 +430,7 @@ mod tests {
         assert_eq!(range.ranges, vec![FloatRange::new(0.0, 1.0)]);
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn intersect_keeps_range_when_eye_is_on_plane() {
         let triangle = test_triangle();
         let line_shape = Line::new(Vector2::new(0.25, -1.0), Vector2::new(0.25, 1.0));
@@ -450,7 +448,7 @@ mod tests {
         assert_eq!(range.ranges, vec![FloatRange::new(0.0, 1.0)]);
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn intersect_keeps_range_when_line_lies_on_triangle() {
         let triangle = test_triangle();
         let line_shape = Line::new(Vector2::new(0.25, 0.25), Vector2::new(0.75, 0.25));
@@ -468,7 +466,7 @@ mod tests {
         assert_eq!(range.ranges, vec![FloatRange::new(0.0, 1.0)]);
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn intersect_removes_occluded_middle() {
         let triangle = test_triangle();
         let line_shape = Line::new(Vector2::new(0.25, -1.0), Vector2::new(0.25, 1.0));
@@ -499,7 +497,7 @@ mod tests {
         }
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn hidden_line_occludes_middle_of_crossing_line() {
         let scene3 = Scene3 {
             points: vec![
@@ -531,7 +529,7 @@ mod tests {
 
         let tree = create_tree(&scene3, &scene2);
         let mut ctx = CollectContext { lines: vec![] };
-        hidden_line(&tree, &scene3, &scene2, &vec![(3, 4)], &mut ctx);
+        hidden_line(&tree, &scene3, &scene2, &[(3, 4)], &mut ctx);
 
         assert_eq!(
             ctx.lines,
@@ -544,7 +542,9 @@ mod tests {
 
     fn sorted_records(flat: &[f32]) -> Vec<[u32; 5]> {
         let mut records: Vec<[u32; 5]> = flat
-            .chunks_exact(5)
+            .as_chunks::<5>()
+            .0
+            .iter()
             .map(|c| {
                 [
                     c[0].to_bits(),
@@ -559,7 +559,7 @@ mod tests {
         records
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn scene_lines_are_deterministic_and_sorted() {
         use crate::plot::init_scene;
 
@@ -574,7 +574,7 @@ mod tests {
         assert_eq!(scene_lines(&scene2), scene_lines(&scene2));
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn records_shards_cover_single_result() {
         use crate::plot::init_scene;
 

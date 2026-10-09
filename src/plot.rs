@@ -41,6 +41,7 @@ mod tests {
     use crate::appcontext::AppContext;
     use crate::drawcontext::*;
     use crate::vec2::Vector2;
+    use wasm_bindgen_test::wasm_bindgen_test;
 
     struct TestDrawContext {
         lines: Vec<(Vector2, Vector2, Color)>,
@@ -77,7 +78,7 @@ mod tests {
             TestDrawContext { lines: vec![] }
         }
     }
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn integration() {
         let mut actx = AppContext::new();
 
@@ -106,7 +107,7 @@ mod tests {
         }
     }
 
-    #[test]
+    #[wasm_bindgen_test(unsupported = test)]
     fn flat_plane_renders_lines() {
         let mut actx = AppContext::new();
         actx.scene3 = init_scene(|_x, _y| 0.0);
