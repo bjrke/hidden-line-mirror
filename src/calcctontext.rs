@@ -176,58 +176,6 @@ pub fn hidden_line_records(
     out
 }
 
-#[cfg(test)]
-#[allow(clippy::too_many_arguments)]
-fn clip(
-    p1: Vector3,
-    p2: Vector3,
-    v1: Vector3,
-    v2: Vector3,
-    v3: Vector3,
-    ref_point: Vector3,
-    ref_point_visible: bool,
-) -> FloatRange {
-    let normal = (v1 - v2).cross(&v3).normalize();
-
-    let ref_dist = ref_point * normal;
-    if ref_dist.abs() < EPSILON0 {
-        return FloatRange::new(MIN, MAX);
-    }
-
-    let ref_dist = if !ref_point_visible {
-        ref_dist.sign()
-    } else {
-        !ref_dist.sign()
-    };
-
-    //https://quickmath.com/webMathematica3/quickmath/equations/solve/advanced.jsp#c=solve_advancedsolveequations&v1=lx_1%2Bmx_2%253Dp%250Aly_1%2Bmy_2%253Dq%250Alz_1%2Bmz_2%253Dr%250Al%2Bm%253D1%250Apx%2Bqy%2Brz%253D0%250A&v2=l%250Am%250A%250A&v5=1&v6=p%250Aq%250Ar
-
-    let p1n = p1 * normal;
-    let p2n = p2 * normal;
-
-    let d = p2n - p1n;
-
-    if d.abs() < EPSILON0 {
-        FloatRange::new(MIN, MAX)
-    } else {
-        let l = p2n / d;
-
-        if l > 0.5 {
-            if p2n.sign() == ref_dist {
-                // l == 0 visible
-                FloatRange::new(l, MAX)
-            } else {
-                FloatRange::new(MIN, l)
-            }
-        } else if p1n.sign() == ref_dist {
-            // l == 1 visible
-            FloatRange::new(MIN, l)
-        } else {
-            FloatRange::new(l, MAX)
-        }
-    }
-}
-
 #[inline]
 fn intersect(
     triangle: &TreeTriangle,
@@ -354,62 +302,6 @@ mod tests {
 
     fn full_range() -> RangeSet {
         RangeSet::new(vec![FloatRange::new(0.0, 1.0)])
-    }
-
-    #[wasm_bindgen_test(unsupported = test)]
-    fn clip_returns_full_range_when_ref_point_on_plane() {
-        let v1 = Vector3::new(1.0, 0.0, 0.0);
-        let v2 = Vector3::new(0.0, 1.0, 0.0);
-        let v3 = Vector3::new(1.0, 1.0, 0.0);
-        let p1 = Vector3::new(0.0, 0.0, 5.0);
-        let p2 = Vector3::new(0.0, 0.0, -1.0);
-
-        assert_eq!(
-            clip(p1, p2, v1, v2, v3, Vector3::new(0.0, 0.0, 0.0), true),
-            FloatRange::new(MIN, MAX)
-        );
-    }
-
-    #[wasm_bindgen_test(unsupported = test)]
-    fn clip_returns_full_range_when_points_parallel() {
-        let v1 = Vector3::new(1.0, 0.0, 0.0);
-        let v2 = Vector3::new(0.0, 1.0, 0.0);
-        let v3 = Vector3::new(1.0, 1.0, 0.0);
-        let p1 = Vector3::new(0.0, 0.0, 1.0);
-        let p2 = Vector3::new(0.0, 0.0, 1.0);
-
-        assert_eq!(
-            clip(p1, p2, v1, v2, v3, Vector3::new(0.0, 0.0, 1.0), true),
-            FloatRange::new(MIN, MAX)
-        );
-    }
-
-    #[wasm_bindgen_test(unsupported = test)]
-    fn clip_visible_ref_point() {
-        let v1 = Vector3::new(1.0, 0.0, 0.0);
-        let v2 = Vector3::new(0.0, 1.0, 0.0);
-        let v3 = Vector3::new(1.0, 1.0, 0.0);
-        let p1 = Vector3::new(0.0, 0.0, 5.0);
-        let p2 = Vector3::new(0.0, 0.0, -1.0);
-
-        assert_eq!(
-            clip(p1, p2, v1, v2, v3, Vector3::new(0.0, 0.0, 1.0), true),
-            FloatRange::new(0.16666667, MAX)
-        );
-    }
-
-    #[wasm_bindgen_test(unsupported = test)]
-    fn clip_hidden_ref_point() {
-        let v1 = Vector3::new(1.0, 0.0, 0.0);
-        let v2 = Vector3::new(0.0, 1.0, 0.0);
-        let v3 = Vector3::new(1.0, 1.0, 0.0);
-        let p1 = Vector3::new(0.0, 0.0, 5.0);
-        let p2 = Vector3::new(0.0, 0.0, -1.0);
-
-        assert_eq!(
-            clip(p1, p2, v1, v2, v3, Vector3::new(0.0, 0.0, 1.0), false),
-            FloatRange::new(MIN, 0.16666667)
-        );
     }
 
     #[wasm_bindgen_test(unsupported = test)]

@@ -8,7 +8,6 @@ pub struct QuadTree<T> {
     subtrees: Vec<QuadTree<T>>,
     bounds: Rect,
     center: Vector2,
-    size: usize,
 }
 
 struct QuadTreeLeave<T> {
@@ -30,7 +29,6 @@ impl<S> QuadTree<S> {
             subtrees: Vec::with_capacity(4),
             bounds,
             center,
-            size: 0,
         }
     }
 
@@ -39,7 +37,6 @@ impl<S> QuadTree<S> {
     }
 
     fn insert2(&mut self, te: QuadTreeLeave<S>) {
-        self.size += 1;
         if self.content.len() >= MAX_ELEMENTS && self.subtrees.is_empty() {
             self.create_subtree(&self.bounds.top_left());
             self.create_subtree(&self.bounds.top_right());

@@ -99,7 +99,12 @@ pub struct SvgContext {
 
 #[inline]
 fn scale(f: Float) -> SvgInt {
-    (SCALE * f).round() as SvgInt
+    let scaled = SCALE * f;
+    if scaled.is_finite() {
+        scaled.round() as SvgInt
+    } else {
+        0
+    }
 }
 
 #[inline]

@@ -46,6 +46,10 @@ impl Worker {
     }
 
     pub fn compute(&self, camera: &[f32], rank: usize, count: usize) -> Vec<f32> {
+        if camera.len() < 13 {
+            return Vec::new();
+        }
+
         let camera = Camera {
             eye: Vector3::new(camera[0], camera[1], camera[2]),
             view: Vector3::new(camera[3], camera[4], camera[5]),
@@ -86,5 +90,15 @@ mod tests {
 
         assert!(!records.is_empty());
         assert_eq!(records.len() % 5, 0);
+    }
+
+    #[wasm_bindgen_test(unsupported = test)]
+    fn compute_with_short_camera_returns_empty() {
+        let mut worker = Worker::new();
+        let points = [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0];
+        let triangles = [0u32, 1, 2, 7];
+        worker.set_scene(&points, &triangles);
+
+        assert!(worker.compute(&[0.0, 0.0], 0, 1).is_empty());
     }
 }

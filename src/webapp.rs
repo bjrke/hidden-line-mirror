@@ -17,6 +17,8 @@ pub struct ViewBox {
     pub size: f64,
 }
 
+const MIN_SIZE: f64 = 0.01;
+
 impl ViewBox {
     pub fn new() -> ViewBox {
         ViewBox {
@@ -27,6 +29,9 @@ impl ViewBox {
     }
 
     pub fn pan(&mut self, dx: f64, dy: f64, rect_size: f64) {
+        if !rect_size.is_finite() || rect_size <= 0.0 {
+            return;
+        }
         let f = self.size / rect_size;
         self.x -= dx * f;
         self.y -= dy * f;
@@ -34,7 +39,10 @@ impl ViewBox {
 
     pub fn zoom(&mut self, delta: f64, px: f64, py: f64, rect_width: f64, rect_height: f64) {
         let rect_size = rect_width.min(rect_height);
-        let additional = self.size * delta / 100.0;
+        if !delta.is_finite() || !rect_size.is_finite() || rect_size <= 0.0 {
+            return;
+        }
+        let additional = (self.size * delta / 100.0).max(MIN_SIZE - self.size);
         let f = additional / (2.0 * rect_size);
         self.x -= (2.0 * px + rect_size - rect_width) * f;
         self.y -= (2.0 * py + rect_size - rect_height) * f;
@@ -387,5 +395,28 @@ mod tests {
         assert_eq!(vb.x, -1500.0);
         assert_eq!(vb.y, -1500.0);
         assert_eq!(vb.size, 3000.0);
+    }
+
+    #[wasm_bindgen_test(unsupported = test)]
+    fn zoom_never_goes_non_positive() {
+        let mut vb = ViewBox::new();
+        vb.zoom(-10_000.0, 0.0, 0.0, 2000.0, 2000.0);
+        assert!(vb.size > 0.0);
+    }
+
+    #[wasm_bindgen_test(unsupported = test)]
+    fn zoom_ignores_non_finite_delta() {
+        let mut vb = ViewBox::new();
+        vb.zoom(f64::NAN, 0.0, 0.0, 2000.0, 2000.0);
+        vb.zoom(f64::INFINITY, 0.0, 0.0, 2000.0, 2000.0);
+        assert_eq!(vb.size, 2000.0);
+    }
+
+    #[wasm_bindgen_test(unsupported = test)]
+    fn pan_ignores_zero_rect() {
+        let mut vb = ViewBox::new();
+        vb.pan(100.0, 50.0, 0.0);
+        assert_eq!(vb.x, -1000.0);
+        assert_eq!(vb.y, -1000.0);
     }
 }

@@ -11,9 +11,17 @@ self.onmessage = ({ data: msg }) => {
         );
         self.postMessage({ type: "scene_ok" });
     } else if (msg.type === "compute") {
-        const records = instance
-            .compute(new Float32Array(msg.camera), msg.rank, msg.count)
-            .slice();
+        let records;
+        try {
+            records = instance
+                ? instance
+                      .compute(new Float32Array(msg.camera), msg.rank, msg.count)
+                      .slice()
+                : new Float32Array();
+        } catch (e) {
+            console.error(e);
+            records = new Float32Array();
+        }
         self.postMessage(
             { type: "records", gen: msg.gen, records },
             [records.buffer]

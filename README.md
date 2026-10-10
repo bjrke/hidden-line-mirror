@@ -1,4 +1,4 @@
-## Hidden Line Elemination
+## Hidden Line Elimination
 
 [gitlab.com/bjrke/hidden-line](https://gitlab.com/bjrke/hidden-line) · [License](LICENSE)
 [![pipeline status](https://gitlab.com/bjrke/hidden-line/badges/main/pipeline.svg)](https://gitlab.com/bjrke/hidden-line/-/pipelines)
