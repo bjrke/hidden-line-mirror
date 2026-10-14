@@ -1,3 +1,38 @@
+:root {
+  color-scheme: dark;
+  --canvas: #000;
+  --fg: #fff;
+  --fg-muted: rgba(255, 255, 255, 0.6);
+  --surface: #111;
+  --border: rgba(255, 255, 255, 0.3);
+  --border-subtle: rgba(255, 255, 255, 0.2);
+  --control: #333;
+  --backdrop: rgba(0, 0, 0, 0.6);
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color-scheme: light;
+    --canvas: #fff;
+    --fg: #000;
+    --fg-muted: rgba(0, 0, 0, 0.6);
+    --surface: #fff;
+    --border: rgba(0, 0, 0, 0.3);
+    --border-subtle: rgba(0, 0, 0, 0.2);
+    --control: #e8e8e8;
+    --backdrop: rgba(0, 0, 0, 0.4);
+  }
+
+  svg path {
+    filter: brightness(0.5);
+  }
+}
+
+body {
+  background: var(--canvas);
+  color: var(--fg);
+}
+
 svg {
   display: block;
   position: absolute;
@@ -5,7 +40,7 @@ svg {
   left: 0;
   width: 100%;
   height: 100%;
-  background: #000;
+  background: var(--canvas);
   z-index: -1;
   touch-action: none;
 }
@@ -14,7 +49,7 @@ svg {
   background: none;
   margin: 5px;
   padding: 5px;
-  color: white;
+  color: var(--fg);
 }
 
 * {
@@ -28,7 +63,7 @@ svg {
   background: none;
   border: none;
   resize: none;
-  color: white;
+  color: var(--fg);
   width: 100%;
   height: 0;
   overflow: hidden;
@@ -44,7 +79,7 @@ svg {
   display: flex;
   align-items: center;
   gap: 12px;
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--fg-muted);
 }
 
 #pageFooter a {
@@ -54,7 +89,7 @@ svg {
 }
 
 #pageFooter a:hover {
-  color: white;
+  color: var(--fg);
   text-decoration: underline;
 }
 
@@ -70,13 +105,13 @@ svg {
   max-height: 80vh;
   overflow: auto;
   overscroll-behavior: contain;
-  color: white;
-  background: #111;
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: var(--fg);
+  background: var(--surface);
+  border: 1px solid var(--border);
 }
 
 .infoDialog::backdrop {
-  background: rgba(0, 0, 0, 0.6);
+  background: var(--backdrop);
 }
 
 #licenseText {
@@ -88,9 +123,9 @@ svg {
 #licenseClose,
 #helpClose {
   padding: 4px 12px;
-  color: white;
-  background: #333;
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: var(--fg);
+  background: var(--control);
+  border: 1px solid var(--border);
   cursor: pointer;
 }
 
@@ -118,8 +153,8 @@ svg {
 #helpDialog kbd {
   font-family: monospace;
   font-size: 0.8rem;
-  background: #333;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: var(--control);
+  border: 1px solid var(--border-subtle);
   border-radius: 3px;
   padding: 0 4px;
 }
@@ -148,5 +183,5 @@ svg {
 
 #helpDialog th {
   font-weight: normal;
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--fg-muted);
 }
