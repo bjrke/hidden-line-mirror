@@ -1,6 +1,6 @@
 ## Hidden Line Elimination
 
-[gitlab.com/bjrke/hidden-line](https://gitlab.com/bjrke/hidden-line) · [License](LICENSE)
+[gitlab.com/bjrke/hidden-line](https://gitlab.com/bjrke/hidden-line) · [License](LICENSE) · [bjrke.gitlab.io/hidden-line](https://bjrke.gitlab.io/hidden-line/)
 [![pipeline status](https://gitlab.com/bjrke/hidden-line/badges/main/pipeline.svg)](https://gitlab.com/bjrke/hidden-line/-/pipelines)
 
 ## How to install
